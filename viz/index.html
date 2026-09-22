@@ -86,7 +86,7 @@
     .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
     .card h2 { margin: 0; padding: 10px 12px 8px; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); font-weight: 650; display: flex; justify-content: space-between; }
     .cam { background: #070a0e; aspect-ratio: 1; }
-    .cam img { width: 100%; height: 100%; object-fit: contain; }
+    .cam img, .cam canvas { width: 100%; height: 100%; object-fit: contain; display: block; }
     .side { padding: 0 12px 12px; }
     .note, .fb { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
     .lbl { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
@@ -188,11 +188,11 @@
     <div class="grid">
       <div class="card">
         <h2>Agent view <span>第三人称</span></h2>
-        <div class="cam"><img id="agentview" alt="agentview" /></div>
+        <div class="cam"><canvas id="agentview" width="256" height="256"></canvas></div>
       </div>
       <div class="card">
         <h2>Wrist view <span>夹爪相机</span></h2>
-        <div class="cam"><img id="wrist" alt="wrist" /></div>
+        <div class="cam"><canvas id="wrist" width="256" height="256"></canvas></div>
       </div>
       <div class="card">
         <h2>当前步骤 <span id="phaseTag"></span></h2>
@@ -269,10 +269,92 @@
         " · 共 " + episodes.length + " 集 · 本页每次刷新都会重新拉取 data.js（不走缓存）";
     }
     let ep = episodes[0];
-    let idx = 0, timer = null, mode = "move";
+    let idx = 0, timer = null, mode = "move", playing = false;
+    const bitmaps = new Map();
+    const loadQueue = [];
+    let activeLoads = 0;
+    const trailCache = { key: "", xy: null, zg: null };
     function currentSteps() {
       if (mode === "ctrl" && ep.ctrl && ep.ctrl.length) return ep.ctrl;
       return ep.steps || [];
+    }
+    function frameUrls(s) {
+      if (!s) return [];
+      return [s.agentview, s.wrist].filter(Boolean);
+    }
+    function frameReady(s) {
+      return frameUrls(s).every(u => {
+        const hit = bitmaps.get(u);
+        return hit instanceof HTMLImageElement || hit === "err";
+      });
+    }
+    function loadUrl(url) {
+      const hit = bitmaps.get(url);
+      if (hit instanceof HTMLImageElement || hit === "err") return Promise.resolve(hit);
+      if (hit && typeof hit.then === "function") return hit;
+      const pending = new Promise(resolve => {
+        const im = new Image();
+        im.onload = () => {
+          const done = () => { bitmaps.set(url, im); resolve(im); };
+          if (im.decode) im.decode().then(done).catch(done);
+          else done();
+        };
+        im.onerror = () => { bitmaps.set(url, "err"); resolve("err"); };
+        im.src = url;
+      });
+      bitmaps.set(url, pending);
+      return pending;
+    }
+    function pumpLoads() {
+      while (activeLoads < 8 && loadQueue.length) {
+        const url = loadQueue.shift();
+        activeLoads++;
+        loadUrl(url).then(() => { activeLoads--; pumpLoads(); trimCache(); });
+      }
+    }
+    function enqueue(url, front) {
+      if (!url) return;
+      const hit = bitmaps.get(url);
+      if (hit instanceof HTMLImageElement || hit === "err" || (hit && typeof hit.then === "function")) return;
+      const at = loadQueue.indexOf(url);
+      if (at >= 0) {
+        if (front && at > 0) { loadQueue.splice(at, 1); loadQueue.unshift(url); }
+        return;
+      }
+      if (front) loadQueue.unshift(url);
+      else loadQueue.push(url);
+      pumpLoads();
+    }
+    function preloadAhead(from) {
+      const steps = currentSteps();
+      const urls = [];
+      const end = Math.min(steps.length, from + 32);
+      for (let i = from; i < end; i++) frameUrls(steps[i]).forEach(u => urls.push(u));
+      for (let i = urls.length - 1; i >= 0; i--) enqueue(urls[i], true);
+    }
+    function trimCache() {
+      if (bitmaps.size < 140) return;
+      const steps = currentSteps();
+      const keep = new Set();
+      const lo = Math.max(0, idx - 4);
+      const hi = Math.min(steps.length, idx + 48);
+      for (let i = lo; i < hi; i++) frameUrls(steps[i]).forEach(u => keep.add(u));
+      for (const key of bitmaps.keys()) {
+        const hit = bitmaps.get(key);
+        if (!keep.has(key) && !(hit && typeof hit.then === "function")) bitmaps.delete(key);
+      }
+    }
+    function paintCam(id, url, frameIdx) {
+      const canvas = document.getElementById(id);
+      const ctx = canvas.getContext("2d", { alpha: false });
+      const draw = (im) => {
+        if (idx !== frameIdx || !(im instanceof HTMLImageElement)) return;
+        ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
+      };
+      const hit = bitmaps.get(url);
+      if (hit instanceof HTMLImageElement) { draw(hit); return; }
+      if (hit === "err" || !url) return;
+      loadUrl(url).then(draw);
     }
 
     document.getElementById("task").textContent = meta.task;
@@ -490,8 +572,9 @@
       if (!steps.length) return;
       idx = Math.max(0, Math.min(steps.length - 1, i));
       const s = steps[idx];
-      document.getElementById("agentview").src = s.agentview;
-      document.getElementById("wrist").src = s.wrist;
+      paintCam("agentview", s.agentview, idx);
+      paintCam("wrist", s.wrist, idx);
+      preloadAhead(idx);
       document.getElementById("note").textContent = s.note || "—";
       let fb = s.feedback || "";
       if (!fb && s.event === "ctrl") {
@@ -533,18 +616,21 @@
       drawXY(); drawZG();
     }
 
-    function drawXY() {
-      const steps = currentSteps();
-      const c = document.getElementById("xy"), ctx = c.getContext("2d");
-      const W = c.width, H = c.height;
-      ctx.clearRect(0, 0, W, H);
-      if (!steps.length) return;
+    function xyScale(steps, W, H) {
       const xs = steps.map(s => s.eef[0]), ys = steps.map(s => s.eef[1]);
       const minX = Math.min(...xs) - 0.04, maxX = Math.max(...xs) + 0.04;
       const minY = Math.min(...ys) - 0.04, maxY = Math.max(...ys) + 0.04;
       const pad = 28;
-      const sx = x => pad + (x - minX) / Math.max(1e-6, maxX - minX) * (W - pad * 2);
-      const sy = y => H - pad - (y - minY) / Math.max(1e-6, maxY - minY) * (H - pad * 2);
+      return {
+        pad,
+        sx: x => pad + (x - minX) / Math.max(1e-6, maxX - minX) * (W - pad * 2),
+        sy: y => H - pad - (y - minY) / Math.max(1e-6, maxY - minY) * (H - pad * 2)
+      };
+    }
+    function paintXY(ctx, steps, W, H, highlight) {
+      ctx.clearRect(0, 0, W, H);
+      if (!steps.length) return;
+      const { pad, sx, sy } = xyScale(steps, W, H);
       ctx.strokeStyle = "#243042"; ctx.strokeRect(pad, pad, W - pad * 2, H - pad * 2);
       ctx.fillStyle = "#8b9bb0"; ctx.font = "12px Segoe UI";
       ctx.fillText("+y 桌面深处", W - 90, 16);
@@ -552,64 +638,120 @@
       steps.forEach((s, i) => { const x = sx(s.eef[0]), y = sy(s.eef[1]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
       ctx.strokeStyle = "#3d5166"; ctx.lineWidth = 2; ctx.stroke();
       const colors = { reset:"#6f7f93", approach:"#5ec8e0", close:"#f0a05a", lift:"#8b8cff", reacquire:"#5ee0c5", stall:"#e6c35c", give_up:"#ff6b7a", success:"#5ee0c5" };
+      const dot = mode === "ctrl" ? 1.4 : 3.2;
       steps.forEach((s, i) => {
+        if (i === highlight) return;
         const x = sx(s.eef[0]), y = sy(s.eef[1]);
-        ctx.beginPath(); ctx.arc(x, y, i === idx ? 7 : (mode === "ctrl" ? 1.4 : 3.2), 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(x, y, dot, 0, Math.PI * 2);
         ctx.fillStyle = colors[s.phase] || "#fff"; ctx.fill();
-        if (i === idx) { ctx.strokeStyle = "#fff"; ctx.stroke(); }
       });
     }
+    function drawXY() {
+      const steps = currentSteps();
+      const c = document.getElementById("xy"), ctx = c.getContext("2d");
+      const key = (ep.id || "") + ":" + mode + ":" + steps.length;
+      if (trailCache.key !== key) {
+        trailCache.key = key;
+        trailCache.xy = document.createElement("canvas");
+        trailCache.xy.width = c.width; trailCache.xy.height = c.height;
+        if (steps.length) paintXY(trailCache.xy.getContext("2d"), steps, c.width, c.height, -1);
+        trailCache.zg = null;
+      }
+      ctx.clearRect(0, 0, c.width, c.height);
+      if (trailCache.xy) ctx.drawImage(trailCache.xy, 0, 0);
+      if (!steps.length) return;
+      const { sx, sy } = xyScale(steps, c.width, c.height);
+      const s = steps[idx];
+      if (!s || !s.eef) return;
+      const colors = { reset:"#6f7f93", approach:"#5ec8e0", close:"#f0a05a", lift:"#8b8cff", reacquire:"#5ee0c5", stall:"#e6c35c", give_up:"#ff6b7a", success:"#5ee0c5" };
+      const x = sx(s.eef[0]), y = sy(s.eef[1]);
+      ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = colors[s.phase] || "#fff"; ctx.fill();
+      ctx.strokeStyle = "#fff"; ctx.stroke();
+    }
 
+    function zgGeom(steps, W, H) {
+      const pad = 30, n = steps.length;
+      const zs = steps.map(s => s.eef[2]);
+      const zmin = Math.min(...zs) - 0.04, zmax = Math.max(...zs) + 0.04;
+      return {
+        pad,
+        xs: i => pad + i / (n - 1) * (W - pad * 2),
+        zy: z => H - pad - (z - zmin) / (zmax - zmin) * (H - pad * 2),
+        gy: g => H - pad - (g ?? 0) * (H - pad * 2),
+        zmin, zmax
+      };
+    }
     function drawZG() {
       const steps = currentSteps();
       const c = document.getElementById("zg"), ctx = c.getContext("2d");
       const W = c.width, H = c.height;
+      if (steps.length < 2) { ctx.clearRect(0, 0, W, H); return; }
+      const key = (ep.id || "") + ":" + mode + ":" + steps.length;
+      if (!trailCache.zg || trailCache.key !== key) {
+        const off = document.createElement("canvas");
+        off.width = W; off.height = H;
+        const o = off.getContext("2d");
+        const g = zgGeom(steps, W, H);
+        o.strokeStyle = "#243042";
+        o.beginPath(); o.moveTo(g.pad, g.pad); o.lineTo(g.pad, H - g.pad); o.lineTo(W - g.pad, H - g.pad); o.stroke();
+        o.setLineDash([4, 4]); o.strokeStyle = "#3a2a20";
+        o.beginPath(); o.moveTo(g.pad, g.zy(0.95)); o.lineTo(W - g.pad, g.zy(0.95)); o.stroke(); o.setLineDash([]);
+        o.fillStyle = "#8b9bb0"; o.font = "12px Segoe UI";
+        o.fillText("z " + g.zmin.toFixed(2) + "–" + g.zmax.toFixed(2), g.pad + 6, g.pad + 12);
+        o.beginPath();
+        steps.forEach((s, i) => { const x = g.xs(i), y = g.zy(s.eef[2]); i ? o.lineTo(x, y) : o.moveTo(x, y); });
+        o.strokeStyle = "#8b8cff"; o.lineWidth = 2; o.stroke();
+        o.beginPath();
+        steps.forEach((s, i) => { const x = g.xs(i), y = g.gy(s.gripper_open); i ? o.lineTo(x, y) : o.moveTo(x, y); });
+        o.strokeStyle = "#f0a05a"; o.stroke();
+        o.fillStyle = "#8b8cff"; o.fillRect(W - 210, 12, 10, 10);
+        o.fillStyle = "#e8eef6"; o.fillText("z", W - 194, 21);
+        o.fillStyle = "#f0a05a"; o.fillRect(W - 160, 12, 10, 10);
+        o.fillStyle = "#e8eef6"; o.fillText("夹爪", W - 144, 21);
+        trailCache.zg = off;
+      }
       ctx.clearRect(0, 0, W, H);
-      if (steps.length < 2) return;
-      const pad = 30, n = steps.length;
-      const xs = i => pad + i / (n - 1) * (W - pad * 2);
-      const zs = steps.map(s => s.eef[2]);
-      const zmin = Math.min(...zs) - 0.04, zmax = Math.max(...zs) + 0.04;
-      const zy = z => H - pad - (z - zmin) / (zmax - zmin) * (H - pad * 2);
-      const gy = g => H - pad - (g ?? 0) * (H - pad * 2);
-      ctx.strokeStyle = "#243042";
-      ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, H - pad); ctx.lineTo(W - pad, H - pad); ctx.stroke();
-      ctx.setLineDash([4,4]); ctx.strokeStyle = "#3a2a20";
-      ctx.beginPath(); ctx.moveTo(pad, zy(0.95)); ctx.lineTo(W - pad, zy(0.95)); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = "#8b9bb0"; ctx.font = "12px Segoe UI";
-      ctx.fillText("z " + zmin.toFixed(2) + "–" + zmax.toFixed(2), pad + 6, pad + 12);
-      ctx.beginPath();
-      steps.forEach((s, i) => { const x = xs(i), y = zy(s.eef[2]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
-      ctx.strokeStyle = "#8b8cff"; ctx.lineWidth = 2; ctx.stroke();
-      ctx.beginPath();
-      steps.forEach((s, i) => { const x = xs(i), y = gy(s.gripper_open); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
-      ctx.strokeStyle = "#f0a05a"; ctx.stroke();
-      const x = xs(idx);
+      ctx.drawImage(trailCache.zg, 0, 0);
+      const g = zgGeom(steps, W, H);
+      const x = g.xs(idx);
       ctx.strokeStyle = "#ffffff55";
-      ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, H - pad); ctx.stroke();
-      ctx.fillStyle = "#8b8cff"; ctx.fillRect(W - 210, 12, 10, 10);
-      ctx.fillStyle = "#e8eef6"; ctx.fillText("z", W - 194, 21);
-      ctx.fillStyle = "#f0a05a"; ctx.fillRect(W - 160, 12, 10, 10);
-      ctx.fillStyle = "#e8eef6"; ctx.fillText("夹爪", W - 144, 21);
+      ctx.beginPath(); ctx.moveTo(x, g.pad); ctx.lineTo(x, H - g.pad); ctx.stroke();
     }
 
     function stopPlay() {
-      if (timer) { clearInterval(timer); timer = null; }
+      playing = false;
+      if (timer) { clearTimeout(timer); timer = null; }
       document.getElementById("play").textContent = "播放";
     }
-    function togglePlay() {
-      if (timer) { stopPlay(); return; }
+    function tick() {
+      timer = null;
+      if (!playing) return;
+      const steps = currentSteps();
+      if (idx >= steps.length - 1) { stopPlay(); return; }
+      const next = steps[idx + 1];
+      preloadAhead(idx + 1);
+      if (!frameReady(next)) {
+        document.getElementById("play").textContent = "缓冲…";
+        timer = setTimeout(tick, 20);
+        return;
+      }
       document.getElementById("play").textContent = "暂停";
-      timer = setInterval(() => {
-        if (idx >= currentSteps().length - 1) { stopPlay(); return; }
-        show(idx + 1);
-      }, Number(document.getElementById("speed").value));
+      show(idx + 1);
+      timer = setTimeout(tick, Number(document.getElementById("speed").value) || 50);
+    }
+    function togglePlay() {
+      if (playing) { stopPlay(); return; }
+      playing = true;
+      document.getElementById("play").textContent = "暂停";
+      preloadAhead(idx);
+      timer = setTimeout(tick, 0);
     }
     document.getElementById("play").onclick = togglePlay;
     document.getElementById("prev").onclick = () => show(idx - 1, true);
     document.getElementById("next").onclick = () => show(idx + 1, true);
     document.getElementById("slider").oninput = e => show(Number(e.target.value), true);
-    document.getElementById("speed").onchange = () => { if (timer) { stopPlay(); togglePlay(); } };
+    document.getElementById("speed").onchange = () => { if (playing) { stopPlay(); togglePlay(); } };
     window.addEventListener("keydown", e => {
       if (["INPUT","SELECT","TEXTAREA"].includes(e.target.tagName)) return;
       if (e.code === "Space") { e.preventDefault(); togglePlay(); }
