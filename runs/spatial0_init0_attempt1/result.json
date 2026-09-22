@@ -1,0 +1,30 @@
+{
+  "success": false,
+  "reason": "give_up:Both RGB camera images became corrupted after the first move and remained unusable after a stationary observation update. Cannot visually locate the bowl or safely align a grasp.",
+  "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+  "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+  "suite": "libero_spatial",
+  "task_id": 0,
+  "init_id": 0,
+  "env_steps": 27,
+  "moves": 2,
+  "elapsed_s": 136.94,
+  "final_state": {
+    "eef_x": -0.0904,
+    "eef_y": -0.1624,
+    "eef_z": 1.109,
+    "eef_quat": [
+      0.9992,
+      0.0007,
+      -0.0399,
+      -0.0047
+    ],
+    "gripper_open": 0.017,
+    "env_steps": 27,
+    "moves": 2,
+    "remaining_env_steps": 573,
+    "remaining_moves": 28,
+    "success": false,
+    "terminated": true
+  }
+}

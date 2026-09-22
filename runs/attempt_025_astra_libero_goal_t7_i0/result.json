@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:One planner move remains and the gripper is empty; a verified regrasp and turn cannot be completed within that budget.",
+  "instruction": "turn on the stove",
+  "task_name": "turn_on_the_stove",
+  "suite": "libero_goal",
+  "task_id": 7,
+  "init_id": 0,
+  "env_steps": 224,
+  "moves": 24,
+  "elapsed_s": 356.03,
+  "final_state": {
+    "eef_x": -0.3533,
+    "eef_y": 0.1989,
+    "eef_z": 0.9679,
+    "roll_deg": -0.8,
+    "pitch_deg": -0.4,
+    "yaw_deg": 19.4,
+    "eef_quat": [
+      0.9856,
+      -0.1672,
+      -0.0249,
+      0.009
+    ],
+    "gripper_open": 0.019,
+    "feedback": "ok: reached dist_m=0.004 remaining_xyz=[-0.0015, -0.0027, -0.0012]",
+    "env_steps": 224,
+    "moves": 24,
+    "remaining_env_steps": 376,
+    "remaining_moves": 1,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}

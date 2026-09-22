@@ -1,0 +1,8 @@
+# Episode summary
+
+Instruction: open the middle drawer of the cabinet (libero_goal task 0 init 0).
+Official state: success=false, terminated=true (max_moves), 25 planner moves, 334 env steps.
+
+Probed +x (agentview moved toward BOTTOM; cheat sheet holds). Approached the cabinet in -y at high z, hit the drying rack at z≈1.10 (blocked descent), then moved +x along the face and backed off +y to clear the rack. Found the middle-drawer handle at z≈1.03. With jaws-down yaw=0, a -y approach blocked immediately (outer pad hit the handle at eef_y≈-0.057; pad offset ~4 cm). Spent moves 13–17 yawing to 90° so pads would close along X, then approached y≈-0.09, x≈-0.01. Closed twice; both times gripper_open fell to 0.05 then 0.018 on the +y pull — empty jaws. Drawer never moved.
+
+Hindsight: World +x is toward the BOTTOM of agentview; -y is toward the cabinet (RIGHT of agentview); +y opens the drawers. Kitchen table z≈0.90, home z≈1.17; drying rack on top of the cabinet blocks descent near y≈-0.10, z≈1.10, x≲-0.09 — approach the handle from +x of the rack (x≳-0.03) in front of the face. Middle handle height ≈ z=1.02–1.03; top handle is near z=1.10. Yaw-90 jaws-down does not put the horizontal handle between the pads; closes go to g≈0.05 (empty). A side grasp needs roll ≈ -90 with pitch/yaw ≈ 0 (fingers above/below the bar). Do not spend 5 moves yawing. A real handle pinch holds g≳0.20; g≈0.05 after close and g≈0.02 after a +y pull is a miss — reopen and change xy/roll before pulling again. Successful pose on this init (from a prior run): eef ≈ (0.027, -0.132, 1.019), roll≈-90, g≈0.228, then pull +y along the rail.

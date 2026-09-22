@@ -1,0 +1,31 @@
+{
+  "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+  "task_name": "pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate",
+  "suite": "libero_spatial",
+  "task_id": 3,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.1008,
+  "eef_y": -0.138,
+  "eef_z": 0.985,
+  "roll_deg": -1.1,
+  "pitch_deg": 20.1,
+  "yaw_deg": -0.9,
+  "eef_quat": [
+    0.9882,
+    0.0043,
+    0.1526,
+    0.0079
+  ],
+  "gripper_open": 0.998,
+  "feedback": "ok: reached dist_m=0.012 remaining_xyz=[0.0008, -0.002, -0.005]",
+  "env_steps": 210,
+  "moves": 17,
+  "remaining_env_steps": 390,
+  "remaining_moves": 13,
+  "success": false,
+  "terminated": false
+}

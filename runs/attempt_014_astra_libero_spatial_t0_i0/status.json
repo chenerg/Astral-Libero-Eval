@@ -1,0 +1,31 @@
+{
+  "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+  "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+  "suite": "libero_spatial",
+  "task_id": 0,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.2112,
+  "eef_y": -0.011,
+  "eef_z": 1.1743,
+  "roll_deg": -0.0,
+  "pitch_deg": -0.0,
+  "yaw_deg": 0.0,
+  "eef_quat": [
+    0.9996,
+    -0.0065,
+    -0.0263,
+    -0.0012
+  ],
+  "gripper_open": 0.517,
+  "feedback": "reset: cameras live, jaws at home (pitch=roll=yaw=0)",
+  "env_steps": 5,
+  "moves": 0,
+  "remaining_env_steps": 595,
+  "remaining_moves": 15,
+  "success": false,
+  "terminated": false
+}

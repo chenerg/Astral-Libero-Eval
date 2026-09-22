@@ -1,0 +1,60 @@
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move. It is the harness speaking:
+- empty_grasp_suspected → the last close+lift did NOT pick the object. Descend 2–4 cm and/or add 10–20 deg pitch. Do NOT close at the same z again.
+- blocked/contact → the Cartesian target was not reached (table/object). Change height, xy, or pitch; do not spam the same target.
+- holding_or_pinching → jaws did not fully shut; lift straight up and check whether the object follows in the wrist camera.
+
+## Lessons from failed episodes on THIS same task
+
+Attempt 2: found the right bowl, then four identical top-down closes at z≈0.94–0.96. Empty every time. gripper_open → 0.02 after lift.
+
+Attempt 4: used pitch ±15–25° and got down to z≈0.91–0.92. Twice the harness said holding_or_pinching (gripper_open 0.28–0.49) — that means the jaws touched the bowl — then a 6–7 cm lift slipped and became empty_grasp. Deeper z=0.89–0.90 was blocked. A 90° yaw in one call twisted the wrist.
+
+Do this instead:
+1. Parallel jaws must go AROUND the bowl wall (10–20° pitch), not pinch the top rim.
+2. Close at the lowest z you can actually reach (blocked ≈ you are on the rim). Then lift ONLY 2 cm and look at the wrist. If the bowl rises, lift the rest. If it stays, go back down immediately — do not lift 6–8 cm on a pinch.
+3. Never repeat the same close height after empty_grasp. Change z or pitch.
+4. Max ±20° of pitch/yaw/roll per move. Do not command 90° yaw.
+5. Never go to the plate until a 2 cm lift shows the bowl moving with the gripper.
+6. Wrist-image "up" is not world +y. Re-read both cameras.
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object.
+5. After a real pick, lift 5–8 cm straight up, confirm the object moved, THEN go to the plate.
+6. One POST /move per turn. Then immediately look at the new images and state.json and send the next move.
+7. This episode is NOT finished after a single blocked move. Keep controlling until state.json has success=true or terminated=true. If you must give_up, do so only after at least 10 moves, via POST /give_up.
+8. If feedback is blocked/contact on a long approach: raise z a few centimetres, set roll_deg=0,pitch_deg=0,yaw_deg=0 if the wrist looks twisted, then continue toward the bowl. Do not end the session.
+9. Leave pitch/roll/yaw unnamed unless you intentionally tilt (10–20 deg pitch for a side-wall bowl grasp). Unnamed orientation holds the current pose.
+10. Do not install packages, edit bridge_server.py, or kill the server.
+11. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.

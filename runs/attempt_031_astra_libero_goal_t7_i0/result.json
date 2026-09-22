@@ -1,0 +1,35 @@
+{
+  "success": true,
+  "reason": "success",
+  "instruction": "turn on the stove",
+  "task_name": "turn_on_the_stove",
+  "suite": "libero_goal",
+  "task_id": 7,
+  "init_id": 0,
+  "env_steps": 192,
+  "moves": 21,
+  "elapsed_s": 431.49,
+  "final_state": {
+    "eef_x": -0.3782,
+    "eef_y": 0.1917,
+    "eef_z": 0.9602,
+    "roll_deg": 0.6,
+    "pitch_deg": -1.4,
+    "yaw_deg": -20.3,
+    "eef_quat": [
+      0.9836,
+      0.1774,
+      -0.033,
+      -0.0079
+    ],
+    "gripper_open": 0.977,
+    "feedback": "ok: reached dist_m=0.017 remaining_xyz=[-0.0085, 0.0008, -0.0151]",
+    "env_steps": 192,
+    "moves": 21,
+    "remaining_env_steps": 408,
+    "remaining_moves": 4,
+    "success": true,
+    "terminated": true,
+    "world_axes_overlay": true
+  }
+}

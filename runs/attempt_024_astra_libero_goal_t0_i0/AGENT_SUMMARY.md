@@ -1,0 +1,8 @@
+# Episode summary
+
+Instruction: open the middle drawer of the cabinet.
+Official state reported success=true after 20 moves and 186 environment steps (5 moves and 414 steps remaining).
+
+Probed +x, approached in the clear space in front of the cabinet, and rotated roll toward -90 degrees in increments no larger than 20 degrees. Aligned the middle handle using both cameras, then advanced in small -y increments. Closed around the bar at measured end-effector position approximately (0.027, -0.132, 1.019). Jaw opening settled at 0.228 and remained stable during pulling. Tested attachment with a 2 cm +y pull, then continued with two 8 cm requested pulls. The middle drawer followed and the official success check fired during the last pull. All motion feedback reported reached; no blocked/contact recovery was needed.
+
+Hindsight: World +x moves toward the bottom of agentview; -y approaches the cabinet on the right, and +y opens its drawers. Home z was 1.1712; support appeared near the kitchen-table height of 0.90, but was not measured by contact. Roll approximately -90 degrees, pitch/yaw approximately zero, provided a side grasp with fingers above/below the handle. At this orientation the handle appears vertical in wrist view, and lowering z moves its image left toward the pad gap. The successful grasp had eef z approximately 1.019 and measured opening 0.228. Small requested translations often stopped 5–8 mm short, so use measured state and images rather than summing commands. Test drawer attachment along its rail rather than lifting a constrained drawer. These are observed grasp poses for this initialization, not general object coordinates.

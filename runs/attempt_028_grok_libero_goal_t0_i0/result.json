@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "max_moves",
+  "instruction": "open the middle drawer of the cabinet",
+  "task_name": "open_the_middle_drawer_of_the_cabinet",
+  "suite": "libero_goal",
+  "task_id": 0,
+  "init_id": 0,
+  "env_steps": 334,
+  "moves": 25,
+  "elapsed_s": 1142.98,
+  "final_state": {
+    "eef_x": -0.0002,
+    "eef_y": 0.0456,
+    "eef_z": 1.0299,
+    "roll_deg": 0.9,
+    "pitch_deg": 0.1,
+    "yaw_deg": 90.4,
+    "eef_quat": [
+      0.7105,
+      -0.7034,
+      -0.0123,
+      0.0163
+    ],
+    "gripper_open": 0.018,
+    "feedback": "ok: reached dist_m=0.008 remaining_xyz=[0.002, 0.0044, 0.0009]",
+    "env_steps": 334,
+    "moves": 25,
+    "remaining_env_steps": 266,
+    "remaining_moves": 0,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": true
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:2 moves left, empty grasp, cannot pick and place in remaining budget",
+  "instruction": "pick up the ketchup and place it in the basket",
+  "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket",
+  "suite": "libero_object",
+  "task_id": 4,
+  "init_id": 0,
+  "env_steps": 207,
+  "moves": 23,
+  "elapsed_s": 1361.41,
+  "final_state": {
+    "eef_x": 0.0371,
+    "eef_y": -0.1197,
+    "eef_z": 0.0638,
+    "roll_deg": 0.0,
+    "pitch_deg": -0.2,
+    "yaw_deg": 0.3,
+    "eef_quat": [
+      0.9996,
+      0.0001,
+      -0.0288,
+      -0.0002
+    ],
+    "gripper_open": 0.05,
+    "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.001, 0.0007, -0.0001]",
+    "env_steps": 207,
+    "moves": 23,
+    "remaining_env_steps": 393,
+    "remaining_moves": 2,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": true
+  }
+}

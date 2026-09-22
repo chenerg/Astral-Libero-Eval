@@ -1,0 +1,32 @@
+{
+  "instruction": "open the middle drawer of the cabinet",
+  "task_name": "open_the_middle_drawer_of_the_cabinet",
+  "suite": "libero_goal",
+  "task_id": 0,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0269,
+  "eef_y": 0.0091,
+  "eef_z": 1.0185,
+  "roll_deg": -89.6,
+  "pitch_deg": 0.3,
+  "yaw_deg": -0.8,
+  "eef_quat": [
+    0.7082,
+    0.0282,
+    -0.0074,
+    0.7054
+  ],
+  "gripper_open": 0.228,
+  "feedback": "ok: reached dist_m=0.026 remaining_xyz=[-0.0, 0.0258, -0.0017]",
+  "env_steps": 186,
+  "moves": 20,
+  "remaining_env_steps": 414,
+  "remaining_moves": 5,
+  "success": true,
+  "terminated": false,
+  "world_axes_overlay": false
+}

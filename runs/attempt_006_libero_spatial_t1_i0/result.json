@@ -1,0 +1,34 @@
+{
+  "success": false,
+  "reason": "give_up:After 28 moves, repeated rim grasps were empty or slipped and pushed the bowl forward. Last closed lift reached gripper_open 0.02 without the bowl following. Two moves remain, insufficient for a verified pick and placement.",
+  "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+  "task_name": "pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate",
+  "suite": "libero_spatial",
+  "task_id": 1,
+  "init_id": 0,
+  "env_steps": 377,
+  "moves": 28,
+  "elapsed_s": 396.59,
+  "final_state": {
+    "eef_x": -0.0351,
+    "eef_y": 0.3422,
+    "eef_z": 0.9229,
+    "roll_deg": 0.5,
+    "pitch_deg": 5.0,
+    "yaw_deg": -0.3,
+    "eef_quat": [
+      0.9997,
+      0.0071,
+      0.0216,
+      -0.0054
+    ],
+    "gripper_open": 0.02,
+    "feedback": "ok: reached dist_m=0.010 remaining_xyz=[-0.0001, -0.0006, 0.0068]",
+    "env_steps": 377,
+    "moves": 28,
+    "remaining_env_steps": 223,
+    "remaining_moves": 2,
+    "success": false,
+    "terminated": true
+  }
+}

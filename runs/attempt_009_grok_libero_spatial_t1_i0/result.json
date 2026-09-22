@@ -1,0 +1,34 @@
+{
+  "success": false,
+  "reason": "give_up:After 26 moves, 8+ empty closes (gripper_open=0.05) never held the patterned bowl. Pads missed at y=0.31-0.37, x=-0.29 to -0.20, z=0.91-0.94, pitch 15-20. Last pose y=0.367 still empty; 4 moves left, not enough for verified pick and place.",
+  "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+  "task_name": "pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate",
+  "suite": "libero_spatial",
+  "task_id": 1,
+  "init_id": 0,
+  "env_steps": 302,
+  "moves": 26,
+  "elapsed_s": 1725.88,
+  "final_state": {
+    "eef_x": -0.2327,
+    "eef_y": 0.3672,
+    "eef_z": 0.9206,
+    "roll_deg": -1.8,
+    "pitch_deg": 15.0,
+    "yaw_deg": -1.6,
+    "eef_quat": [
+      0.9938,
+      0.0162,
+      0.1089,
+      0.0121
+    ],
+    "gripper_open": 0.05,
+    "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0027, -0.0021, 0.0009]",
+    "env_steps": 302,
+    "moves": 26,
+    "remaining_env_steps": 298,
+    "remaining_moves": 4,
+    "success": false,
+    "terminated": true
+  }
+}

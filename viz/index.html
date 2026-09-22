@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LIBERO × Astra · 全部测评回放</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #121820;
+      --panel-2: #18202a;
+      --line: #2a3646;
+      --text: #e8eef6;
+      --muted: #8b9bb0;
+      --approach: #5ec8e0;
+      --close: #f0a05a;
+      --lift: #8b8cff;
+      --reacquire: #5ee0c5;
+      --stall: #e6c35c;
+      --giveup: #ff6b7a;
+      --fail: #ff6b7a;
+      --ok: #5ee0c5;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg); color: var(--text);
+      font: 14px/1.45 "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+    button, input, select { font: inherit; color: inherit; }
+    .wrap { max-width: 1760px; margin: 0 auto; padding: 18px 20px 32px; }
+    header { display: grid; grid-template-columns: 1fr auto; gap: 16px; margin-bottom: 14px; }
+    h1 { margin: 0 0 6px; font-size: 22px; font-weight: 650; }
+    .sub { color: var(--muted); max-width: 860px; }
+    .sub b { color: var(--text); }
+    .picker {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      background: #0f151c; border: 1px solid var(--line);
+      border-radius: 14px; padding: 12px 14px; margin-bottom: 12px;
+    }
+    .picker label { color: var(--muted); font-size: 12px; letter-spacing: .4px; text-transform: uppercase; font-weight: 650; }
+    .picker select {
+      flex: 1; min-width: 280px; max-width: 720px;
+      background: #1c2733; border: 1px solid #4c5d73;
+      border-radius: 10px; padding: 10px 12px; font-size: 15px;
+    }
+    .picker .hint { color: var(--muted); font-size: 12px; }
+    .modebar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0 0 12px; }
+    .modebar .off { opacity: .55; }
+    .eps { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .ep {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .ep:hover { border-color: #4c5d73; }
+    .ep.on { border-color: var(--approach); box-shadow: 0 0 0 1px color-mix(in srgb, var(--approach) 45%, transparent); }
+    .ep .n { color: var(--muted); font-size: 11px; letter-spacing: .4px; text-transform: uppercase; }
+    .ep h3 { margin: 2px 0 6px; font-size: 15px; }
+    .ep .hd { color: #c9d6e5; min-height: 44px; }
+    .st { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+    .st.fail, .st.harness { background: #3a1820; color: #ff8b97; }
+    .st.aborted { background: #3a3218; color: #e6c35c; }
+    .st.running { background: #17343a; color: #8ff0e2; }
+    .st.success { background: #14332c; color: #8ff0c9; }
+    .metrics { display: flex; gap: 10px; flex-wrap: wrap; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; margin-top: 8px; }
+    table.cmp { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+    table.cmp th, table.cmp td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    table.cmp th { color: var(--muted); font-size: 11px; letter-spacing: .4px; text-transform: uppercase; font-weight: 650; }
+    table.cmp tr.on td { background: #182833; }
+    .anal { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-bottom: 12px; }
+    .anal h2 { margin: 0 0 8px; font-size: 14px; }
+    .anal ul { margin: 0; padding-left: 18px; color: #d5deea; }
+    .anal li { margin: 4px 0; }
+    .pipe { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 0 0 14px; }
+    .hop { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; position: relative; }
+    .hop:not(:last-child)::after { content: "→"; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .hop.on { border-color: var(--approach); }
+    .hop .t { font-weight: 650; }
+    .hop .s { color: var(--muted); font-size: 12px; }
+    .grid { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr) minmax(520px, 1.7fr); gap: 12px; align-items: start; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .card h2 { margin: 0; padding: 10px 12px 8px; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); font-weight: 650; display: flex; justify-content: space-between; }
+    .cam { background: #070a0e; aspect-ratio: 1; }
+    .cam img { width: 100%; height: 100%; object-fit: contain; }
+    .side { padding: 0 12px 12px; }
+    .note, .fb { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+    .lbl { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr) 72px minmax(0, 1fr);
+      gap: 4px 14px;
+      font-variant-numeric: tabular-nums;
+      align-items: baseline;
+    }
+    .kv span { color: var(--muted); white-space: nowrap; }
+    .kv b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .kv b#ctrlmeta, .kv b#action { grid-column: 2 / -1; overflow-x: auto; text-overflow: clip; }
+    .cmd {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: #0b1118;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-top: 10px;
+      white-space: pre;
+      overflow-x: auto;
+      color: #c9f3ea;
+    }
+    .plots { display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px; margin-top: 12px; }
+    canvas { width: 100%; height: 240px; display: block; background: #0b1118; }
+    .controls { margin-top: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px 10px; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn { background: #1c2733; border: 1px solid var(--line); border-radius: 9px; padding: 7px 12px; cursor: pointer; }
+    .btn:hover { border-color: #4c5d73; }
+    .btn.primary { background: #17343a; border-color: #2e6b72; color: #b7f3ea; }
+    input[type=range] { flex: 1; min-width: 200px; accent-color: #5ee0c5; }
+    .ticks { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .tick { border: 1px solid var(--line); background: #151c24; color: var(--muted); border-radius: 999px; padding: 3px 8px; font-size: 11px; cursor: pointer; }
+    .tick.on { color: #0b0f14; font-weight: 700; }
+    .tick.reset.on { background: #9aa8b8; }
+    .tick.approach.on { background: var(--approach); }
+    .tick.close.on { background: var(--close); }
+    .tick.lift.on { background: var(--lift); }
+    .tick.reacquire.on { background: var(--reacquire); }
+    .tick.stall.on { background: var(--stall); }
+    .tick.give_up.on, .tick.success.on { background: var(--giveup); }
+    .story { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin: 12px 0 0; }
+    .shot { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; cursor: pointer; }
+    .shot.on { border-color: var(--approach); }
+    .shot img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+    .shot .cap { padding: 5px 7px 7px; font-size: 11px; color: var(--muted); }
+    .help { margin-top: 12px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .grid .card:last-child { grid-column: 1 / -1; }
+    }
+    @media (max-width: 1100px) {
+      .eps, .plots, .pipe, .story { grid-template-columns: 1fr 1fr; }
+      header { grid-template-columns: 1fr; }
+      .hop:not(:last-child)::after { content: none; }
+    }
+    @media (max-width: 720px) {
+      .eps, .grid, .plots, .story, .pipe { grid-template-columns: 1fr; }
+      .grid .card:last-child { grid-column: auto; }
+      .kv { grid-template-columns: 72px minmax(0, 1fr); }
+      .kv b#ctrlmeta, .kv b#action { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>LIBERO × Codex CLI · 全部测评回放</h1>
+        <div class="sub">
+          同一任务：<b id="task"></b><br />
+          下拉框回看任意一集。有 <code>ctrl/</code> 细帧的会按 20 Hz 控制步播放。<br />
+          <code>http://localhost:8788</code> 刷新时若 runs 更新会先重打包再加载。<br />
+          <span id="builtAt"></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="picker">
+      <label for="epSelect">回看测评</label>
+      <select id="epSelect"></select>
+      <button class="btn" id="epPrev" type="button">上一集</button>
+      <button class="btn" id="epNext" type="button">下一集</button>
+      <span class="hint" id="epHint"></span>
+    </div>
+    <div class="eps" id="eps"></div>
+    <table class="cmp" id="cmp"></table>
+    <div class="anal" id="anal"></div>
+    <div class="modebar" id="modebar" hidden>
+      <span class="hint">回放粒度</span>
+      <button class="btn" id="modeMove" type="button">按 /move</button>
+      <button class="btn primary" id="modeCtrl" type="button">控制帧 20 Hz</button>
+      <span class="hint" id="ctrlHint"></span>
+    </div>
+    <div class="pipe" id="pipe"></div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Agent view <span>第三人称</span></h2>
+        <div class="cam"><img id="agentview" alt="agentview" /></div>
+      </div>
+      <div class="card">
+        <h2>Wrist view <span>夹爪相机</span></h2>
+        <div class="cam"><img id="wrist" alt="wrist" /></div>
+      </div>
+      <div class="card">
+        <h2>当前步骤 <span id="phaseTag"></span></h2>
+        <div class="side">
+          <div class="note"><div class="lbl">Astra note</div><div id="note"></div></div>
+          <div class="fb"><div class="lbl">Harness feedback</div><div id="fb"></div></div>
+          <div class="kv">
+            <span>阶段</span><b id="phase"></b>
+            <span>时间</span><b id="trel"></b>
+            <span>EEF xyz</span><b id="eef"></b>
+            <span>RPY °</span><b id="rpy"></b>
+            <span>夹爪开合</span><b id="grip"></b>
+            <span>环境步</span><b id="steps"></b>
+            <span>剩余预算</span><b id="budget"></b>
+            <span>插值 / 误差</span><b id="interp"></b>
+            <span>控制步</span><b id="ctrlmeta">—</b>
+            <span>OSC 7D</span><b id="action">—</b>
+          </div>
+          <div class="cmd" id="cmd"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plots">
+      <div class="card">
+        <h2>末端轨迹 · 桌面俯视 (x, y)</h2>
+        <canvas id="xy" width="720" height="240"></canvas>
+      </div>
+      <div class="card">
+        <h2>高度 z、夹爪、pitch</h2>
+        <canvas id="zg" width="860" height="240"></canvas>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="row">
+        <button class="btn" id="prev">上一步</button>
+        <button class="btn primary" id="play">播放</button>
+        <button class="btn" id="next">下一步</button>
+        <input id="slider" type="range" min="0" max="1" value="0" />
+        <b id="poslbl"></b>
+        <label>速度
+          <select id="speed">
+            <option value="1400">慢 · /move</option>
+            <option value="850" selected>中 · /move</option>
+            <option value="420">快 · /move</option>
+            <option value="50">20 Hz 细帧</option>
+            <option value="20">50 Hz 细帧</option>
+          </select>
+        </label>
+      </div>
+      <div class="ticks" id="ticks"></div>
+    </div>
+    <div class="story" id="story"></div>
+    <div class="help">
+      下拉框选任意一集。有细帧时默认按 20 Hz 播 OSC 插值。键盘 1–9 / 0，← → 单步，空格播放。M 切 /move，C 切控制帧。
+    </div>
+  </div>
+  <script>
+  (async function () {
+    await new Promise(function (resolve, reject) {
+      const s = document.createElement("script");
+      s.src = "data.js?t=" + Date.now();
+      s.onload = resolve;
+      s.onerror = function () { reject(new Error("data.js 加载失败")); };
+      document.head.appendChild(s);
+    });
+    const DATA = window.EPISODE;
+    const meta = DATA.meta;
+    const episodes = DATA.episodes;
+    const builtEl = document.getElementById("builtAt");
+    if (builtEl) {
+      builtEl.textContent = "数据打包于 " + (meta.built_at || "未知") +
+        " · 共 " + episodes.length + " 集 · 本页每次刷新都会重新拉取 data.js（不走缓存）";
+    }
+    let ep = episodes[0];
+    let idx = 0, timer = null, mode = "move";
+    function currentSteps() {
+      if (mode === "ctrl" && ep.ctrl && ep.ctrl.length) return ep.ctrl;
+      return ep.steps || [];
+    }
+
+    document.getElementById("task").textContent = meta.task;
+
+    const stLabel = { fail: "策略失败", harness: "harness 失败", aborted: "中途退出", running: "进行中", success: "成功" };
+    function optionLabel(e) {
+      const st = stLabel[e.status] || e.status;
+      const suite = (e.suite || "libero_spatial").replace("libero_", "");
+      const task = e.task_id == null ? suite : `${suite}/${e.task_id}`;
+      const who = e.planner ? ` · ${e.planner}` : "";
+      return `第 ${e.n} 集 · ${task}${who} · ${e.title.replace(/^第 \d+ 集 · /, "")} · ${e.moves ?? "—"} moves · ${st}`;
+    }
+    const sel = document.getElementById("epSelect");
+    episodes.forEach((e, i) => {
+      const o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = optionLabel(e);
+      sel.appendChild(o);
+    });
+    sel.onchange = () => selectEp(Number(sel.value), true);
+    document.getElementById("epPrev").onclick = () => selectEp(Math.max(0, episodes.indexOf(ep) - 1), true);
+    document.getElementById("epNext").onclick = () => selectEp(Math.min(episodes.length - 1, episodes.indexOf(ep) + 1), true);
+
+    const epsEl = document.getElementById("eps");
+    episodes.forEach((e, i) => {
+      const b = document.createElement("button");
+      b.className = "ep";
+      b.dataset.id = e.id;
+      b.innerHTML = `<div class="n">Attempt ${e.n} · ${e.kind}${e.planner ? " · "+e.planner : ""} · ${(e.suite||"libero_spatial").replace("libero_","")}/${e.task_id ?? "—"}</div>
+        <h3>${e.title}</h3>
+        <span class="st ${e.status}">${stLabel[e.status] || e.status}</span>
+        <div class="hd">${e.headline}</div>
+        <div class="metrics"><span>${e.moves ?? "—"} moves</span><span>${e.env_steps ?? "—"} steps</span><span>${e.elapsed_s ? Math.round(e.elapsed_s)+" s" : ""}</span></div>`;
+      b.onclick = () => selectEp(i, true);
+      epsEl.appendChild(b);
+    });
+
+    const cmp = document.getElementById("cmp");
+    cmp.innerHTML = `<thead><tr>
+      <th></th><th>任务</th><th>Planner</th><th>结果</th><th>Moves</th><th>Env steps</th><th>细帧</th><th>合爪</th><th>空抓抬升</th><th>卡住</th><th>最低 z</th>
+    </tr></thead><tbody>` + episodes.map(e => `<tr data-id="${e.id}">
+      <td>第 ${e.n} 集</td>
+      <td>${(e.suite||"libero_spatial").replace("libero_","")}/${e.task_id ?? "—"}</td>
+      <td>${e.planner || "—"}</td>
+      <td>${stLabel[e.status] || e.status}</td>
+      <td>${e.moves ?? "—"}</td>
+      <td>${e.env_steps ?? "—"}</td>
+      <td>${e.hasCtrl ? (e.n_ctrl + " ctrl") : "—"}</td>
+      <td>${e.n_close}</td>
+      <td>${e.n_empty}</td>
+      <td>${e.n_blocked}</td>
+      <td>${e.min_z ?? "—"}</td>
+    </tr>`).join("") + `</tbody>`;
+    cmp.querySelectorAll("tbody tr").forEach(tr => {
+      tr.style.cursor = "pointer";
+      tr.onclick = () => {
+        const i = episodes.findIndex(e => e.id === tr.dataset.id);
+        if (i >= 0) selectEp(i, true);
+      };
+    });
+
+    const pipeEl = document.getElementById("pipe");
+    meta.architecture.forEach(h => {
+      const d = document.createElement("div");
+      d.className = "hop";
+      d.dataset.id = h.id;
+      d.innerHTML = `<div class="t">${h.title}</div><div class="s">${h.sub}</div>`;
+      pipeEl.appendChild(d);
+    });
+
+    function rebuildNav() {
+      const steps = currentSteps();
+      const ticks = document.getElementById("ticks");
+      ticks.innerHTML = "";
+      if (mode === "ctrl") {
+        let last = null;
+        steps.forEach((s, k) => {
+          if (s.move_id === last) return;
+          last = s.move_id;
+          const b = document.createElement("button");
+          b.className = "tick " + s.phase;
+          b.textContent = "M" + (s.move_id ?? 0);
+          b.title = "跳到 move " + s.move_id;
+          b.onclick = () => show(k, true);
+          ticks.appendChild(b);
+        });
+      } else {
+        steps.forEach((s, k) => {
+          const b = document.createElement("button");
+          b.className = "tick " + s.phase;
+          b.textContent = s.event === "reset" ? "R" : (s.event === "done" ? "G" : String(s.move_id));
+          b.title = s.phaseLabel;
+          b.onclick = () => show(k, true);
+          ticks.appendChild(b);
+        });
+      }
+      const story = document.getElementById("story");
+      story.innerHTML = "";
+      (ep.story || []).forEach(k => {
+        const s = (ep.steps || [])[k]; if (!s) return;
+        const d = document.createElement("div");
+        d.className = "shot";
+        d.dataset.i = k;
+        d.innerHTML = `<img src="${s.agentview}" alt=""><div class="cap">${s.phaseLabel}</div>`;
+        d.onclick = () => {
+          if (mode === "ctrl" && ep.ctrl) {
+            const j = ep.ctrl.findIndex(c => c.move_id === s.move_id);
+            show(j < 0 ? 0 : j, true);
+          } else show(k, true);
+        };
+        story.appendChild(d);
+      });
+      document.getElementById("slider").max = String(Math.max(0, steps.length - 1));
+    }
+
+    function setMode(m, keepPos) {
+      const prev = currentSteps()[idx];
+      mode = m;
+      const has = !!(ep.ctrl && ep.ctrl.length);
+      if (!has) mode = "move";
+      document.getElementById("modebar").hidden = !has;
+      document.getElementById("modeCtrl").classList.toggle("primary", mode === "ctrl");
+      document.getElementById("modeMove").classList.toggle("primary", mode === "move");
+      document.getElementById("ctrlHint").textContent = has
+        ? (mode === "ctrl"
+            ? `正在播 ${ep.n_ctrl} 个 20 Hz 控制步（OSC 插值）`
+            : `这集有 ${ep.n_ctrl} 个控制步，当前按 planner /move`)
+        : "这集没有 ctrl/ 细帧，只按 /move 边界回放";
+      rebuildNav();
+      let jump = 0;
+      if (keepPos && prev) {
+        const steps = currentSteps();
+        jump = steps.findIndex(s => s.move_id === prev.move_id);
+        if (jump < 0) jump = 0;
+      }
+      if (mode === "ctrl") document.getElementById("speed").value = "50";
+      show(jump);
+    }
+
+    document.getElementById("modeMove").onclick = () => setMode("move", true);
+    document.getElementById("modeCtrl").onclick = () => setMode("ctrl", true);
+
+    function selectEp(i, stop) {
+      if (stop) stopPlay();
+      i = Math.max(0, Math.min(episodes.length - 1, i));
+      ep = episodes[i];
+      sel.value = String(i);
+      document.getElementById("epHint").textContent =
+        `正在回看第 ${ep.n} / ${episodes.length} 集（${stLabel[ep.status] || ep.status}），不是自动最新。`;
+      document.getElementById("epPrev").disabled = i === 0;
+      document.getElementById("epNext").disabled = i === episodes.length - 1;
+      try { localStorage.setItem("libero-viz-ep", ep.id); } catch (err) {}
+      if (location.hash !== "#" + ep.id) history.replaceState(null, "", "#" + ep.id);
+      document.querySelectorAll(".ep").forEach(el => el.classList.toggle("on", el.dataset.id === ep.id));
+      document.querySelectorAll("#cmp tbody tr").forEach(el => el.classList.toggle("on", el.dataset.id === ep.id));
+      document.getElementById("task").textContent = ep.task || meta.task;
+      document.getElementById("anal").innerHTML =
+        `<h2>${ep.title}</h2><div class="sub" style="margin-bottom:8px">${ep.reason || ""}</div><ul>` +
+        (ep.analysis || []).map(x => `<li>${x}</li>`).join("") + `</ul>`;
+      setMode(ep.hasCtrl ? "ctrl" : "move", false);
+    }
+
+    function hopFor(s) {
+      if (s.event === "ctrl") return ["osc", "env", "obs"];
+      if (s.event === "reset") return ["env", "obs"];
+      if (s.event === "done") return ["planner", "http"];
+      return ["planner", "http", "osc", "env", "obs"];
+    }
+    function fmt(n, d=3) { return (n == null || Number.isNaN(n)) ? "—" : Number(n).toFixed(d); }
+    function parentMove(s) {
+      if (!ep.steps || s.move_id == null) return null;
+      return ep.steps.find(m => m.move_id === s.move_id && (m.named || m.event === "move" || m.event === "reset")) || null;
+    }
+    function fmtMoveTo(s) {
+      const src = (s.named && Object.keys(s.named).length) ? s : (parentMove(s) || s);
+      const named = src.named || {};
+      const order = ["x","y","z","dx","dy","dz","roll_deg","pitch_deg","yaw_deg","droll_deg","dpitch_deg","dyaw_deg","gripper"];
+      const parts = [];
+      for (const k of order) {
+        if (named[k] == null) continue;
+        const v = named[k];
+        parts.push(k + "=" + (typeof v === "number" ? Number(v).toFixed(3).replace(/\.?0+$/, "") : v));
+      }
+      const tgt = src.target || s.target;
+      const rpy = src.target_rpy || s.target_rpy;
+      if (!parts.length && !tgt) return "";
+      let line = "MOVE_TO  " + (parts.join("  ") || "hold unnamed axes");
+      if (tgt && tgt.length) line += "\n  target xyz  " + tgt.map(v => Number(v).toFixed(3)).join(" , ") + " m";
+      if (rpy && rpy.some(v => v != null && Math.abs(Number(v)) > 0.05))
+        line += "\n  target rpy  " + rpy.map(v => Number(v).toFixed(1)).join(" , ") + " °";
+      return line;
+    }
+    function cmdText(s) {
+      if (s.event === "reset") return "RESET  GET /status";
+      if (s.event === "done") return "GIVE_UP  " + JSON.stringify({reason: s.note});
+      const moveTo = fmtMoveTo(s);
+      if (s.event === "ctrl") {
+        const osc = "OSC  " + JSON.stringify(s.action) + "   kind=" + s.kind +
+          (s.dist_m == null ? "" : "  dist=" + s.dist_m + "m");
+        return (moveTo ? moveTo + "\n" : "") + osc;
+      }
+      return moveTo || ("POST /move  " + JSON.stringify(s.named || {}));
+    }
+    function gripTxt(g) {
+      if (g == null) return "—";
+      const t = fmt(g, 3);
+      if (g > 0.6) return t + "  张开";
+      if (g < 0.1) return t + "  合死（多半空抓）";
+      return t + "  半开 / 顶到物体";
+    }
+
+    function show(i, stop) {
+      if (stop) stopPlay();
+      const steps = currentSteps();
+      if (!steps.length) return;
+      idx = Math.max(0, Math.min(steps.length - 1, i));
+      const s = steps[idx];
+      document.getElementById("agentview").src = s.agentview;
+      document.getElementById("wrist").src = s.wrist;
+      document.getElementById("note").textContent = s.note || "—";
+      let fb = s.feedback || "";
+      if (!fb && s.event === "ctrl") {
+        const parent = (ep.steps || []).find(m => m.move_id === s.move_id && (m.feedback || m.event === "move" || m.event === "reset"));
+        fb = (parent && parent.feedback) || "";
+      }
+      document.getElementById("fb").textContent = fb || "—";
+      document.getElementById("phase").textContent = (s.phaseLabel || s.phase || "") + (s.phaseHint ? " · " + s.phaseHint : "");
+      document.getElementById("phaseTag").textContent = s.phaseLabel || s.kind || s.event;
+      document.getElementById("trel").textContent = s.t_rel == null ? "—" : (s.t_rel + " s");
+      document.getElementById("eef").textContent = (s.eef || []).map(v => fmt(v)).join(" , ");
+      const rpy = (s.rpy || []).map(v => v == null ? "—" : Number(v).toFixed(1));
+      document.getElementById("rpy").textContent = rpy.join(" , ");
+      document.getElementById("grip").textContent = gripTxt(s.gripper_open);
+      document.getElementById("steps").textContent = (s.env_steps ?? "—") + " / 600";
+      document.getElementById("budget").textContent = (s.remaining_moves ?? "—") + " moves · " + (s.remaining_env_steps ?? "—") + " steps";
+      document.getElementById("interp").textContent =
+        (s.planned_env_steps == null ? "—" : s.planned_env_steps + " 步") +
+        (s.stopped ? " · " + s.stopped : "") +
+        (s.final_dist_m == null && s.dist_m == null ? "" : " · 剩余 " + fmt((s.final_dist_m ?? s.dist_m) * 100, 1) + " cm");
+      document.getElementById("ctrlmeta").textContent = s.event === "ctrl"
+        ? (`#${s.env_steps}  move ${s.move_id}  interp ${s.interp_i}  ${s.kind}`)
+        : "—";
+      document.getElementById("action").textContent = s.action ? s.action.map(v => Number(v).toFixed(2)).join("  ") : "—";
+      document.getElementById("cmd").textContent = cmdText(s);
+      document.getElementById("slider").value = String(idx);
+      document.getElementById("poslbl").textContent = s.event === "ctrl"
+        ? (`ctrl ${idx + 1}/${steps.length}  ·  move ${s.move_id}  ·  ${s.kind} ${s.interp_i}`)
+        : ((s.event === "move" ? ("Move " + s.move_id) : s.event) + "  ·  " + idx + " / " + (steps.length - 1));
+      document.querySelectorAll(".hop").forEach(h => h.classList.toggle("on", hopFor(s).includes(h.dataset.id)));
+      document.querySelectorAll(".tick").forEach((b) => {
+        const on = mode === "ctrl" ? b.textContent === ("M" + (s.move_id ?? 0)) : false;
+        b.classList.toggle("on", on);
+      });
+      if (mode !== "ctrl") {
+        document.querySelectorAll(".tick").forEach((b, k) => b.classList.toggle("on", k === idx));
+      }
+      document.querySelectorAll(".shot").forEach(el => el.classList.toggle("on", Number(el.dataset.i) === idx));
+      drawXY(); drawZG();
+    }
+
+    function drawXY() {
+      const steps = currentSteps();
+      const c = document.getElementById("xy"), ctx = c.getContext("2d");
+      const W = c.width, H = c.height;
+      ctx.clearRect(0, 0, W, H);
+      if (!steps.length) return;
+      const xs = steps.map(s => s.eef[0]), ys = steps.map(s => s.eef[1]);
+      const minX = Math.min(...xs) - 0.04, maxX = Math.max(...xs) + 0.04;
+      const minY = Math.min(...ys) - 0.04, maxY = Math.max(...ys) + 0.04;
+      const pad = 28;
+      const sx = x => pad + (x - minX) / Math.max(1e-6, maxX - minX) * (W - pad * 2);
+      const sy = y => H - pad - (y - minY) / Math.max(1e-6, maxY - minY) * (H - pad * 2);
+      ctx.strokeStyle = "#243042"; ctx.strokeRect(pad, pad, W - pad * 2, H - pad * 2);
+      ctx.fillStyle = "#8b9bb0"; ctx.font = "12px Segoe UI";
+      ctx.fillText("+y 桌面深处", W - 90, 16);
+      ctx.beginPath();
+      steps.forEach((s, i) => { const x = sx(s.eef[0]), y = sy(s.eef[1]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.strokeStyle = "#3d5166"; ctx.lineWidth = 2; ctx.stroke();
+      const colors = { reset:"#6f7f93", approach:"#5ec8e0", close:"#f0a05a", lift:"#8b8cff", reacquire:"#5ee0c5", stall:"#e6c35c", give_up:"#ff6b7a", success:"#5ee0c5" };
+      steps.forEach((s, i) => {
+        const x = sx(s.eef[0]), y = sy(s.eef[1]);
+        ctx.beginPath(); ctx.arc(x, y, i === idx ? 7 : (mode === "ctrl" ? 1.4 : 3.2), 0, Math.PI * 2);
+        ctx.fillStyle = colors[s.phase] || "#fff"; ctx.fill();
+        if (i === idx) { ctx.strokeStyle = "#fff"; ctx.stroke(); }
+      });
+    }
+
+    function drawZG() {
+      const steps = currentSteps();
+      const c = document.getElementById("zg"), ctx = c.getContext("2d");
+      const W = c.width, H = c.height;
+      ctx.clearRect(0, 0, W, H);
+      if (steps.length < 2) return;
+      const pad = 30, n = steps.length;
+      const xs = i => pad + i / (n - 1) * (W - pad * 2);
+      const zs = steps.map(s => s.eef[2]);
+      const zmin = Math.min(...zs) - 0.04, zmax = Math.max(...zs) + 0.04;
+      const zy = z => H - pad - (z - zmin) / (zmax - zmin) * (H - pad * 2);
+      const gy = g => H - pad - (g ?? 0) * (H - pad * 2);
+      ctx.strokeStyle = "#243042";
+      ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, H - pad); ctx.lineTo(W - pad, H - pad); ctx.stroke();
+      ctx.setLineDash([4,4]); ctx.strokeStyle = "#3a2a20";
+      ctx.beginPath(); ctx.moveTo(pad, zy(0.95)); ctx.lineTo(W - pad, zy(0.95)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "#8b9bb0"; ctx.font = "12px Segoe UI";
+      ctx.fillText("z " + zmin.toFixed(2) + "–" + zmax.toFixed(2), pad + 6, pad + 12);
+      ctx.beginPath();
+      steps.forEach((s, i) => { const x = xs(i), y = zy(s.eef[2]); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.strokeStyle = "#8b8cff"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.beginPath();
+      steps.forEach((s, i) => { const x = xs(i), y = gy(s.gripper_open); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.strokeStyle = "#f0a05a"; ctx.stroke();
+      const x = xs(idx);
+      ctx.strokeStyle = "#ffffff55";
+      ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, H - pad); ctx.stroke();
+      ctx.fillStyle = "#8b8cff"; ctx.fillRect(W - 210, 12, 10, 10);
+      ctx.fillStyle = "#e8eef6"; ctx.fillText("z", W - 194, 21);
+      ctx.fillStyle = "#f0a05a"; ctx.fillRect(W - 160, 12, 10, 10);
+      ctx.fillStyle = "#e8eef6"; ctx.fillText("夹爪", W - 144, 21);
+    }
+
+    function stopPlay() {
+      if (timer) { clearInterval(timer); timer = null; }
+      document.getElementById("play").textContent = "播放";
+    }
+    function togglePlay() {
+      if (timer) { stopPlay(); return; }
+      document.getElementById("play").textContent = "暂停";
+      timer = setInterval(() => {
+        if (idx >= currentSteps().length - 1) { stopPlay(); return; }
+        show(idx + 1);
+      }, Number(document.getElementById("speed").value));
+    }
+    document.getElementById("play").onclick = togglePlay;
+    document.getElementById("prev").onclick = () => show(idx - 1, true);
+    document.getElementById("next").onclick = () => show(idx + 1, true);
+    document.getElementById("slider").oninput = e => show(Number(e.target.value), true);
+    document.getElementById("speed").onchange = () => { if (timer) { stopPlay(); togglePlay(); } };
+    window.addEventListener("keydown", e => {
+      if (["INPUT","SELECT","TEXTAREA"].includes(e.target.tagName)) return;
+      if (e.code === "Space") { e.preventDefault(); togglePlay(); }
+      if (e.code === "ArrowRight") show(idx + 1, true);
+      if (e.code === "ArrowLeft") show(idx - 1, true);
+      if (e.key === "c" || e.key === "C") setMode("ctrl", true);
+      if (e.key === "m" || e.key === "M") setMode("move", true);
+      if (e.key === "0" && episodes.length >= 10) selectEp(9, true);
+      else if (e.key >= "1" && e.key <= "9") selectEp(Number(e.key) - 1, true);
+    });
+    window.addEventListener("hashchange", () => {
+      const id = location.hash.replace("#", "");
+      const i = episodes.findIndex(e => e.id === id);
+      if (i >= 0 && episodes[i] !== ep) selectEp(i, true);
+    });
+    function initialIndex() {
+      const fromHash = location.hash.replace("#", "");
+      let i = episodes.findIndex(e => e.id === fromHash);
+      if (i >= 0) return i;
+      try {
+        const saved = localStorage.getItem("libero-viz-ep");
+        i = episodes.findIndex(e => e.id === saved);
+        if (i >= 0) return i;
+      } catch (err) {}
+      return 0;
+    }
+    selectEp(initialIndex());
+  })().catch(function (err) {
+    document.body.insertAdjacentHTML("afterbegin",
+      '<p style="color:#ff6b7a;padding:12px">加载 data.js 失败：' + err +
+      '。请确认打开的是 http://localhost:8788 或与 data.js 同目录的 index.html。</p>');
+  });
+  </script>
+</body>
+</html>

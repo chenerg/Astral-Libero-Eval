@@ -1,0 +1,9 @@
+# Episode summary
+
+Instruction: pick up the milk and place it in the basket.
+
+Official result: success=false, reason=max_moves, 25 moves and 263 physics steps. The final move response reports terminated=true in result.final_state; its top-level state and saved observation still reported terminated=false.
+
+Probed +x, approached the red MILK carton, and attempted two empty pinches. Correcting fore-aft alignment toward -x produced a retained grasp at measured eef approximately (-0.087, -0.240, 0.105), with gripper_open approximately 0.669. The test lift retained the carton and a subsequent lift cleared the floor. Transported toward the basket, but exhausted the move budget before accurate placement. Final simultaneous lateral correction and opening released the milk beside the basket. All motions reported reached/ok; that feedback did not imply task success.
+
+Hindsight: World +x moves toward the bottom of agentview; +y moves left. This is a floor scene, support approximately z=0, home measured z=0.2565. The milk is the tall red carton marked MILK, not the flat blue-white packet. At reset orientation, a carton visible only near the bottom of wrist view can be behind the actual pinch location. Empty grasps at z=0.136 and z=0.109 closed to approximately 0.019 after lift. Moving back toward -x approximately 3cm from the second empty grasp produced a body pinch at z=0.105 with opening approximately 0.668, maintained through lift and transport. Reached targets commonly left 5–8mm residual, so 2cm commanded descents often moved only 1.3cm. Basket alignment requires further wrist-based correction; the basket appeared to shift during approach. Reserve enough calls to align fully, descend, and then release separately. Opening during lateral correction dropped the carton before it entered the basket.

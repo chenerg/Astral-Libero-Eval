@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:Empty grasps used the budget. Two closes were lip pinches (gripper_open 0.144 then 0.022 on lift; then 0.05). 1 move left cannot regrasp and place.",
+  "instruction": "put the bowl on the plate",
+  "task_name": "put_the_bowl_on_the_plate",
+  "suite": "libero_goal",
+  "task_id": 8,
+  "init_id": 0,
+  "env_steps": 221,
+  "moves": 24,
+  "elapsed_s": 1182.99,
+  "final_state": {
+    "eef_x": -0.0754,
+    "eef_y": 0.0461,
+    "eef_z": 0.9224,
+    "roll_deg": -0.4,
+    "pitch_deg": 20.1,
+    "yaw_deg": -0.3,
+    "eef_quat": [
+      0.9889,
+      -0.0005,
+      0.1485,
+      0.0015
+    ],
+    "gripper_open": 0.05,
+    "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.001, -0.0041, -0.0015]",
+    "env_steps": 221,
+    "moves": 24,
+    "remaining_env_steps": 379,
+    "remaining_moves": 1,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": true
+  }
+}

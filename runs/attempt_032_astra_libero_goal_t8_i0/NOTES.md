@@ -1,0 +1,12 @@
+# attempt_032 — ABORT (usage limit after 24 /move)
+
+Instruction: put the bowl on the plate.
+Official success: false. No result.json (episode never terminated). reason=none. remaining_moves=1 at abort. Codex CLI usage-limit/quota error; not retried. Codex exit 1, ~83.6k tokens. Retry window: try again at 10:32 PM.
+
+24 POST /move, 239 env steps, ~309.9 s from reset to last move (transcript t). LIBERO_MAX_MOVES=25. LIBERO_WORLD_AXES=1 (world_axes_overlay=true on agentview and wrist). Planner astra, Codex gpt-6-astra medium.
+
+Prompt: PROMPT_BASE_2.txt with {{LESSONS}} replaced by “(no extra accumulated lessons)”, plus a WORLD_AXES header that both obs/agentview.png and obs/wrist.png carry a translucent world XYZ triad (red=+X, green=+Y, orange/blue=+Z). Close-now check (“close now would trap the object”) and collision-avoid (“would collide” / never send a Cartesian target that would collide) kept from BASE_2. compose_prompt.py was not run. LESSONS.md was not injected.
+
+Story: Kitchen-table scene. Reset at home eef ≈ (−0.207, 0.002, 1.179), gripper_open 0.517, jaws-down. Mandatory +x 3 cm probe (m01) confirmed +x → agentview BOTTOM (axes overlay on both views). Open-jaw +x 8 cm then −z 10 / 7 cm (m02–m04) to hover above the bowl; pitch 15° (m05); +y 3.5 cm side-wall offset (m06) then +x 2 / −z 2 cm and two 2 cm lowers (m07–m09) to ≈(−0.100, 0.040, 0.972). First close (m10) at z≈0.972 with “close now would trap: yes”; g=0.05 then 0.019 on a 2 cm lift (m11) — bowl stayed on the table. Reopened and two 2 cm lowers (m12–m14). Second close (m15) at ≈(−0.100, 0.041, 0.945), pitch ≈15°, g=0.082. 2 cm test lift (m16) kept g=0.05 and the bowl rose; 6 cm clearance lift (m17) g=0.044. Carry +x 10 cm twice then −z 4 / 2 cm over the plate (m18–m21). Open (m22) at ≈(0.098, 0.043, 0.970) released; two open-jaw vertical retracts (m23–m24, +6 then +8 cm) to ≈(0.098, 0.044, 1.097), g=0.981. Official success stayed false. Last agentview shows the bowl overlapping the plate; last wrist shows the bowl detached from open pads. All 24 moves reported reached/ok; no blocked/contact.
+
+Codex then hit the ChatGPT usage limit (`You’ve hit your usage limit… try again at 10:32 PM`) before spending the last remaining_move. 24 /move actually happened (budget 25). One empty close (g=0.05→0.019) then a retained side-wall pinch (g≈0.08→0.044). Bowl was released over the plate but check_success() never flipped true. WORLD_AXES=1 on both cameras. Not retried.

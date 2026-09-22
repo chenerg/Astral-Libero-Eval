@@ -1,0 +1,32 @@
+{
+  "instruction": "turn on the stove",
+  "task_name": "turn_on_the_stove",
+  "suite": "libero_goal",
+  "task_id": 7,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.4315,
+  "eef_y": 0.1943,
+  "eef_z": 0.9539,
+  "roll_deg": -1.6,
+  "pitch_deg": 2.0,
+  "yaw_deg": -44.3,
+  "eef_quat": [
+    0.9259,
+    0.3778,
+    0.0027,
+    -0.0029
+  ],
+  "gripper_open": 0.386,
+  "feedback": "ok: reached dist_m=0.001 remaining_xyz=[0.0014, 0.0001, 0.0001]",
+  "env_steps": 200,
+  "moves": 20,
+  "remaining_env_steps": 400,
+  "remaining_moves": 5,
+  "success": true,
+  "terminated": false,
+  "world_axes_overlay": true
+}

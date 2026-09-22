@@ -1,0 +1,34 @@
+{
+  "success": false,
+  "reason": "max_moves",
+  "instruction": "pick up the milk and place it in the basket",
+  "task_name": "pick_up_the_milk_and_place_it_in_the_basket",
+  "suite": "libero_object",
+  "task_id": 7,
+  "init_id": 0,
+  "env_steps": 372,
+  "moves": 30,
+  "elapsed_s": 2030.43,
+  "final_state": {
+    "eef_x": -0.0804,
+    "eef_y": -0.1719,
+    "eef_z": 0.1025,
+    "roll_deg": -0.7,
+    "pitch_deg": 18.1,
+    "yaw_deg": -0.8,
+    "eef_quat": [
+      0.9923,
+      0.0033,
+      0.124,
+      0.0029
+    ],
+    "gripper_open": 0.05,
+    "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0013, -0.0012, 0.0014]",
+    "env_steps": 372,
+    "moves": 30,
+    "remaining_env_steps": 228,
+    "remaining_moves": 0,
+    "success": false,
+    "terminated": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "instruction": "pick up the alphabet soup and place it in the basket",
+  "task_name": "pick_up_the_alphabet_soup_and_place_it_in_the_basket",
+  "suite": "libero_object",
+  "task_id": 0,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0074,
+  "eef_y": 0.2393,
+  "eef_z": 0.2162,
+  "roll_deg": -0.1,
+  "pitch_deg": 0.8,
+  "yaw_deg": -0.3,
+  "eef_quat": [
+    0.9996,
+    0.0001,
+    -0.0282,
+    -0.0003
+  ],
+  "gripper_open": 0.973,
+  "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0007, 0.0002, 0.0061]",
+  "env_steps": 264,
+  "moves": 25,
+  "remaining_env_steps": 336,
+  "remaining_moves": 0,
+  "success": false,
+  "terminated": true
+}

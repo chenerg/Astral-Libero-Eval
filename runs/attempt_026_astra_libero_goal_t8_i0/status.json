@@ -1,0 +1,32 @@
+{
+  "instruction": "put the bowl on the plate",
+  "task_name": "put_the_bowl_on_the_plate",
+  "suite": "libero_goal",
+  "task_id": 8,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0915,
+  "eef_y": 0.0342,
+  "eef_z": 0.984,
+  "roll_deg": -0.3,
+  "pitch_deg": 14.3,
+  "yaw_deg": -0.3,
+  "eef_quat": [
+    0.9952,
+    0.0002,
+    0.098,
+    0.001
+  ],
+  "gripper_open": 0.088,
+  "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.0006, -0.0001, -0.0004]",
+  "env_steps": 246,
+  "moves": 25,
+  "remaining_env_steps": 354,
+  "remaining_moves": 0,
+  "success": true,
+  "terminated": false,
+  "world_axes_overlay": false
+}

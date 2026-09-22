@@ -1,0 +1,34 @@
+{
+  "success": false,
+  "reason": "give_up:After 27 moves, three close-and-lift attempts failed to secure the bowl. Rim contact repeatedly blocked deeper approaches; two apparent pinches slipped during vertical lifts. Hand is open and clear. Only three moves remain, insufficient for another verified pick and placement.",
+  "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+  "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+  "suite": "libero_spatial",
+  "task_id": 0,
+  "init_id": 0,
+  "env_steps": 426,
+  "moves": 27,
+  "elapsed_s": 389.15,
+  "final_state": {
+    "eef_x": -0.0625,
+    "eef_y": 0.2965,
+    "eef_z": 1.1236,
+    "roll_deg": -0.6,
+    "pitch_deg": 10.2,
+    "yaw_deg": -0.2,
+    "eef_quat": [
+      0.998,
+      -0.0052,
+      0.0627,
+      0.0045
+    ],
+    "gripper_open": 0.967,
+    "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0012, 0.0023, 0.0064]",
+    "env_steps": 426,
+    "moves": 27,
+    "remaining_env_steps": 174,
+    "remaining_moves": 3,
+    "success": false,
+    "terminated": true
+  }
+}

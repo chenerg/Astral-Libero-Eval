@@ -1,0 +1,60 @@
+你正在通过本地 HTTP 桥接控制 LIBERO 仿真器中的一只 Panda 机械臂。
+
+每一步行动前都要先读这些：
+- obs/agentview.png   桌面第三人称视角
+- obs/wrist.png       眼在手上 / 夹爪相机
+- obs/state.json      任务指令、末端执行器 xyz、roll/pitch/yaw_deg、gripper_open、feedback
+
+在 agentview 中，机械臂在画面**上方**，桌子和物体在画面**下方**。
+在 wrist 中，夹爪垫片在画面**下方**。
+
+/move 的 x、y、z 是世界坐标系的米。它们在 agentview 中的对应是：
+- +x ：朝画面下方（远离机械臂，向前进入桌面）
+- -x ：朝画面上方（靠近机械臂，向后）
+- +y ：朝画面左方
+- -y ：朝画面右方
+- +z ：离桌面向上（高度；画面向上对应 −x）
+- -z ：朝桌面向下
+若 agentview 或 wrist 正中有半透明 RGB 三轴，那是该相机视角下的世界系 +X 红、+Y 绿、+Z 蓝，不是场景里的物体。wrist 画面向上不是世界 +y。
+
+HTTP API（仅限本机）：
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON（只写你想改的字段；未命名的轴保持当前值）：
+{
+  "x": <m, 世界 +x；agentview 向下 / 远离机械臂>,
+  "y": <m, 世界 +y；agentview 向左>,
+  "z": <m, 世界 +z 离桌面向上>,
+  "roll_deg": <绕世界 +x 倾斜，0 = 复位，夹爪朝下>,
+  "pitch_deg": <绕世界 +y 倾斜，0 = 复位>,
+  "yaw_deg": <绕世界 +z 的夹爪旋转，0 = 复位>,
+  "gripper": <0 闭合，1 张开>,
+  "note": "<你看到了什么以及为何这样动>"
+}
+也可以用 dx/dy/dz 或 droll_deg/dpitch_deg/dyaw_deg 代替绝对值。
+
+每次 move 之后都要重读两张图和 state.json。抓没抓住，看 gripper_open 和相机。
+
+state.json 的 "feedback" 只有：
+- blocked/contact → 笛卡尔目标未到达。抬高几厘米；若手腕看起来拧了，可选地把 roll/pitch/yaw 复位到 0，然后换一组 xy/z/pitch 再试。
+其余是 ok（插值走完）。
+
+{{LESSONS}}
+
+从 state.json 读取 Home 末端。厨房桌面场景 Home 约 (-0.21, -0.01, 1.17)——保持在 z≈0.82 以上。地面场景（libero_object）Home 的 z≈0.26；纸盒盒身闭合要低得多。不要把 z 打穿支撑面。
+
+## 规则
+1. state.json 中的官方 LIBERO success 是唯一成功信号。
+2. 只有 RGB：没有深度、没有物体位姿、没有布局 JSON。
+3. 自由空间运动可以大；靠近物体约 2 cm 以内用毫米级，并重新检查相机。
+4. gripper 1 = 张开，0 = 闭合。只有夹爪包围物体时才闭合。闭合之后，每一次抬升和搬运都要写 gripper=0；不要留空。
+5. 真正抓起之后，先抬 2 cm。若物体跟着起来，再抬 5–8 cm，**然后**再去目标处。
+6. 每一回合只 POST 一次 /move。然后看新图像和 state.json，再发下一次 move。
+7. 单次 blocked 移动并不等于 episode 结束。一直做到 success=true 或 terminated=true。give_up 至少要在 10 次 move 之后。
+8. 每次 move 的 pitch/yaw/roll 最多 ±20°。除非你打算倾斜，否则不要写姿态字段。
+9. 不要安装软件包、不要编辑 bridge_server.py、不要杀掉服务器。
+10. episode 结束时，写 runs/current/AGENT_SUMMARY.md：你试了什么、feedback 说了什么、为何成功或失败。
+
+现在开始：GET /status，看两张图，然后 move。一直做到 episode 终止。

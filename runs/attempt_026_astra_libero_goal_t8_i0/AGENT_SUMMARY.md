@@ -1,0 +1,9 @@
+# Episode summary
+
+Instruction: put the bowl on the plate (libero_goal, task 8, init 0).
+
+Official state reported success=true after move 25, at 246 environment steps. The response result also reported terminated=true. No further motions were issued.
+
+Confirmed +x with a 3cm probe, approached with open jaws, and pitched approximately 15 degrees for a side-wall pinch. The first two grasps at measured eef z=0.986 and 0.959 failed the small lift test: the bowl stayed on the table and opening fell to 0.019/0.024. Reopened, lowered, and corrected slightly toward the bowl. The third close at measured eef (-0.0795, 0.0321, 0.9447), pitch 15.1 degrees, retained the wall. Opening remained 0.053 after the test lift and 0.044 after the clearance lift. Transported forward, approached the plate, and opened. All motion feedback reported reached; no blocked/contact was returned.
+
+Hindsight: World +x moves toward the BOTTOM of agentview; +y moves left in agentview and moved the bowl left in the wrist view relative to the gripper. Home z was 1.179 in this kitchen scene; the approximate 0.90 support height was a scene guide, not directly measured. In the wrist image the useful side rim crossed the pad row near the bottom, with one pad inside and one outside. Rim overlap alone at the higher poses did not establish a grasp. The successful measured eef height was about 0.945 with 15-degree pitch and a lateral offset; treat this as this episode's observed pose, not a universal object coordinate. Small commanded 2cm vertical moves often achieved only about 1.3cm due to roughly 7mm stopping residual. The bowl occupied roughly 30px across in initial agentview versus roughly 45px for the plate. Preserve more planner calls by recognizing that residual and approaching a suitable pregrasp height efficiently.

@@ -1,0 +1,31 @@
+{
+  "instruction": "pick up the milk and place it in the basket",
+  "task_name": "pick_up_the_milk_and_place_it_in_the_basket",
+  "suite": "libero_object",
+  "task_id": 7,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.0317,
+  "eef_y": -0.0541,
+  "eef_z": 0.0514,
+  "roll_deg": -0.3,
+  "pitch_deg": 0.5,
+  "yaw_deg": -0.3,
+  "eef_quat": [
+    0.9996,
+    0.0006,
+    -0.0292,
+    -0.0001
+  ],
+  "gripper_open": 0.05,
+  "feedback": "ok: reached dist_m=0.009 remaining_xyz=[-0.0031, 0.0007, -0.0064]",
+  "env_steps": 136,
+  "moves": 15,
+  "remaining_env_steps": 464,
+  "remaining_moves": 0,
+  "success": false,
+  "terminated": false
+}
