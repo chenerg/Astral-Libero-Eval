@@ -1,0 +1,35 @@
+{
+  "success": true,
+  "reason": "success",
+  "instruction": "put the bowl on the plate",
+  "task_name": "put_the_bowl_on_the_plate",
+  "suite": "libero_goal",
+  "task_id": 8,
+  "init_id": 0,
+  "env_steps": 183,
+  "moves": 18,
+  "elapsed_s": 954.93,
+  "final_state": {
+    "eef_x": 0.0514,
+    "eef_y": 0.0384,
+    "eef_z": 0.9726,
+    "roll_deg": -1.4,
+    "pitch_deg": -0.0,
+    "yaw_deg": -1.5,
+    "eef_quat": [
+      0.9995,
+      0.0114,
+      -0.0264,
+      0.0106
+    ],
+    "gripper_open": 0.04,
+    "feedback": "ok: reached dist_m=0.018 remaining_xyz=[0.0011, 0.0002, -0.0177]",
+    "env_steps": 183,
+    "moves": 18,
+    "remaining_env_steps": 417,
+    "remaining_moves": 7,
+    "success": true,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}
