@@ -31,6 +31,7 @@
 1. 同一座桥、同一套相机约定下，Astra 能在厨房桌面（碗、抽屉、灶）和地面（番茄酱瓶颈）上完成接触级闭环。grok-4.7 在 goal 抽屉/灶/碗上也拿到了官方成功。
 2. 失败几乎都发生在 **夹爪缝是否包住物体**，而不是语言理解：两个模型都能点名正确物体，并做 +x 探针确认图像方向。
 3. 世界坐标轴叠加（`LIBERO_WORLD_AXES=1`）能稳住轴向符号、帮助灶具这类「高度 + 绕 z 转动」任务；它 **不** 替代腕部缝隙对齐，也 **不** 告诉模型抽屉把手该用 roll 还是 yaw。
+4. grok-4.7 的 033–038 **不是闭卷视动**：六局里有五局读了任务源码、初始状态或上一局轨迹（审计会话 `01a0c7bd-aea8-79c2-9d35-1a875dcd3b57`）。Astra 18 局没有这类读取。详见 §6。
 
 ---
 
@@ -141,7 +142,58 @@ grok --prompt-file PROMPT.txt --always-approve --verbatim \
      --max-turns 250 --disallowed-tools Agent
 ```
 
-两套规划器打同一座桥、同一套图像、同一份 prompt。
+两套规划器打同一座桥、同一套图像、同一份 **英文** prompt。全文中英对照见 [附录 A](#附录-a-实验用-prompt中英对照)。改稿时间线见下一小节。
+
+### 1.6.1 Prompt 改稿史：闭合检查与碰撞检查
+
+飞书附录 A 是 **终稿**。这两条规则不是一开始就有的，是 9-21 下午写进第 4 节、从 **attempt 019** 起才下发的。对后续执行提升最大的就是它们。
+
+**三版（以各局归档的 `PROMPT.txt` 为准）**
+
+| 版本 | 用在哪些局 | 要点 |
+|---|---|---|
+| 短稿 `PROMPT_BASE.txt` | 003–012 | 十条规则。有「包围物体才闭合」「真夹后点名 gripper=0」「先抬 2 cm」，**没有**闭合前 yes/no，**没有**平移前碰撞检查。 |
+| 长稿 BASE_2，尚无两段门 | 013–018 | 坐标、探针、循环都在了。016 在第 8 节加了碗沿必须在两垫之间（碗专用）。闭合/平移仍没有强制自问。 |
+| 长稿 + 两段门（现附录 A） | **019 起至今** | 第 4 节插入下面两段。019 的 `EXPERIMENT.md` 记为 `close-check+collision`。 |
+
+**英文（019 起实际下发，第 4 节新增）**
+
+```text
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads
+  (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target,
+  a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target.
+  Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move.
+  A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+```
+
+**中文**
+
+```text
+每次 gripper=0 闭合前：
+  看两张图，在 note 里回答："close now would trap the object: yes/no"。
+  只有腕部图显示物体本体或沿在两垫之间的缝里才答 yes
+  （不是压在薄沿上、不是在空腔里、不是只靠着一块垫）。
+  若 no，不要发 gripper=0。先改 xy / z / pitch / yaw，再看腕部。
+
+每次平移（x/y/z 或 dx/dy/dz）前：
+  看两张图，问这次运动会不会撞到目标、邻居或支撑面。
+  如果路径会让腕部或垫穿过物体，不要发这个目标。
+  先抬几厘米 z 和/或改 pitch/yaw 让开口让开，再动。
+  上一拍 blocked/contact 就是碰撞——不要重复同一个 xyz。
+```
+
+**加上之后发生了什么**
+
+- 加上之前：015 两次 jaws-down 空抬；017 真夹牛奶后最后一步把张开和横移写在一起，掉在篮外。016 能成功，靠的是第 8 节碗专用「沿在两垫之间」，不是通用门。
+- 加上之后（Astra）：020 番茄酱 **全程一次闭合**，note 里 m06 写 `close now: no`、继续降，m10 才闭，官方成功。随后 goal 抽屉 024、碗 026、开灶 027/031 都在同一套门下完成。
+- 规则卡住的是「先闭再看」和「直线穿物体」。它不保证释放（017 式最后一步仍可能把开爪和横移写在一起），也不保证 Grok 把腕部投影重叠当成可闭（021–023 空夹）。
 
 ### 1.7 世界坐标轴叠加（可选）
 
@@ -205,7 +257,8 @@ Prompt 里有一句：画面中心半透明 RGB 三轴是世界 +X/+Y/+Z，不�
 | 11:54 | Astra 同样 BASE_2：GET `/status` 后直接退出（014）。 |
 | 12:03 | Astra 015：留在循环里，但全程 jaws-down，两次空抬，15 步不够。 |
 | 14:36 | **Astra 016**：BASE_2 静态「碗沿必须在两垫之间」+ 25 步。15° 侧壁，一次闭合就夹住，19 步成功。 |
-| 14:47–15:21 | 地面：牛奶（017 夹起，最后一步在篮子旁张开）、resume 018 侧倒纸盒再抓失败、字母汤 019 **视觉在篮内但官方 success=false**。 |
+| 14:47–15:21 | 地面：牛奶（017 夹起，最后一步在篮子旁张开）、resume 018 侧倒纸盒再抓失败。 |
+| 15:21 | **Prompt 第 4 节写入闭合 yes/no 与平移前碰撞检查**，从 019 起下发。019 字母汤视觉在篮内、官方 false。 |
 | **15:37** | **Astra 020 番茄酱成功**：瓶颈 g≈0.42，2 cm 验夹，放入篮子。 |
 
 016 说明：哪怕不注入上一局战报，只要 prompt 把「缝里才闭合」写死，Astra 能在 spatial/0 上复现成功，而且比 005 更干净（19 vs 29 步）。
@@ -613,6 +666,7 @@ Astra 031 开轴开灶（开爪碰杆，20 Hz，约 10 s）：
 - grok-4.7 在抽屉上第一次给出 roll −90° 的正确 affordance（033），早期 Grok 028 用的是 yaw 90°。
 - 开灶在 grok-4.7 上 **开轴、关轴都能做**（034 / 037），说明 029 的成功不能单归因于画面中心的三轴。
 - 碗任务 035 失败在释放预算，不是认物；038 关轴一次放到盘上。轴没有单调地提高这一条的成功率。
+- **闭卷口径：** 033、034、037 读过上一局成功轨迹或场景文件，不能当成纯 RGB 闭环。038 是这六局里唯一没有读 LIBERO 数据、也没有读历史局的成功。详见 §6。
 
 ---
 
@@ -665,31 +719,96 @@ grok-4.7 的 goal 对照把「轴是否充分」说得更窄：开灶关轴也�
 
 ---
 
-## 6. 方法学边界
+## 6. 评测卫生：信息泄露
+
+依据会话 `01a0c7bd-aea8-79c2-9d35-1a875dcd3b57`（2026-09-22，对 grok-4.7 033–038 的工具日志审计），以及同一会话里对 Astra `codex.log` / Codex rollout 的核对。这里的「泄露」指策略进程读到了 **RGB + 当前 `obs/state.json` + 本局 HTTP 桥之外** 的任务定义、场景、成功判定源码、初始状态或上一局轨迹。不是密钥或账号泄漏：六份 grok-4.7 会话里没有 API key、token 或私钥。
+
+评测设计上，`PROMPT_BASE_2` 把 `{{LESSONS}}` 换成 “(no extra accumulated lessons)”，本意是下一局看不到上一局战报。prompt 也写了：只通过 HTTP 控制手臂；观测只有两张 RGB 和 `obs/state.json`；不要深度、物体位姿和布局 JSON。这是文字约束。工具层没有挡住工作区。
+
+### 6.1 启动方式
+
+| | Astra | Grok 4.7（033–038） |
+|---|---|---|
+| 入口 | `codex exec -m gpt-6-astra` | nested `grok --prompt-file PROMPT.txt -m grok-4.7 --always-approve --verbatim --cwd astra_eval --disallowed-tools Agent` |
+| 沙箱 | `--dangerously-bypass-approvals-and-sandbox`（`danger-full-access`） | 沙箱关，只禁了 `Agent` |
+| 仍可用的读工具 | shell `cat` / `curl` | `read_file`、`grep`、shell |
+| 工作目录 | `/home/chener/LIBERO/astra_eval`，向上能看见整个 LIBERO 仓库 | 同左 |
+
+prompt 同一份。Astra 没有去打开仓库里的任务文件。Grok 4.7 打开了。
+
+### 6.2 Grok 4.7（attempt 033–038）
+
+归档目录里的 `grok.log` 大约 1 KB，几乎看不到工具调用。实际读取记在本机 nested 会话 `~/.grok/sessions/.../astra_eval/*/chat_history.jsonl`。
+
+| 局 | 任务 / 轴 | 官方结果 | 额外读到的东西 |
+|---|---|---|---|
+| 033 | 抽屉，开轴 | 成功 | LIBERO 柜子关节源码；Astra 024 的笔记、轨迹和 6 张腕部图 |
+| 034 | 开灶，开轴 | 成功 | 灶的 BDDL（含目标与摆放区域）和灶 XML 关节；027 / 029 / 031 的成功笔记；029 的轨迹和腕部图。只定位到 `pruned_init` 路径，没有把初始状态解出来 |
+| 035 | 碗放盘，开轴 | 失败 | 碗、夹爪、Panda 的 XML；`bridge_server.py`；成功判定函数的前半段；Astra 026 的成功摘要。返回片段里没有「碗」「盘子」这两个词 |
+| 036 | 抽屉，关轴 | 失败 | 抽屉 BDDL、柜子 XML、开合判定源码、`bridge_server.py`；用 libero 环境的 Python 解开 `open_the_middle_drawer_of_the_cabinet.pruned_init`，得到 50×79 的初始状态数组 |
+| 037 | 开灶，关轴 | 成功 | 没有读 BDDL / XML。读了 029 的 `transcript.jsonl`，15 条 `/move` 的目标和备注都返回了 |
+| 038 | 碗放盘，关轴 | 成功 | 没有读 LIBERO 数据，也没有读历史局。只用 Python 对当时的 `obs/*.png` 做了像素统计 |
+
+033、034、037 的成功 **不能当成闭卷视动结果**。036 是这批里读得最重的一次（初始状态被解码进上下文），这一局失败了。038 是六局里唯一没有读任务文件、也没有读历史局的成功。
+
+更早的 nested Grok（029）已经在实验笔记里写过：读了 Astra 027 的灶高度。那一局同样不是闭卷。这次审计没有把 008–030 全部再扫一遍工具日志。
+
+`NOTES.md` / 对外 `grok.log` 里没有 BDDL、`pruned_init` 或 `check_success` 原文。泄露留在本机 nested `chat_history.jsonl`。
+
+### 6.3 Astra
+
+对当时全部 18 份 `codex.log` 和 20 份 Codex rollout 核对，一共 1206 条命令：
+
+- 实际动作只有 `curl` 访问 `127.0.0.1:8765`、`cat obs/state.json`，以及 prompt 要求的写 `AGENT_SUMMARY.md`。
+- 图像只打开过当前的 `obs/agentview.png` 和 `obs/wrist.png`（各 419 次），没有历史局的 `ctrl/` 或 `frames/`。
+- 没有读到 BDDL、`pruned_init`、场景 XML、`check_success` 源码、`bridge_server.py` 或上一局轨迹。
+- 从 attempt 015 起，Codex 会多试一次 `cat docs/agents/*.md`。当前目录是 `astra_eval`，这三个相对路径不存在，日志是 `No such file or directory`。真实文件在 `/home/chener/LIBERO/docs/agents/`，内容是仓库议题/分诊说明，没有任务配置或物体位置。
+
+Astra 是自己遵守了「RGB only」。工具层同样没有禁读仓库。
+
+### 6.4 不会跨局传递的两条
+
+这两条 **不会** 把上一局的结果或经验自动送进下一局：
+
+1. **`curl` 打本机桥。** 每一局开始前旧桥关掉、新桥重置。`GET /status` 和 `POST /move` 只返回这一局的任务句子、末端、夹爪、是否碰到、官方 `success`。没有上一局复盘，也没有 `LESSONS.md`。
+2. **`AGENT_SUMMARY.md`。** 是本局结束时策略自己写进 `runs/current/` 的复盘，不是成功判定。下一局启动时 `run_episode.sh` 删掉 `runs/current` 再指向新目录，开局时这个文件还不存在。Astra 018 曾经 `cat runs/current/AGENT_SUMMARY.md`，结果是 `No such file or directory`。18 局 Astra 里没有任何一次成功读到上一局的这份复盘。
+
+上一局文件仍在 `runs/attempt_NNN/`。桥不会读它，prompt 也不会自动附上。要读到，得是下一局模型自己去打开那个路径。Astra 没有这么做。Grok 4.7 读上一局，走的是它自己的 `read_file`。
+
+### 6.5 对成绩怎么用
+
+- Astra 的官方成功（005 / 016 / 020 / 024 / 026 / 027 / 031）按现有日志，可以按 RGB + 桥闭环来报。
+- grok-4.7 的 033 / 034 / 037 报成功时必须注明读过上一局或场景文件。
+- grok-4.7 的 038 是这批里唯一可按闭卷视动报的成功。
+- 035、036 失败，不能用来证明「读了源码就会成功」。
+
+---
+
+## 7. 方法学边界
 
 1. **单 init，不是套件分。** 官方 LIBERO 是每任务 20 个 init × 600 步。这里每条任务只打了 init 0，有的还打了多次（spatial/0、object/4、goal/7）。数字不能外推到 LIBERO 论文表。
-2. **后期对照关掉了 LESSONS 注入**，但仓库里仍有 `LESSONS.md` 和上一局 `NOTES.md`。Grok nested 默认能读工作区，029 读了 027 的灶高度。Astra `codex exec` 同样在该目录下。这是「同机可读文件」设定，不是纯图像策略。
+2. **后期对照关掉了 LESSONS 注入**，但仓库文件仍在磁盘上。Grok nested 的 `read_file` 能打开它们；Astra 的 18 局没有打开。详见 §6。
 3. **019 说明视觉成功 ≠ 官方成功。** 汇报时成功一律以 `result.json` 为准。
 4. **014 / 007 / 011** 分别是会话早退、额度、用户停止，不是接触能力。
-5. **030 / 035** 都是碗任务在释放前把预算用尽。038 证明同一 init 上 grok-4.7 关轴可以官方成功。
+5. **030 / 035** 都是碗任务在释放前把预算用尽。038 是 grok-4.7 关轴闭卷成功；035 开轴失败且读过源码。
 6. Prompt 从「可 pitch」到 BASE_2「闭合检查 + 碰撞检查 + 强制探针」，和模型能力缠在一起。005 的成功带着 LESSONS；016 起才比较接近「同一张卷子」。
 
 ---
 
-## 7. 结论与下一步
+## 8. 结论与下一步
 
 **已经能汇报的事实**
 
 - Direct-EEF 桥在这台机器上稳定：单线程 EGL、夹爪符号、世界系 OSC、rot180 图像、blocked/ok 反馈、可选世界轴。
 - Astra（gpt-6-astra medium）在三个套件都拿到过官方成功：桌面碗、地面番茄酱、抽屉、开灶、goal 碗。031 是开爪碰杆开灶。
-- Grok 官方成功从 1 次增加到 5 次。新增全部来自 9-22 grok-4.7 的 goal 套件：抽屉 033、开灶 034/037、碗 038。
-- 开灶在 grok-4.7 上开轴、关轴都能做。抽屉出现「开轴成功 / 关轴失败」一对；碗则是关轴成功、开轴夹住未张。世界轴不是单调开关。
+- Grok 官方成功从 1 次增加到 5 次。新增全部来自 9-22 grok-4.7 的 goal 套件：抽屉 033、开灶 034/037、碗 038。其中 033 / 034 / 037 读过上一局或场景文件；**038 是闭卷成功**。Astra 18 局没有这类读取。
+- 开灶在 grok-4.7 上开轴、关轴都能做。抽屉出现「开轴成功 / 关轴失败」一对；碗则是关轴成功、开轴夹住未张。世界轴不是单调开关。把 033–037 和轴条件绑在一起解释之前，先看 §6。
 
 **建议的下一轮（仍是单 init 定性）**
 
-1. 番茄酱：grok-4.7 还没对照 020/021。保持关 LESSONS，看空夹是否还在。
-2. 抽屉再打 1–2 个 init，确认 033 的 roll −90° 能否复现。
-3. 若要报套件数字：每个已成功任务再抽 3 个 init，Astra / grok-4.7 各跑一遍，仍用 BASE_2。
+1. 把 Grok 策略进程的工作区收紧（禁 `read_file` / `grep` 仓库，或换干净目录），再重跑 033–038 同任务，才能和 Astra 比闭卷视动。
+2. 番茄酱：grok-4.7 还没对照 020/021。收紧工具后再跑。
+3. 若要报套件数字：每个已成功任务再抽 3 个 init，Astra / grok-4.7 各跑一遍，仍用 BASE_2，并且工具层禁止读 `runs/` 和 `libero/` 源码。
 
 **工件位置**
 
@@ -701,3 +820,491 @@ grok-4.7 的 goal 对照把「轴是否充分」说得更窄：开灶关轴也�
 | 实验流水账 | `astra_eval/EXPERIMENT.md` |
 | 累积策略（对照实验未注入） | `astra_eval/LESSONS.md` |
 | 回放 UI | `astra_eval/viz/index.html`（`build.py` 打包 runs） |
+
+## 附录 A. 实验用 Prompt（中英对照）
+
+对照实验实际下发的是 **英文** `PROMPT_BASE_2.txt`。`{{LESSONS}}` 在公平对照里替换成 `(no extra accumulated lessons)`，不注入 `LESSONS.md`。
+
+**改稿：** 第 4 节「闭合前 yes/no」和「平移前碰撞检查」从 **attempt 019** 才写入（见 §1.6.1）。013–018 的长稿还没有这两段。下面 A.2 / A.3 是 019 之后的终稿。
+
+中文来自仓库里的平行译文 `PROMPT_BASE_2.zh.txt`。英文稿多出的三处（闭合前 yes/no 检查、平移前碰撞检查、第 6 节第 8 条「GET 之后必须 POST」、第 8 节静态碗沿规则）已按英文补进下面的中文，便于对照；**模型当局读到的仍是英文**。
+
+grok-4.7 的 nested 会话在英文稿前还加了 7 行头（任务名、轴开关、25 步预算）。Astra 的 `codex exec` 没有这 7 行，直接从 “You are controlling a single Panda arm…” 开始。
+
+### A.1 grok-4.7 nested 头（033–038 加在英文稿前）
+
+英文：
+
+```text
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+Task in obs/state.json: <instruction from state.json>
+LIBERO_WORLD_AXES=0 or 1: axis overlay on / off. Images are rot180. World xyz in /move does not flip.
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+```
+
+中文：
+
+```text
+你是这一局 LIBERO 的机器人策略。不要调用 Codex。不要再开子代理。
+后面全文严格按 PROMPT_BASE_2 执行。
+任务以 obs/state.json 为准。
+LIBERO_WORLD_AXES=0 或 1：PNG 上是否画世界轴。图像是 rot180。/move 的世界 xyz 不翻转。
+接口：GET http://127.0.0.1:8765/status ；POST /move ；POST /give_up。
+每回合用读图工具读两张 PNG、读 state.json，然后恰好一次 HTTP。
+预算 25 次 /move。一直循环到 success=true 或 terminated=true。不要在 GET /status 之后停住。
+```
+
+### A.2 英文 PROMPT_BASE_2（实验实际下发）
+
+文件：`astra_eval/PROMPT_BASE_2.txt`。下面是公平对照替换 `{{LESSONS}}` 之后的全文。
+
+```text
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+```
+
+### A.3 中文对照译文
+
+文件底稿：`astra_eval/PROMPT_BASE_2.zh.txt`，并补上英文稿多出的闭合/碰撞检查与静态碗沿规则。
+
+```text
+你正在通过 HTTP 工具调用控制 LIBERO 仿真器里的单臂 Panda。只能用工具，不要输出别的动作格式。
+
+目标：完成 obs/state.json 里的官方语言指令。禁止输出关节角。禁止编造物体坐标。禁止自己宣布成功——只要还在给你观测且 success 不是 true，任务就还没完成。
+
+整场试验的预算是 remaining_moves 次规划调用（默认 30）和 remaining_env_steps 步物理步进（默认 600），都以 state.json 为准。每回合只发一次 HTTP 调用。
+
+============================================================
+1. 坐标系（每次移动前先读）
+============================================================
+名称：world / MuJoCo 世界系。单位：米、度。
+
+单臂。Panda 平行爪。OSC 笛卡尔控制（不是关节空间）。
+
++x  远离机器人基座，指向工作空间远端
++y  从基座看是机器人左侧（你面对机器人时是右侧）
++z  向上。支撑面高度随场景变化——绝不要默认桌面 z = 0。
+
+Home（约值；reset 后务必从 state.json 重读）：
+  厨房桌场景（libero_spatial、libero_goal、厨房类 libero_10）
+      x≈-0.21  y≈-0.01  z≈1.17     桌面 ≈ 0.90
+      不要把 z 打到 ≈0.82 以下
+  地面场景（libero_object）
+      x≈-0.15  y≈-0.01  z≈0.26     地面 ≈ 0.00
+      纸盒本体抓取会低得多；不要沿用厨房桌的 z
+      不要把 z 打到 ≈0.03 以下
+
+Yaw   ：绕世界 +z，单位度。0 = 复位。从上往下看，正值为逆时针。
+Pitch ：绕世界 +y，单位度。0 = 复位、爪口朝下。正值把工具尖向 +x 倾。
+Roll  ：绕世界 +x，单位度。0 = 复位、爪口朝下。正值把工具尖向 +y 倾。
+夹爪命令：1.0 = 张开，0.0 = 闭合。
+state.json 里的 gripper_open 是测得的开口比例（≈1 全开，≈0 全闭）。它不是命令。
+
+桥接层不会帮你夹紧笛卡尔目标。IK、接触、桌面/地面会挡住你。不要把 z 打穿支撑面。
+
+agentview 速查（存图前 rot180：img[::-1, ::-1]，与 OpenVLA / π0 一致）：
+  机械臂在画面 TOP，工作空间在画面 BOTTOM
+  +x  → 夹爪在 agentview 里朝 BOTTOM 走（远离手臂）
+  -x  → 夹爪在 agentview 里朝 TOP 走（回到手臂）
+  +y  → 夹爪在 agentview 里朝 LEFT 走
+  -y  → 夹爪在 agentview 里朝 RIGHT 走
+  +z  → 夹爪升高（不是图像向上）。腕部图里物体变小。
+  若 agentview 或 wrist 正中有半透明 RGB 三轴，那是该相机视角下的世界系 +X 红、+Y 绿、+Z 蓝，不是场景里的物体。
+
+腕部图速查：
+  夹爪垫在画面 BOTTOM
+  腕部图的“上”不是世界 +y
+
+如果探测移动和这份速查矛盾，相信图像，并在本集剩余步骤里反转该轴。把反转写进下一条 note，之后一直用。PNG 旋转不会翻转 /move 的世界 x,y,z。
+
+============================================================
+2. 每次观测里有什么
+============================================================
+每回合行动前读这三样：
+  obs/agentview.png     第三人称 RGB
+  obs/wrist.png         腕部 / 夹爪 RGB
+  obs/state.json        唯一的度量状态
+
+state.json 字段：
+  instruction           官方语言目标（没有物体位姿、没有布局 JSON、没有深度）
+  suite task_id init_id 本集场景家族
+  eef_x eef_y eef_z     测得的末端位置，米
+  roll_deg pitch_deg yaw_deg
+                        相对复位（爪口朝下）的测得姿态，度
+  gripper_open          测得开口，[0, 1]
+  feedback              卡住时报 blocked/contact，否则 ok——不是官方成功
+  remaining_moves       剩余规划次数
+  remaining_env_steps   剩余物理步
+  success               官方 LIBERO check_success()。这是唯一成功信号。
+  terminated            本集是否已经结束
+
+POST /move 还会返回 last_move：点名的轴、target、final_dist_m、stopped（reached|blocked）、feedback。
+
+怎么读状态：
+- 把新数字和你刚发出的目标比。残差 = 手臂实际做到的。
+- 你命令的轴几乎没动，就是接触挡住了或目标不可达。不要再发同一个目标。
+- 没写名的维度保持当前值。想让某轴不动，就省略它。
+- 没写名的 gripper 保持上一次命令的开/合，不是 analog 的 gripper_open。真夹住之后，之后每次调用都要写 gripper=0。
+
+怎么读图：
+- Agentview：哪个物体、在工作空间哪一侧、粗接近、闭合后的左右。
+- 腕部：抓取几何——沿、壁、本体；垫会不会打到支撑面；物体是否在两爪之间。
+- 腕部图被物体填满 ≠ 抓住。常常只是近侧沿已经进了爪垫。
+
+怎么读 feedback：
+  blocked/contact        卡住，笛卡尔目标没到。抬高几厘米；腕部拧了就把 roll/pitch/yaw 归 0；然后换 xy/z/pitch。
+  ok / reset             插值走完或本集刚开始。抓没抓住，看图像和 gripper_open。
+
+官方成功只有 state.json 里的 success。一次 blocked 不是结束。
+
+============================================================
+3. 工具
+============================================================
+GET  http://127.0.0.1:8765/status
+  刷新 obs/*.png 和 obs/state.json。开场先调；文件看起来旧了也调。
+
+POST http://127.0.0.1:8765/move
+  只对点名的维度发绝对（或增量）笛卡尔目标。
+  JSON 体——只写要改的字段：
+  {
+    "x": <m, 世界 +x>,
+    "y": <m, 世界 +y>,
+    "z": <m, 世界 +z 向上>,
+    "roll_deg": <度, 0 = 复位, 爪口朝下>,
+    "pitch_deg": <度, 0 = 复位>,
+    "yaw_deg": <度, 0 = 复位>,
+    "gripper": <0 闭合, 1 张开>,
+    "note": "<你现在看见什么，以及为什么这样动>"
+  }
+  也可用 dx/dy/dz 或 droll_deg/dpitch_deg/dyaw_deg 代替绝对值。
+  桥接层开环插值一段 OSC 直线（大约每物理步 0.05 m / 0.5 rad，有上限）然后停留。到位 ≈ 距离 < 1.2 cm。手臂在目标前停滞则 blocked。
+  返回 JSON 含 stopped、final_dist_m、remaining_xyz、feedback 和新 state。先读它，再重读两张图，然后才规划下一步。
+
+POST http://127.0.0.1:8765/give_up
+  只在剩余预算内确定做不完时调用。
+  {
+    "reason": "<短原因>",
+    "hindsight": "<给下一任、同一套桥的可迁移事实>"
+  }
+  写坐标系符号、支撑面高度、夹爪偏差、相机映射、物体尺度。只有确实没有可写的才在 hindsight 填 none。
+
+没有 done 接口。环境自己在 success=true 时结束；也会在 max_moves 或 max_env_steps 时结束。
+
+禁止安装软件包、修改 bridge_server.py、或杀掉 server。
+
+============================================================
+4. 运动纪律
+============================================================
+默认步长：
+  自由空间          最多约 8–12 cm
+  靠近物体          0.5–2 cm，再近用毫米
+  pitch/yaw/roll    每次最多 ±20 度。不想转就不要写姿态。
+  gripper           一次跳到 0 或 1；不要慢慢爬
+
+每次调用一个意图。不要把“接近 + 下降 + 闭合”塞进同一组目标，除非三个增量都已经很小且对齐。
+
+每次 gripper=0 闭合前：
+  看两张图，在 note 里回答："close now would trap the object: yes/no"。
+  只有腕部图显示物体本体或沿在两垫之间的缝里才答 yes（不是压在薄沿上、不是在空腔里、不是只靠着一块垫）。
+  若 no，不要发 gripper=0。先改 xy / z / pitch / yaw，再看腕部。
+
+每次平移（x/y/z 或 dx/dy/dz）前：
+  看两张图，问这次运动会不会撞到目标、邻居或支撑面。
+  如果路径会让腕部或垫穿过物体，不要发这个目标。先抬几厘米 z 和/或改 pitch/yaw 让开口让开，再动。上一拍 blocked/contact 就是碰撞——不要重复同一个 xyz。
+
+
+允许重新抓取。“小而明确”的意思是“接触附近不要一次甩 20 cm”，不是“永远不要改姿态”。
+如果腕部图显示接触几何不对（垫在沿上而不是包住壁/本体、手掌打到支撑面、物体不在两爪之间）：
+  1. +z 后退 0.02–0.04
+  2. 转到更好的 pitch / yaw / roll（每次不超过 20 度，分多次）
+  3. 再接近
+在 note 里写明旋转（“pitch 15，让开口对上碗壁”）。
+
+禁止：
+- 把 z 打穿支撑面（厨房 ≲ 0.82，地面 ≲ 0.03），除非腕部清楚显示指尖在支撑面之上
+- 物体不在两爪之间还继续闭合
+- 刚返回 blocked/contact 或残差很大的目标再发一遍
+- 腕部是空的、或抬 2 cm 物体没跟着走，却运去目标
+- 闭合之后不写 gripper——每次抬升和搬运都要写 gripper=0
+
+每次运动后，先重读两张图和 state.json，再规划下一个目标。你思考的时候世界已经在动。
+
+============================================================
+5. 开场：轴探测（物体已经有被撞风险则可跳过）
+============================================================
+如果这是第一条观测、你还没确认轴符号：
+  GET /status。读 instruction、suite、home xyz、两张图。
+  只把 x 增加 +0.03（或 dx=+0.03）。看 agentview 和腕部。
+  在随后的 note 里写：
+    "probe +x: agentview 朝 TOP / BOTTOM / 不清楚 移动；本集把 +x 当作 ..."
+  如果图像运动和第 1 节矛盾，本集剩余步骤反转该轴。
+物体已经在夹爪下方时，不要三个轴都探。只探你马上要用的轴。
+
+============================================================
+6. 任务循环
+============================================================
+1. 在 note 里写清哪个物体、接下来几厘米是为了什么。
+2. 先把夹爪放到匹配物体抓取几何的预抓姿态。
+   需要转就先转。再平移。
+3. 只有腕部图显示物体在两爪之间时才闭合。
+4. +z 抬 0.02，用腕部图和 gripper_open 确认物体跟着夹爪起来。
+   起来了，再抬 5–8 cm，然后去目标。
+   没起来，立刻下去，改 xy/z/pitch。不要拖着空爪去目标。
+5. 在自由空间移动。z 要高到能越过其他物体。
+6. 到目标后：先对齐姿态，再下降，再张开或放下。
+7. 一直做到 success=true 或 terminated=true。give_up 至少 10 步之后。
+
+8. GET /status 之后，下一回合必须是 POST /move（预算已经用尽才 give_up）。写完 “Next: probe +x” 就结束会话算失败。
+
+如果你说出一个这回合没法用的修正（“再倾斜一点”），现在就下一个具体数字（pitch_deg += 10），不要留到下一轮空想。
+
+============================================================
+7. note 与 hindsight 格式
+============================================================
+note（每次 /move）：
+  "Agentview: 黑碗在夹爪左侧约 4cm，盘子在更远的 +x。
+   Wrist: pitch 0 时爪垫会打到沿。
+   Action: z+0.03 后退，然后 pitch 15，让开口对上碗壁。"
+
+hindsight（give_up）：
+  "世界 +x 朝 agentview 的 BOTTOM。厨房桌 z≈0.90，home z≈1.17。
+   碗壁闭合大约 z=0.91–0.92、15 度 pitch。抬 2cm 后 gripper_open≈0.02
+   仍是空抓。"
+
+本集结束时写 runs/current/AGENT_SUMMARY.md：试了什么、feedback 说了什么、为什么成功或失败，以及同样的 hindsight。
+
+============================================================
+8. 经验（每跑完一集由 parent 更新；保持短）
+============================================================
+碗抓取（平行爪）：
+- 只有碗沿/边缘在两垫之间才闭合——一块垫朝碗内，一块朝碗外。不要从正上方捏薄沿。那样抬 2 cm 后 gripper_open≈0.02。
+- 是否该闭合看腕部图：沿必须占住两垫之间的缝。沿只在腕部图底边、或垫压在沿上，就还没对齐：pitch 10–20° 让开口对上壁，再居中，再闭合。agentview 里张开的爪叠在碗上不够。
+
+闭合 / 碰撞（所有物体）：
+- 当前图像显示这一闭会真正抓住，才发 gripper=0。否则先动。
+- 不要发会碰撞的笛卡尔目标；先抬或改姿态，再平移。
+
+（本集不注入累积经验）
+
+朝着 state.json 里的指令做。一次 HTTP 调用。每次运动后重新检查。
+```

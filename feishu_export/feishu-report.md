@@ -143,7 +143,58 @@ grok --prompt-file PROMPT.txt --always-approve --verbatim \
      --max-turns 250 --disallowed-tools Agent
 ```
 
-两套规划器打同一座桥、同一套图像、同一份英文 prompt。全文中英对照见文末附录 A。
+两套规划器打同一座桥、同一套图像、同一份英文 prompt。全文中英对照见文末附录 A。改稿时间线见下一小节 1.6.1。
+
+### 1.6.1 Prompt 改稿史：闭合检查与碰撞检查
+
+飞书附录 A 是**终稿**。这两条规则不是一开始就有的，是 9-21 下午写进第 4 节、从 **attempt 019** 起才下发的。对后续执行提升最大的就是它们。
+
+**三版（以各局归档的 PROMPT.txt 为准）**
+
+| 版本 | 用在哪些局 | 要点 |
+|-|-|-|
+| 短稿 PROMPT_BASE.txt | 003–012 | 十条规则。有「包围物体才闭合」「真夹后点名 gripper=0」「先抬 2 cm」，**没有**闭合前 yes/no，**没有**平移前碰撞检查。 |
+| 长稿 BASE_2，尚无两段门 | 013–018 | 坐标、探针、循环都在了。016 在第 8 节加了碗沿必须在两垫之间（碗专用）。闭合/平移仍没有强制自问。 |
+| 长稿 + 两段门（现附录 A） | **019 起至今** | 第 4 节插入下面两段。019 的 EXPERIMENT.md 记为 close-check+collision。 |
+
+**英文（019 起实际下发，第 4 节新增）**
+
+```text
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads
+  (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target,
+  a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target.
+  Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move.
+  A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+```
+
+**中文**
+
+```text
+每次 gripper=0 闭合前：
+  看两张图，在 note 里回答："close now would trap the object: yes/no"。
+  只有腕部图显示物体本体或沿在两垫之间的缝里才答 yes
+  （不是压在薄沿上、不是在空腔里、不是只靠着一块垫）。
+  若 no，不要发 gripper=0。先改 xy / z / pitch / yaw，再看腕部。
+
+每次平移（x/y/z 或 dx/dy/dz）前：
+  看两张图，问这次运动会不会撞到目标、邻居或支撑面。
+  如果路径会让腕部或垫穿过物体，不要发这个目标。
+  先抬几厘米 z 和/或改 pitch/yaw 让开口让开，再动。
+  上一拍 blocked/contact 就是碰撞——不要重复同一个 xyz。
+```
+
+**加上之后发生了什么**
+
+- 加上之前：015 两次 jaws-down 空抬；017 真夹牛奶后最后一步把张开和横移写在一起，掉在篮外。016 能成功，靠的是第 8 节碗专用「沿在两垫之间」，不是通用门。
+- 加上之后（Astra）：020 番茄酱全程一次闭合，note 里 m06 写 close now: no、继续降，m10 才闭，官方成功。随后 goal 抽屉 024、碗 026、开灶 027/031 都在同一套门下完成。
+- 规则卡住的是「先闭再看」和「直线穿物体」。它不保证释放（017 式最后一步仍可能把开爪和横移写在一起），也不保证 Grok 把腕部投影重叠当成可闭（021–023 空夹）。
 
 ### 1.7 世界坐标轴叠加（可选）
 
@@ -762,7 +813,7 @@ Astra 是自己遵守了「RGB only」。工具层同样没有禁读仓库。
 
 ## 附录 A. 实验用 Prompt（中英对照）
 
-对照实验（attempt 016 起，含 grok-4.7 033–038）实际下发的是 **英文** `PROMPT_BASE_2.txt`。`{{LESSONS}}` 在公平对照里替换成 `(no extra accumulated lessons)`，不注入 `LESSONS.md`。
+第 4 节「闭合前 yes/no」和「平移前碰撞检查」从 attempt 019 才写入（见 §1.6.1）。013–018 的长稿还没有这两段。附录 A.2 / A.3 是 019 之后的终稿。对照实验实际下发的是 **英文** `PROMPT_BASE_2.txt`。`{{LESSONS}}` 在公平对照里替换成 `(no extra accumulated lessons)`，不注入 `LESSONS.md`。
 
 中文来自仓库里的平行译文 `PROMPT_BASE_2.zh.txt`。英文稿多出的三处（闭合前 yes/no 检查、平移前碰撞检查、第 6 节第 8 条「GET 之后必须 POST」、第 8 节静态碗沿规则）已按英文补进下面的中文，便于对照；**模型当局读到的仍是英文**。
 
