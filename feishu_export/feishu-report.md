@@ -772,13 +772,13 @@ Astra 是自己遵守了「RGB only」。工具层同样没有禁读仓库。
 
 ### 6.6 为什么 038 没有读上一局复盘
 
-没有新的限制。038 和 036、037 是同一次启动的，prompt、关着的沙箱、能用的 `read_file` 都一样。它只是开头没去翻，后来也没被卡住，所以这条分支没发生。
+没有新的限制。038 和 036、037 是同一次启动的，prompt、关着的沙箱、能用的 read_file 都一样。它只是开头没去翻，后来也没被卡住，所以这条分支没发生。
 
-037 在第一次动作之前就写了「先看以前的开灶是怎么拧的」，然后去搜 `runs/`。038 的第一句是读当前观测、刷新状态、做 +x 探针，没有提旧局。
+037 在第一次动作之前就写了「先看以前的开灶是怎么拧的」，然后去搜 runs/。038 的第一句是读当前观测、刷新状态、做 +x 探针，没有提旧局。
 
-图像工具不够细的时候，两条路也不一样。038 说相机描述太粗，看不清 10 cm 的移动，于是用 Python 量了当时那两张 `obs/*.png`。同一件「看不清」的事，035 去翻了相机参数、碗的模型和 LIBERO 源码；卡住之后还找到 Astra 026 的成功复盘，并写成「降到 z≈0.945、俯仰 15°」。038 没有走到这一步。
+图像工具不够细的时候，两条路也不一样。038 说相机描述太粗，看不清 10 cm 的移动，于是用 Python 量了当时那两张 obs/\*.png。同一件「看不清」的事，035 去翻了相机参数、碗的模型和 LIBERO 源码；卡住之后还找到 Astra 026 的成功复盘，并写成「降到 z≈0.945、俯仰 15°」。038 没有走到这一步。
 
-放碗的做法 prompt 里本来就有（`PROMPT.txt` 第 8 节，即使 `{{LESSONS}}` 已换成 “no extra accumulated lessons”）：碗沿放进两垫之间，俯仰 10–20°，用腕部图判断。038 第一次闭合就夹住了，开合停在 0.04，碗跟着抬起来，18 步里没有空夹。它不需要再去找别人的坐标。035 是同一个放碗任务，空夹和碰撞之后才去翻 026，最后仍然没放开碗。
+放碗的做法 prompt 里本来就有（PROMPT.txt 第 8 节，即使 {{LESSONS}} 已换成 “no extra accumulated lessons”）：碗沿放进两垫之间，俯仰 10–20°，用腕部图判断。038 第一次闭合就夹住了，开合停在 0.04，碗跟着抬起来，18 步里没有空夹。它不需要再去找别人的坐标。035 是同一个放碗任务，空夹和碰撞之后才去翻 026，最后仍然没放开碗。
 
 所以 038 不是变得守规矩，而是这次抽样没去搜，而且第一次夹取就成了。换一次运行，它仍可以像 035 那样打开旧复盘。
 
@@ -1307,4 +1307,4300 @@ hindsight（give_up）：
 （本集不注入累积经验）
 
 朝着 state.json 里的指令做。一次 HTTP 调用。每次运动后重新检查。
+```
+
+## 附录 B. 仓库里的完整 Prompt 文件
+
+附录 A.2 是公平对照时把 `{{LESSONS}}` 换成 “(no extra accumulated lessons)” 之后的文本。下面 B.1 是磁盘上 `PROMPT_BASE_2.txt` 的原文，占位符保留。
+
+B.2 起是各局目录里 `PROMPT.txt` 的全文。内容相同的只收一份，并标明用过它的 attempt。早期 003–012 是短稿；013 起换成接近 BASE_2 的长稿；019 起写入闭合前检查；033 起的 grok-4.7 在正文前加了任务头。
+
+### B.1 PROMPT_BASE_2.txt
+
+路径：`astra_eval/PROMPT_BASE_2.txt`。Astra 的 codex 直接下发这份正文（占位符已替换）。grok-4.7 在它前面再加任务头，见各局 PROMPT.txt。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+{{LESSONS}}
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.2 attempt_003_libero_spatial_t0_i0/PROMPT.txt
+
+相同全文还用于：003_libero_spatial_t0_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move. It is the harness speaking:
+- empty_grasp_suspected → the last close+lift did NOT pick the object. Descend 2–4 cm and/or add 10–20 deg pitch. Do NOT close at the same z again.
+- blocked/contact → the Cartesian target was not reached (table/object). Change height, xy, or pitch; do not spam the same target.
+- holding_or_pinching → jaws did not fully shut; lift straight up and check whether the object follows in the wrist camera.
+
+## Lessons from a failed episode on THIS same task
+A previous Astra run identified the correct black bowl (between plate and ramekin) and reached it, then failed four identical pick cycles:
+
+1. Closing at z ≈ 0.94–0.96 pinches ABOVE the rim. Table bowls sit lower. After an empty lift, gripper_open falls to ~0.02.
+2. Repeating the same close height never works. If the object stays on the table after a lift, the next close must be 2–4 cm lower, or pitched 10–20 deg so one finger goes beside the wall.
+3. Parallel jaws need to go AROUND the bowl walls, not pinch the top rim from straight above.
+4. Never translate to the plate until a lift clearly carries the bowl in the wrist view (bowl rises with the gripper).
+5. Wrist-image "up" is not world +y. Re-read both cameras; do not assume image axes.
+6. Do not spend many moves on millimetre hunting at the same height. Change z or pitch.
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object.
+5. After a real pick, lift 5–8 cm straight up, confirm the object moved, THEN go to the plate.
+6. One POST /move per turn.
+7. Stop when success or terminated is true. Otherwise give_up with a short reason.
+8. Do not install packages, edit bridge_server.py, or kill the server.
+9. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move.
+
+```
+
+### B.3 attempt_004_libero_spatial_t0_i0/PROMPT.txt
+
+相同全文还用于：004_libero_spatial_t0_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move. It is the harness speaking:
+- empty_grasp_suspected → the last close+lift did NOT pick the object. Descend 2–4 cm and/or add 10–20 deg pitch. Do NOT close at the same z again.
+- blocked/contact → the Cartesian target was not reached (table/object). Change height, xy, or pitch; do not spam the same target.
+- holding_or_pinching → jaws did not fully shut; lift straight up and check whether the object follows in the wrist camera.
+
+## Lessons from a failed episode on THIS same task
+A previous Astra run identified the correct black bowl (between plate and ramekin) and reached it, then failed four identical pick cycles:
+
+1. Closing at z ≈ 0.94–0.96 pinches ABOVE the rim. Table bowls sit lower. After an empty lift, gripper_open falls to ~0.02.
+2. Repeating the same close height never works. If the object stays on the table after a lift, the next close must be 2–4 cm lower, or pitched 10–20 deg so one finger goes beside the wall.
+3. Parallel jaws need to go AROUND the bowl walls, not pinch the top rim from straight above.
+4. Never translate to the plate until a lift clearly carries the bowl in the wrist view (bowl rises with the gripper).
+5. Wrist-image "up" is not world +y. Re-read both cameras; do not assume image axes.
+6. Do not spend many moves on millimetre hunting at the same height. Change z or pitch.
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object.
+5. After a real pick, lift 5–8 cm straight up, confirm the object moved, THEN go to the plate.
+6. One POST /move per turn. Then immediately look at the new images and state.json and send the next move.
+7. This episode is NOT finished after a single blocked move. Keep controlling until state.json has success=true or terminated=true. If you must give_up, do so only after at least 10 moves, via POST /give_up.
+8. If feedback is blocked/contact on a long approach: raise z a few centimetres, set roll_deg=0,pitch_deg=0,yaw_deg=0 if the wrist looks twisted, then continue toward the bowl. Do not end the session.
+9. Leave pitch/roll/yaw unnamed unless you intentionally tilt (10–20 deg pitch for a side-wall bowl grasp). Unnamed orientation holds the current pose.
+10. Do not install packages, edit bridge_server.py, or kill the server.
+11. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.4 attempt_005_libero_spatial_t0_i0/PROMPT.txt
+
+相同全文还用于：005_libero_spatial_t0_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move. It is the harness speaking:
+- empty_grasp_suspected → the last close+lift did NOT pick the object. Descend 2–4 cm and/or add 10–20 deg pitch. Do NOT close at the same z again.
+- blocked/contact → the Cartesian target was not reached (table/object). Change height, xy, or pitch; do not spam the same target.
+- holding_or_pinching → jaws did not fully shut; lift straight up and check whether the object follows in the wrist camera.
+
+## Lessons from failed episodes on THIS same task
+
+Attempt 2: found the right bowl, then four identical top-down closes at z≈0.94–0.96. Empty every time. gripper_open → 0.02 after lift.
+
+Attempt 4: used pitch ±15–25° and got down to z≈0.91–0.92. Twice the harness said holding_or_pinching (gripper_open 0.28–0.49) — that means the jaws touched the bowl — then a 6–7 cm lift slipped and became empty_grasp. Deeper z=0.89–0.90 was blocked. A 90° yaw in one call twisted the wrist.
+
+Do this instead:
+1. Parallel jaws must go AROUND the bowl wall (10–20° pitch), not pinch the top rim.
+2. Close at the lowest z you can actually reach (blocked ≈ you are on the rim). Then lift ONLY 2 cm and look at the wrist. If the bowl rises, lift the rest. If it stays, go back down immediately — do not lift 6–8 cm on a pinch.
+3. Never repeat the same close height after empty_grasp. Change z or pitch.
+4. Max ±20° of pitch/yaw/roll per move. Do not command 90° yaw.
+5. Never go to the plate until a 2 cm lift shows the bowl moving with the gripper.
+6. Wrist-image "up" is not world +y. Re-read both cameras.
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object.
+5. After a real pick, lift 5–8 cm straight up, confirm the object moved, THEN go to the plate.
+6. One POST /move per turn. Then immediately look at the new images and state.json and send the next move.
+7. This episode is NOT finished after a single blocked move. Keep controlling until state.json has success=true or terminated=true. If you must give_up, do so only after at least 10 moves, via POST /give_up.
+8. If feedback is blocked/contact on a long approach: raise z a few centimetres, set roll_deg=0,pitch_deg=0,yaw_deg=0 if the wrist looks twisted, then continue toward the bowl. Do not end the session.
+9. Leave pitch/roll/yaw unnamed unless you intentionally tilt (10–20 deg pitch for a side-wall bowl grasp). Unnamed orientation holds the current pose.
+10. Do not install packages, edit bridge_server.py, or kill the server.
+11. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.5 attempt_006_libero_spatial_t1_i0/PROMPT.txt
+
+相同全文还用于：006_libero_spatial_t1_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move:
+- empty_grasp_suspected → last close+lift did NOT pick the object. Change z and/or pitch. Do NOT close at the same z again.
+- blocked/contact → Cartesian target not reached. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry with a different xy/z/pitch.
+- holding_or_pinching → jaws did not fully shut. Lift ONLY 2 cm and check whether the object follows in the wrist camera.
+
+## Lessons (keep this section short; parent updates it after every run)
+
+### General
+- Do not stop after one blocked move. Raise, reset twist if needed, continue.
+- Unnamed orientation holds the current pose. Never command 90° yaw in one call.
+- empty_grasp_suspected + gripper_open≈0.02 = empty. Next close must be lower or pitched, not the same z.
+- holding_or_pinching: lift 2 cm only. If the object does not rise, go back down immediately. A 6–8 cm lift on a pinch slips.
+- Wrist-image "up" is not world +y. Re-read both cameras after every move.
+- Never transport to the goal until a 2 cm lift shows the object moving with the gripper.
+
+### libero_spatial bowls (pick black bowl → plate)
+- Parallel jaws need 10–20° pitch around the wall, not a vertical pinch on the rim.
+- Close near the lowest reachable z (blocked ≈ on the rim). Successful run: ~15° pitch, close ~z=0.91–0.92, 2 cm test lift (open stayed ~0.16), then 5 cm more, then place. Off-center first drop → regrasp and nudge xy.
+- Spatial/0 init0 succeeded on attempt 5 with that recipe (29 moves, 466 steps).
+
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object.
+5. After a real pick, lift 2 cm first. If the object rises, lift 5–8 cm more, THEN go to the goal.
+6. One POST /move per turn. Then look at the new images and state.json and send the next move.
+7. The episode is NOT finished after a single blocked move. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. Max ±20° of pitch/yaw/roll per move. Leave orientation unnamed unless you intend to tilt.
+9. Do not install packages, edit bridge_server.py, or kill the server.
+10. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.6 attempt_007_libero_spatial_t2_i0/PROMPT.txt
+
+相同全文还用于：007_libero_spatial_t2_i0, 008_grok_libero_spatial_t0_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move:
+- empty_grasp_suspected → last close+lift did NOT pick the object. Change z and/or pitch. Do NOT close at the same z again.
+- blocked/contact → Cartesian target not reached. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry with a different xy/z/pitch.
+- holding_or_pinching → jaws did not fully shut. Lift ONLY 2 cm and check whether the object follows in the wrist camera.
+
+## Lessons (keep this section short; parent updates it after every run)
+
+### General
+- Do not stop after one blocked move. Raise, reset twist if needed, continue.
+- Unnamed orientation holds the current pose. Never command 90° yaw in one call.
+- empty_grasp_suspected + gripper_open≈0.02 = empty. Next close must be lower or pitched, not the same z.
+- holding_or_pinching: lift 2 cm only. If the object does not rise, go back down immediately. A 6–8 cm lift on a pinch slips.
+- Wrist-image "up" is not world +y. Re-read both cameras after every move.
+- Never transport to the goal until a 2 cm lift shows the object moving with the gripper.
+
+### libero_spatial bowls (pick black bowl → plate)
+- Parallel jaws need 10–20° pitch around the wall, not a vertical pinch on the rim.
+- Close near the lowest reachable z (blocked ≈ on the rim). Successful spatial/0: ~15° pitch, close ~z=0.91–0.92, 2 cm test lift (open stayed ~0.16), then 5 cm more, then place. Off-center first drop → regrasp and nudge xy.
+- After a pinch, **name `gripper=0` on every lift/transport**. Unnamed gripper used to copy analog `gripper_open`; ≥0.5 opened the jaws and dropped the pinch (spatial/1 m13–15). Harness now holds last command; still name it.
+- Wrist-centering ≠ contact. Bowl filling the wrist image often means the near rim is in the pads; that shove the bowl. Put the wall *between* the pads.
+- g≈0.02 after a 2 cm lift is empty even if feedback says `ok`. Change xy, keep 10–20° pitch; do not chase the rim in +x or use 30° at z<0.90.
+- Spatial/0 init0 succeeded on attempt 5. Spatial/1 init0 failed on attempt 6 (rim chase, unnamed gripper opened a 0.71 pinch).
+
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object. After a close, name gripper=0 on every lift and transport; do not leave it unnamed.
+5. After a real pick, lift 2 cm first. If the object rises, lift 5–8 cm more, THEN go to the goal.
+6. One POST /move per turn. Then look at the new images and state.json and send the next move.
+7. The episode is NOT finished after a single blocked move. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. Max ±20° of pitch/yaw/roll per move. Leave orientation unnamed unless you intend to tilt.
+9. Do not install packages, edit bridge_server.py, or kill the server.
+10. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.7 attempt_009_grok_libero_spatial_t1_i0/PROMPT.txt
+
+相同全文还用于：009_grok_libero_spatial_t1_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move:
+- empty_grasp_suspected → last close+lift did NOT pick the object. Change z and/or pitch. Do NOT close at the same z again.
+- blocked/contact → Cartesian target not reached. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry with a different xy/z/pitch.
+- holding_or_pinching → jaws did not fully shut. Lift ONLY 2 cm and check whether the object follows in the wrist camera.
+
+## Image convention
+- Bridge default `LIBERO_IMAGE_FLIP=none`: feed Astra `obs[cam]` as PNG. On this MuJoCo3/robosuite1.4 stack the raw agentview already has the robot in the lower foreground.
+- OpenVLA / π0 do `img[::-1, ::-1]` (180°) because that matches **their** LIBERO-dataset training pixels. LIBERO's own `VideoWriter` only does `img[::-1]` (vertical).
+- For a general VLM (Astra), 180° puts the robot on the "ceiling" and mirrors left/right vs world. Do not enable `rot180` unless comparing to a LIBERO-trained VLA. Set `LIBERO_IMAGE_FLIP=vflip|rot180|none` on the bridge.
+
+## Lessons (keep this section short; parent updates it after every run)
+
+### General
+- Do not stop after one blocked move. Raise, reset twist if needed, continue.
+- Unnamed orientation holds the current pose. Never command 90° yaw in one call.
+- empty_grasp_suspected + gripper_open≈0.02 = empty. Next close must be lower or pitched, not the same z.
+- holding_or_pinching: lift 2 cm only. If the object does not rise, go back down immediately. A 6–8 cm lift on a pinch slips.
+- Wrist-image "up" is not world +y. Re-read both cameras after every move.
+- Never transport to the goal until a 2 cm lift shows the object moving with the gripper.
+
+### libero_spatial bowls (pick black bowl → plate)
+- Parallel jaws need 10–20° pitch around the wall, not a vertical pinch on the rim.
+- Close near the lowest reachable z (blocked ≈ on the rim). Successful spatial/0: ~15° pitch, close ~z=0.91–0.92, 2 cm test lift (open stayed ~0.16), then 5 cm more, then place. Off-center first drop → regrasp and nudge xy.
+- After a pinch, **name `gripper=0` on every lift/transport**. Unnamed gripper used to copy analog `gripper_open`; ≥0.5 opened the jaws and dropped the pinch (spatial/1 m13–15). Harness now holds last command; still name it.
+- Wrist-centering ≠ contact. Bowl filling the wrist image often means the near rim is in the pads; that shove the bowl. Put the wall *between* the pads.
+- g≈0.02 after a 2 cm lift is empty even if feedback says `ok`. Change xy, keep 10–20° pitch; do not chase the rim in +x or use 30° at z<0.90.
+- Spatial/0 init0 succeeded on attempt 5 (Astra). Grok attempt_008 on the same init picked the bowl (20° pitch, ~3 cm −x from center, z≈0.915, open stayed ~0.23) but hit max_moves while nudging on the plate; never opened. Close width ≈0.14 that drops to ≈0.07 on a 2 cm lift is a rim miss — do not retry that xy/z/pitch. Leave 4–6 moves after pickup to center; success can fire while still holding. If success is still false after the bowl is over the plate, OPEN (gripper=1). Do not spend remaining moves nudging while closed.
+- Spatial/1 (bowl next to the ramekin, not the stove pan / back silver bowl): Astra a6 failed by rim-chasing in +x and unnamed gripper opening a 0.71 pinch. Put the wall between the pads; name gripper=0 on every lift.
+- If the target disappears *under* the gripper at grasp height, back off only 2–3 cm along the approach. A long retreat (spatial/2: −8 to −12 cm in x) lands on the stove.
+- `holding_or_pinching` with g≈0.7 and **no bowl in the wrist** is furniture contact (stove/table), not a grasp. Open and re-center; do not lift.
+
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object. After a close, name gripper=0 on every lift and transport; do not leave it unnamed.
+5. After a real pick, lift 2 cm first. If the object rises, lift 5–8 cm more, THEN go to the goal.
+6. One POST /move per turn. Then look at the new images and state.json and send the next move.
+7. The episode is NOT finished after a single blocked move. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. Max ±20° of pitch/yaw/roll per move. Leave orientation unnamed unless you intend to tilt.
+9. Do not install packages, edit bridge_server.py, or kill the server.
+10. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.8 attempt_010_grok_libero_spatial_t2_i0/PROMPT.txt
+
+相同全文还用于：010_grok_libero_spatial_t2_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move:
+- empty_grasp_suspected → last close+lift did NOT pick the object. Change z and/or pitch. Do NOT close at the same z again.
+- blocked/contact → Cartesian target not reached. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry with a different xy/z/pitch.
+- holding_or_pinching → jaws did not fully shut. Lift ONLY 2 cm and check whether the object follows in the wrist camera.
+
+## Image convention
+- Bridge default `LIBERO_IMAGE_FLIP=none`: feed Astra `obs[cam]` as PNG. On this MuJoCo3/robosuite1.4 stack the raw agentview already has the robot in the lower foreground.
+- OpenVLA / π0 do `img[::-1, ::-1]` (180°) because that matches **their** LIBERO-dataset training pixels. LIBERO's own `VideoWriter` only does `img[::-1]` (vertical).
+- For a general VLM (Astra), 180° puts the robot on the "ceiling" and mirrors left/right vs world. Do not enable `rot180` unless comparing to a LIBERO-trained VLA. Set `LIBERO_IMAGE_FLIP=vflip|rot180|none` on the bridge.
+
+## Lessons (keep this section short; parent updates it after every run)
+
+### General
+- Do not stop after one blocked move. Raise, reset twist if needed, continue.
+- Unnamed orientation holds the current pose. Never command 90° yaw in one call.
+- empty_grasp_suspected + gripper_open≈0.02 = empty. Next close must be lower or pitched, not the same z.
+- holding_or_pinching: lift 2 cm only. If the object does not rise, go back down immediately. A 6–8 cm lift on a pinch slips.
+- Wrist-image "up" is not world +y. Re-read both cameras after every move.
+- Never transport to the goal until a 2 cm lift shows the object moving with the gripper.
+
+### libero_spatial bowls (pick black bowl → plate)
+- Parallel jaws need 10–20° pitch around the wall, not a vertical pinch on the rim.
+- Close near the lowest reachable z (blocked ≈ on the rim). Successful spatial/0: ~15° pitch, close ~z=0.91–0.92, 2 cm test lift (open stayed ~0.16), then 5 cm more, then place. Off-center first drop → regrasp and nudge xy.
+- After a pinch, **name `gripper=0` on every lift/transport**. Unnamed gripper used to copy analog `gripper_open`; ≥0.5 opened the jaws and dropped the pinch (spatial/1 m13–15). Harness now holds last command; still name it.
+- Wrist-centering ≠ contact. Bowl filling the wrist image often means the near rim is in the pads; that shove the bowl. Put the wall *between* the pads.
+- g≈0.02 after a 2 cm lift is empty even if feedback says `ok`. Change xy, keep 10–20° pitch; do not chase the rim in +x or use 30° at z<0.90.
+- Spatial/0 init0 succeeded on attempt 5 (Astra). Grok attempt_008 on the same init picked the bowl (20° pitch, ~3 cm −x from center, z≈0.915, open stayed ~0.23) but hit max_moves while nudging on the plate; never opened. Close width ≈0.14 that drops to ≈0.07 on a 2 cm lift is a rim miss — do not retry that xy/z/pitch. Leave 4–6 moves after pickup to center; success can fire while still holding. If success is still false after the bowl is over the plate, OPEN (gripper=1). Do not spend remaining moves nudging while closed.
+- Spatial/1 (bowl next to the ramekin, not the stove pan / back silver bowl): Astra a6 failed by rim-chasing in +x and unnamed gripper opening a 0.71 pinch. Grok a9 (same init) never made contact: 8 empty closes, g=0.05 every time, wrist often full (pads in the hollow or beside the bowl). On this init the bowl sits near y≈0.34–0.36; y=0.31 is left of it. After a close, judge left/right from **agentview**, not a full wrist image. g=0.05 + full wrist → step y then x until g≳0.14; get first contact by ~move 12.
+- If the target disappears *under* the gripper at grasp height, back off only 2–3 cm along the approach. A long retreat (spatial/2: −8 to −12 cm in x) lands on the stove.
+- `holding_or_pinching` with g≈0.7 and **no bowl in the wrist** is furniture contact (stove/table), not a grasp. Open and re-center; do not lift.
+
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object. After a close, name gripper=0 on every lift and transport; do not leave it unnamed.
+5. After a real pick, lift 2 cm first. If the object rises, lift 5–8 cm more, THEN go to the goal.
+6. One POST /move per turn. Then look at the new images and state.json and send the next move.
+7. The episode is NOT finished after a single blocked move. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. Max ±20° of pitch/yaw/roll per move. Leave orientation unnamed unless you intend to tilt.
+9. Do not install packages, edit bridge_server.py, or kill the server.
+10. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.9 attempt_011_grok_libero_spatial_t3_i0/PROMPT.txt
+
+相同全文还用于：011_grok_libero_spatial_t3_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move:
+- empty_grasp_suspected → last close+lift did NOT pick the object. Change z and/or pitch. Do NOT close at the same z again.
+- blocked/contact → Cartesian target not reached. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry with a different xy/z/pitch.
+- holding_or_pinching → jaws did not fully shut. Lift ONLY 2 cm and check whether the object follows in the wrist camera.
+
+## Image convention
+- Bridge default `LIBERO_IMAGE_FLIP=none`: feed Astra `obs[cam]` as PNG. On this MuJoCo3/robosuite1.4 stack the raw agentview already has the robot in the lower foreground.
+- OpenVLA / π0 do `img[::-1, ::-1]` (180°) because that matches **their** LIBERO-dataset training pixels. LIBERO's own `VideoWriter` only does `img[::-1]` (vertical).
+- For a general VLM (Astra), 180° puts the robot on the "ceiling" and mirrors left/right vs world. Do not enable `rot180` unless comparing to a LIBERO-trained VLA. Set `LIBERO_IMAGE_FLIP=vflip|rot180|none` on the bridge.
+
+## Lessons (keep this section short; parent updates it after every run)
+
+### General
+- Do not stop after one blocked move. Raise, reset twist if needed, continue.
+- Unnamed orientation holds the current pose. Never command 90° yaw in one call.
+- empty_grasp_suspected + gripper_open≈0.02 = empty. Next close must be lower or pitched, not the same z.
+- holding_or_pinching: lift 2 cm only. If the object does not rise, go back down immediately. A 6–8 cm lift on a pinch slips.
+- Wrist-image "up" is not world +y. Re-read both cameras after every move.
+- Never transport to the goal until a 2 cm lift shows the object moving with the gripper.
+
+### libero_spatial bowls (pick black bowl → plate)
+- Parallel jaws need 10–20° pitch around the wall, not a vertical pinch on the rim.
+- Close near the lowest reachable z (blocked ≈ on the rim). Successful spatial/0: ~15° pitch, close ~z=0.91–0.92, 2 cm test lift (open stayed ~0.16), then 5 cm more, then place. Off-center first drop → regrasp and nudge xy.
+- After a pinch, **name `gripper=0` on every lift/transport**. Unnamed gripper used to copy analog `gripper_open`; ≥0.5 opened the jaws and dropped the pinch (spatial/1 m13–15). Harness now holds last command; still name it.
+- Wrist-centering ≠ contact. Bowl filling the wrist image often means the near rim is in the pads; that shove the bowl. Put the wall *between* the pads.
+- g≈0.02 after a 2 cm lift is empty even if feedback says `ok`. Change xy, keep 10–20° pitch; do not chase the rim in +x or use 30° at z<0.90.
+- Spatial/0 init0 succeeded on attempt 5 (Astra). Grok attempt_008 on the same init picked the bowl (20° pitch, ~3 cm −x from center, z≈0.915, open stayed ~0.23) but hit max_moves while nudging on the plate; never opened. Close width ≈0.14 that drops to ≈0.07 on a 2 cm lift is a rim miss — do not retry that xy/z/pitch. Leave 4–6 moves after pickup to center; success can fire while still holding. If success is still false after the bowl is over the plate, OPEN (gripper=1). Do not spend remaining moves nudging while closed.
+- Spatial/1 (bowl next to the ramekin, not the stove pan / back silver bowl): Astra a6 failed by rim-chasing in +x and unnamed gripper opening a 0.71 pinch. Grok a9 (same init) never made contact: 8 empty closes, g=0.05 every time, wrist often full (pads in the hollow or beside the bowl). On this init the bowl sits near y≈0.34–0.36; y=0.31 is left of it. After a close, judge left/right from **agentview**, not a full wrist image. g=0.05 + full wrist → step y then x until g≳0.14; get first contact by ~move 12.
+- If the target disappears *under* the gripper at grasp height, back off only 2–3 cm along the approach. A long retreat (spatial/2 Astra a7: −8 to −12 cm in x) lands on the stove.
+- Spatial/2 (bowl from table center): Grok a10 stayed on the center bowl (did not hit the stove) but 9 empty closes, only one graze g=0.11 at xy≈(0.044, −0.008), z≈0.920. Do not hunt y at z≈0.91 with 20° pitch — wrist is blind (cookie box) and in-front side-peeks flip left/right. Set y from a high wrist view (z≥1.00, pitch ≤15°) with the bowl between the pads, then descend. Agentview open-jaw overlay ≠ grasp: the left pad can sit on the bowl while the closing axis misses (in-place close still g=0.05). Next: wall close g≳0.20 by ~move 12 from that xy with 1–2 cm −x, then 2 cm test lift.
+- `holding_or_pinching` with g≈0.7 and **no bowl in the wrist** is furniture contact (stove/table), not a grasp. Open and re-center; do not lift.
+
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object. After a close, name gripper=0 on every lift and transport; do not leave it unnamed.
+5. After a real pick, lift 2 cm first. If the object rises, lift 5–8 cm more, THEN go to the goal.
+6. One POST /move per turn. Then look at the new images and state.json and send the next move.
+7. The episode is NOT finished after a single blocked move. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. Max ±20° of pitch/yaw/roll per move. Leave orientation unnamed unless you intend to tilt.
+9. Do not install packages, edit bridge_server.py, or kill the server.
+10. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.10 attempt_012_grok_libero_object_t7_i0/PROMPT.txt
+
+相同全文还用于：012_grok_libero_object_t7_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through a local HTTP bridge.
+
+Read these every turn before you act:
+- obs/agentview.png   third-person view of the table
+- obs/wrist.png       eye-in-hand / gripper camera
+- obs/state.json      instruction, EEF xyz, roll/pitch/yaw_deg, gripper_open, feedback
+
+Images are rotated 180° before saving (img[::-1, ::-1], same as OpenVLA / π0). In agentview the arm is toward the TOP of the frame; in wrist the pads are toward the BOTTOM. /move x,y,z are world metres, not image axes.
+
+HTTP API (localhost only):
+  GET  http://127.0.0.1:8765/status
+  POST http://127.0.0.1:8765/move      JSON body
+  POST http://127.0.0.1:8765/give_up   JSON {"reason": "..."}
+
+move JSON (name only what you want to change; unnamed axes keep the current value):
+{
+  "x": <m, world +x>,
+  "y": <m, world +y>,
+  "z": <m, world +z up>,
+  "roll_deg": <tilt about world +x, 0 = reset, jaws down>,
+  "pitch_deg": <tilt about world +y, 0 = reset>,
+  "yaw_deg": <jaw rotation about world +z, 0 = reset>,
+  "gripper": <0 closed, 1 open>,
+  "note": "<what you see and why this motion>"
+}
+You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+
+Read state.json "feedback" after every move:
+- empty_grasp_suspected → last close+lift did NOT pick the object. Change z and/or pitch. Do NOT close at the same z again.
+- blocked/contact → Cartesian target not reached. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry with a different xy/z/pitch.
+- holding_or_pinching → jaws did not fully shut. Lift ONLY 2 cm and check whether the object follows in the wrist camera.
+
+## Image convention
+- Bridge default `LIBERO_IMAGE_FLIP=rot180` (`img[::-1, ::-1]`), matching OpenVLA / π0 eval and their LIBERO→RLDS conversion. Agentview: arm toward the **top** of the frame. Wrist: pads toward the **bottom**.
+- Runs a1–a11 used `none` (raw OpenGL). Do not mix those pixels with rot180 runs in one score table. `vflip` (`img[::-1]`) is only LIBERO's VideoWriter, not OpenVLA.
+- World xyz in `/move` does not flip. After rot180, image-left/right is mirrored vs a1–a11; re-read both cameras, do not reuse old “image-left = −y” habits.
+
+## Lessons (keep this section short; parent updates it after every run)
+
+### General
+- Do not stop after one blocked move. Raise, reset twist if needed, continue.
+- Unnamed orientation holds the current pose. Never command 90° yaw in one call.
+- empty_grasp_suspected + gripper_open≈0.02 = empty. Next close must be lower or pitched, not the same z.
+- holding_or_pinching: lift 2 cm only. If the object does not rise, go back down immediately. A 6–8 cm lift on a pinch slips.
+- Wrist-image "up" is not world +y. Re-read both cameras after every move.
+- Never transport to the goal until a 2 cm lift shows the object moving with the gripper.
+
+### libero_spatial bowls (pick black bowl → plate)
+- Parallel jaws need 10–20° pitch around the wall, not a vertical pinch on the rim.
+- Close near the lowest reachable z (blocked ≈ on the rim). Successful spatial/0: ~15° pitch, close ~z=0.91–0.92, 2 cm test lift (open stayed ~0.16), then 5 cm more, then place. Off-center first drop → regrasp and nudge xy.
+- After a pinch, **name `gripper=0` on every lift/transport**. Unnamed gripper used to copy analog `gripper_open`; ≥0.5 opened the jaws and dropped the pinch (spatial/1 m13–15). Harness now holds last command; still name it.
+- Wrist-centering ≠ contact. Bowl filling the wrist image often means the near rim is in the pads; that shove the bowl. Put the wall *between* the pads.
+- g≈0.02 after a 2 cm lift is empty even if feedback says `ok`. Change xy, keep 10–20° pitch; do not chase the rim in +x or use 30° at z<0.90.
+- Spatial/0 init0 succeeded on attempt 5 (Astra). Grok attempt_008 on the same init picked the bowl (20° pitch, ~3 cm −x from center, z≈0.915, open stayed ~0.23) but hit max_moves while nudging on the plate; never opened. Close width ≈0.14 that drops to ≈0.07 on a 2 cm lift is a rim miss — do not retry that xy/z/pitch. Leave 4–6 moves after pickup to center; success can fire while still holding. If success is still false after the bowl is over the plate, OPEN (gripper=1). Do not spend remaining moves nudging while closed.
+- Spatial/1 (bowl next to the ramekin, not the stove pan / back silver bowl): Astra a6 failed by rim-chasing in +x and unnamed gripper opening a 0.71 pinch. Grok a9 (same init) never made contact: 8 empty closes, g=0.05 every time, wrist often full (pads in the hollow or beside the bowl). On this init the bowl sits near y≈0.34–0.36; y=0.31 is left of it. After a close, judge left/right from **agentview**, not a full wrist image. g=0.05 + full wrist → step y then x until g≳0.14; get first contact by ~move 12.
+- If the target disappears *under* the gripper at grasp height, back off only 2–3 cm along the approach. A long retreat (spatial/2 Astra a7: −8 to −12 cm in x) lands on the stove.
+- Spatial/2 (bowl from table center): Grok a10 stayed on the center bowl (did not hit the stove) but 9 empty closes, only one graze g=0.11 at xy≈(0.044, −0.008), z≈0.920. Do not hunt y at z≈0.91 with 20° pitch — wrist is blind (cookie box) and in-front side-peeks flip left/right. Set y from a high wrist view (z≥1.00, pitch ≤15°) with the bowl between the pads, then descend. Agentview open-jaw overlay ≠ grasp: the left pad can sit on the bowl while the closing axis misses (in-place close still g=0.05). Next: wall close g≳0.20 by ~move 12 from that xy with 1–2 cm −x, then 2 cm test lift.
+- `holding_or_pinching` with g≈0.7 and **no bowl in the wrist** is furniture contact (stove/table), not a grasp. Open and re-center; do not lift.
+
+
+Home EEF is about (-0.21, -0.01, 1.17). Do not command z below ~0.82.
+
+## Rules
+1. Official LIBERO success in state.json is the only success signal.
+2. RGB only: no depth, no object pose, no layout JSON.
+3. Free-space motions can be large; within ~2 cm of the object use millimetres and re-check cameras.
+4. gripper 1 = open, 0 = closed. Close only when the jaws surround the object. After a close, name gripper=0 on every lift and transport; do not leave it unnamed.
+5. After a real pick, lift 2 cm first. If the object rises, lift 5–8 cm more, THEN go to the goal.
+6. One POST /move per turn. Then look at the new images and state.json and send the next move.
+7. The episode is NOT finished after a single blocked move. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. Max ±20° of pitch/yaw/roll per move. Leave orientation unnamed unless you intend to tilt.
+9. Do not install packages, edit bridge_server.py, or kill the server.
+10. When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed.
+
+Begin now: GET /status, look at both images, then move. Keep going until the episode terminates.
+
+```
+
+### B.11 attempt_013_grok_libero_object_t7_i0/PROMPT.txt
+
+相同全文还用于：013_grok_libero_object_t7_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json. Respond with exactly one HTTP call per turn.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              harness heuristic after the last move — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback (heuristic templates; can be wrong):
+  empty_grasp_suspected  closed and lifted, jaws fully shut (gripper_open ≲ 0.12). Object likely still on the support. Change z and/or pitch. Do NOT close at the same z again.
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  holding_or_pinching    jaws did not fully shut (gripper_open ≳ 0.15). Lift ONLY 2 cm and check whether the object follows in the wrist. If the wrist is empty, this is furniture contact — open and re-center.
+  ok                     interpolation finished; not a guarantee of grasp. gripper_open≈0.02 after a 2 cm lift is still empty.
+  reset                  cameras live, jaws at home.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty even if feedback says ok."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+(none — this episode uses PROMPT_BASE_2 only; no accumulated lessons)
+
+
+Work toward the instruction in state.json. One HTTP call. Re-check after every motion.
+
+```
+
+### B.12 attempt_014_astra_libero_spatial_t0_i0/PROMPT.txt
+
+相同全文还用于：014_astra_libero_spatial_t0_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json. Respond with exactly one HTTP call per turn.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+(none — this episode uses PROMPT_BASE_2 only; no accumulated lessons)
+
+
+Work toward the instruction in state.json. One HTTP call. Re-check after every motion.
+
+```
+
+### B.13 attempt_015_astra_libero_spatial_t0_i0/PROMPT.txt
+
+相同全文还用于：015_astra_libero_spatial_t0_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+(none — this episode uses PROMPT_BASE_2 only; no accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.14 attempt_016_astra_libero_spatial_t0_i0/PROMPT.txt
+
+相同全文还用于：016_astra_libero_spatial_t0_i0, 017_astra_libero_object_t7_i0, 018_astra_resume_libero_object_t7_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.15 attempt_019_astra_libero_object_t0_i0/PROMPT.txt
+
+相同全文还用于：019_astra_libero_object_t0_i0, 020_astra_libero_object_t4_i0, 021_grok_libero_object_t4_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.16 attempt_022_grok_libero_object_t4_i0/PROMPT.txt
+
+相同全文还用于：022_grok_libero_object_t4_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview center, it is world +X red, +Y green, +Z blue — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.17 attempt_023_grok_libero_object_t4_i0/PROMPT.txt
+
+相同全文还用于：023_grok_libero_object_t4_i0。
+
+```
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+
+Task in obs/state.json: pick up the ketchup and place it in the basket (libero_object task 4 init 0, floor scene).
+
+LIBERO_WORLD_AXES=1: BOTH obs/agentview.png AND obs/wrist.png have a translucent world XYZ triad (red=+X, green=+Y, orange/blue=+Z). Use them to check the coordinate cheat sheet. World xyz in /move does not flip. Images are rot180.
+
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.18 attempt_024_astra_libero_goal_t0_i0/PROMPT.txt
+
+相同全文还用于：024_astra_libero_goal_t0_i0, 025_astra_libero_goal_t7_i0, 026_astra_libero_goal_t8_i0。
+
+```
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.19 attempt_027_astra_libero_goal_t7_i0/PROMPT.txt
+
+相同全文还用于：027_astra_libero_goal_t7_i0, 031_astra_libero_goal_t7_i0, 032_astra_libero_goal_t8_i0。
+
+```
+LIBERO_WORLD_AXES=1: BOTH obs/agentview.png AND obs/wrist.png have a translucent world XYZ triad (red=+X, green=+Y, orange/blue=+Z). Use them to check the coordinate cheat sheet. World xyz in /move does not flip.
+
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.20 attempt_028_grok_libero_goal_t0_i0/PROMPT.txt
+
+相同全文还用于：028_grok_libero_goal_t0_i0, 033_grok_libero_goal_t0_i0。
+
+```
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+Task in obs/state.json: open the middle drawer of the cabinet (libero_goal task 0 init 0, kitchen table).
+LIBERO_WORLD_AXES=1: BOTH obs/agentview.png AND obs/wrist.png have a translucent world XYZ triad (red=+X, green=+Y, orange/blue=+Z). Use them to check the coordinate cheat sheet. World xyz in /move does not flip. Images are rot180.
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.21 attempt_029_grok_libero_goal_t7_i0/PROMPT.txt
+
+相同全文还用于：029_grok_libero_goal_t7_i0, 034_grok_libero_goal_t7_i0。
+
+```
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+Task in obs/state.json: turn on the stove (libero_goal task 7 init 0, kitchen table).
+LIBERO_WORLD_AXES=1: BOTH obs/agentview.png AND obs/wrist.png have a translucent world XYZ triad (red=+X, green=+Y, orange/blue=+Z). Use them to check the coordinate cheat sheet. World xyz in /move does not flip. Images are rot180.
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.22 attempt_030_grok_libero_goal_t8_i0/PROMPT.txt
+
+相同全文还用于：030_grok_libero_goal_t8_i0, 035_grok_libero_goal_t8_i0。
+
+```
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+Task in obs/state.json: put the bowl on the plate (libero_goal task 8 init 0, kitchen table).
+LIBERO_WORLD_AXES=1: BOTH obs/agentview.png AND obs/wrist.png have a translucent world XYZ triad (red=+X, green=+Y, orange/blue=+Z). Use them to check the coordinate cheat sheet. World xyz in /move does not flip. Images are rot180.
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.23 attempt_036_grok_libero_goal_t0_i0/PROMPT.txt
+
+相同全文还用于：036_grok_libero_goal_t0_i0。
+
+```
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+Task in obs/state.json: open the middle drawer of the cabinet (libero_goal task 0 init 0, kitchen table).
+LIBERO_WORLD_AXES=0: no coordinate-axis overlay on the PNGs. Images are rot180. World xyz in /move does not flip.
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.24 attempt_037_grok_libero_goal_t7_i0/PROMPT.txt
+
+相同全文还用于：037_grok_libero_goal_t7_i0。
+
+```
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+Task in obs/state.json: turn on the stove (libero_goal task 7 init 0, kitchen table).
+LIBERO_WORLD_AXES=0: no coordinate-axis overlay on the PNGs. Images are rot180. World xyz in /move does not flip.
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
+```
+
+### B.25 attempt_038_grok_libero_goal_t8_i0/PROMPT.txt
+
+相同全文还用于：038_grok_libero_goal_t8_i0, current。
+
+```
+You are the robot policy for ONE LIBERO episode. Do NOT call Codex. Do not spawn subagents.
+Follow PROMPT_BASE_2 (the rest of this file) exactly.
+Task in obs/state.json: put the bowl on the plate (libero_goal task 8 init 0, kitchen table).
+LIBERO_WORLD_AXES=0: no coordinate-axis overlay on the PNGs. Images are rot180. World xyz in /move does not flip.
+API: GET http://127.0.0.1:8765/status ; POST /move ; POST /give_up.
+Every turn read both PNGs with the image/file tool, read state.json, then exactly one HTTP call.
+Budget is 25 planner /move calls. Loop until success=true or terminated=true. Do not stop after GET /status.
+You are controlling a single Panda arm in the LIBERO simulator through HTTP tool calls only.
+
+Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
+
+You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+
+This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
+
+============================================================
+1. COORDINATE FRAME  (read this before every move)
+============================================================
+Frame name: world / MuJoCo frame. Units: meters and degrees.
+
+One arm. Parallel-jaw Panda gripper. OSC Cartesian control (not joint space).
+
++x  away from the robot torso, toward the far side of the workspace
++y  robot left from the torso (operator right if you face the robot)
++z  up. Support-surface height is SCENE-DEPENDENT — never assume table z = 0.
+
+Home (approx; always re-read from state.json after reset):
+  kitchen-table scenes (libero_spatial, libero_goal, kitchen libero_10)
+      x≈-0.21  y≈-0.01  z≈1.17     table top ≈ 0.90
+      do not command z below ≈0.82
+  floor scenes (libero_object)
+      x≈-0.15  y≈-0.01  z≈0.26     floor ≈ 0.00
+      carton-body grasps sit much lower; do not reuse kitchen z
+      do not command z below ≈0.03
+
+Yaw   : rotation about world +z, degrees. 0 = reset. Positive = counterclockwise from above.
+Pitch : rotation about world +y, degrees. 0 = reset, jaws down. Positive tips the tool toward +x.
+Roll  : rotation about world +x, degrees. 0 = reset, jaws down. Positive tips the tool toward +y.
+Gripper command: 1.0 = OPEN, 0.0 = CLOSED.
+gripper_open in state.json is the measured jaw fraction (≈1 fully open, ≈0 fully shut). It is NOT the command.
+
+The harness does not clamp Cartesian targets. IK, contact, or the table/floor will stop you. Do not drive z through the support surface.
+
+Agentview cheat sheet (images are saved rot180: img[::-1, ::-1], OpenVLA / π0 convention):
+  arm is toward the TOP of the frame; workspace is toward the BOTTOM
+  +x  → gripper moves toward the BOTTOM of agentview (away from the arm)
+  -x  → gripper moves toward the TOP of agentview (back toward the arm)
+  +y  → gripper moves toward the LEFT of agentview
+  -y  → gripper moves toward the RIGHT of agentview
+  +z  → gripper rises (not image-up). Object shrinks in the wrist image.
+  If a translucent RGB triad is at the agentview or wrist center, it is world +X red, +Y green, +Z blue from that camera — not a scene object.
+
+Wrist cheat sheet:
+  gripper pads are toward the BOTTOM of the frame
+  wrist-image "up" is NOT world +y
+
+If a probe move disagrees with this cheat sheet, TRUST THE IMAGES and invert that axis for the rest of the episode. Write the inversion in your next note and keep using it. World x,y,z in /move never flip when the PNG is rotated.
+
+============================================================
+2. WHAT EACH OBSERVATION CONTAINS
+============================================================
+Read these every turn before you act:
+  obs/agentview.png     third-person RGB of the workspace
+  obs/wrist.png         eye-in-hand / gripper RGB
+  obs/state.json        the only metric state
+
+state.json fields:
+  instruction           official language goal (no object poses, no layout JSON, no depth)
+  suite task_id init_id which scene family this episode is
+  eef_x eef_y eef_z     measured end-effector position, metres
+  roll_deg pitch_deg yaw_deg
+                        measured orientation relative to reset (jaws-down), degrees
+  gripper_open          measured jaw opening in [0, 1]
+  feedback              blocked/contact after a stall, otherwise ok — NOT official success
+  remaining_moves       planner-call budget left
+  remaining_env_steps   physics-step budget left
+  success               official LIBERO check_success() bit. This is the only success signal.
+  terminated            episode already over
+
+POST /move also returns last_move: named axes, target, final_dist_m, stopped (reached|blocked), feedback.
+
+How to read state:
+- Compare the new numbers to the targets you just sent. Residual = what the arm actually did.
+- If an axis you commanded barely moved, contact blocked you or the target was unreachable. Do not raise the same target again.
+- Unnamed dimensions hold their current value. If you want an axis to stay put, omit it.
+- Unnamed gripper holds the last commanded open/close, NOT analog gripper_open. After a real pinch, name gripper=0 on every later call.
+
+How to read images:
+- Agentview: which object, which side of the workspace, coarse approach, left/right after a close.
+- Wrist: grasp affordance — rim vs wall vs body, whether the pads will hit the table, whether the object is BETWEEN the jaws.
+- A full wrist image is not a grasp. Object filling the wrist often means the near rim is in the pads.
+
+How to read feedback:
+  blocked/contact        Cartesian target not reached after stall. Raise a few cm, optionally reset roll/pitch/yaw to 0 if the wrist looks twisted, then retry a different xy/z/pitch.
+  ok / reset             interpolation finished or episode start. Judge grasp from images and gripper_open.
+
+Official success in state.json is the only success signal. Ignore any urge to stop because a single move was blocked.
+
+============================================================
+3. TOOLS
+============================================================
+GET  http://127.0.0.1:8765/status
+  Refresh obs/*.png and obs/state.json. Call this first, and whenever files look stale.
+
+POST http://127.0.0.1:8765/move
+  Absolute (or delta) Cartesian targets for the named dimensions only.
+  JSON body — name only what you want to change:
+  {
+    "x": <m, world +x>,
+    "y": <m, world +y>,
+    "z": <m, world +z up>,
+    "roll_deg": <deg, 0 = reset, jaws down>,
+    "pitch_deg": <deg, 0 = reset>,
+    "yaw_deg": <deg, 0 = reset>,
+    "gripper": <0 closed, 1 open>,
+    "note": "<what you see NOW, and why this motion>"
+  }
+  You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
+  The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
+  The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+
+POST http://127.0.0.1:8765/give_up
+  Call only when the task cannot be finished inside the remaining budget.
+  {
+    "reason": "<short>",
+    "hindsight": "<concrete transferable facts for the next agent on this same harness>"
+  }
+  Write advice about frame signs, support-surface height, gripper offset, camera mapping, object scale. Say "none" in hindsight only if nothing qualifies.
+
+There is no done endpoint. The environment ends a successful episode by itself (success=true). It also ends on max_moves or max_env_steps.
+
+Do not install packages, edit bridge_server.py, or kill the server.
+
+============================================================
+4. MOTION DISCIPLINE
+============================================================
+Default step size:
+  free space          up to ~8–12 cm
+  near the object     0.5–2 cm, then millimetres
+  pitch/yaw/roll      max ±20 deg per call. Leave them unnamed unless you intend to tilt.
+  gripper             jump fully to 0 or 1; do not creep
+
+One intent per call. Do not combine "approach + descend + close" in one target list unless all three deltas are tiny and already aligned.
+
+Before every gripper=0 close:
+  Look at BOTH images and answer in the note: "close now would trap the object: yes/no".
+  Yes only if the wrist shows the object body or rim in the gap BETWEEN the pads (not on top of a lip, not in the hollow, not beside one pad).
+  If no, do NOT send gripper=0. Adjust xy / z / pitch / yaw first, then re-check the wrist.
+
+Before every translate (x/y/z or dx/dy/dz):
+  Look at both images and ask whether this motion would collide with the target, a neighbor, or the support.
+  If the path would drive the wrist or pads through an object, do NOT send that target. Raise z a few centimetres and/or change pitch/yaw so the opening clears, then move. A blocked/contact on the previous call is a collision — do not repeat the same xyz.
+
+REGRASP IS ALLOWED. "Small, deliberate motions" means "do not swing 20 cm in one shot near contact". It does NOT mean "never change orientation".
+If the wrist image shows a bad contact geometry (pads on the rim instead of around the wall/body, palm hitting the support, object not between the jaws):
+  1. retract +z by 0.02–0.04
+  2. rotate pitch / yaw / roll to the better affordance (split at 20 deg per call)
+  3. approach again
+Name the rotation in the note ("pitch 15 so the opening meets the bowl wall").
+
+Never:
+- command z through the support surface (kitchen ≲ 0.82, floor ≲ 0.03) unless the wrist clearly shows the fingertips above it
+- keep closing a gripper that is not around the object
+- repeat a target that just returned blocked/contact or a large residual
+- transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
+- leave gripper unnamed after a close — name gripper=0 on every lift and transport
+
+After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+
+============================================================
+5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)
+============================================================
+If this is the first observation and you have not yet confirmed axis signs:
+  GET /status. Read instruction, suite, home xyz, both images.
+  Move ONLY x by +0.03 (or dx=+0.03). Watch agentview and wrist.
+  In the following note, state:
+    "probe +x: agentview moved toward TOP / BOTTOM / unclear; I will treat +x as ..."
+  If the image motion contradicts section 1, invert that axis for the rest of the episode.
+Do not probe all three axes if the object is already under the gripper. Probe the axis you are about to use.
+
+============================================================
+6. TASK LOOP
+============================================================
+1. Say in the note which object and what the next few centimetres are for.
+2. Get the gripper to a pre-grasp pose that matches the object's affordance.
+   Rotate first if needed. Translate second.
+3. Close only when the wrist image shows the object between the jaws.
+4. Lift +z 0.02 and confirm the object rose with the gripper (wrist + gripper_open).
+   If it rose, lift 5–8 cm more, THEN go to the goal.
+   If it did not, go back down immediately and change xy/z/pitch. Do not haul an empty gripper.
+5. Move in free space. Keep z high enough to clear other objects.
+6. At the target, match orientation first, then descend, then open or place.
+7. Keep going until success=true or terminated=true. give_up only after at least 10 moves.
+8. After GET /status, the next turn must be a POST /move (or give_up if the budget is already exhausted). Writing "Next: probe +x" and then ending the session is a failure.
+
+If you name a correction you cannot apply this turn ("tilt more"), apply a concrete number NOW (pitch_deg += 10) instead of waiting for the next thought.
+
+============================================================
+7. NOTE AND HINDSIGHT FORMAT
+============================================================
+note (every /move):
+  "Agentview: black bowl is 4cm left of the gripper, plate is further +x.
+   Wrist: pads would hit the rim at pitch 0.
+   Action: retract z+0.03 then pitch 15 so the opening meets the wall."
+
+hindsight (give_up):
+  "World +x is toward the BOTTOM of agentview. Kitchen table z≈0.90, home z≈1.17.
+   Bowl wall close ≈ z=0.91–0.92 with 15 deg pitch. gripper_open≈0.02 after a 2cm
+   lift is empty."
+
+When the episode ends, write runs/current/AGENT_SUMMARY.md: what you tried, what feedback said, why it worked or failed, and the same hindsight.
+
+============================================================
+8. LESSONS  (parent updates this after every run; keep it short)
+============================================================
+Bowl grasp (parallel jaws):
+- Close only when the bowl rim / edge sits BETWEEN the two pads — one pad toward the inside of the bowl, the other toward the outside. Do not close when the pads are on top of the thin lip (jaws-down pinch from above). That empties to gripper_open≈0.02 on a 2 cm lift.
+- Decide from the WRIST image whether a close would trap the object. In wrist view the rim must occupy the gap between the two pads. If the rim is only at the bottom of the wrist frame, or the pads rest on the lip, you are not aligned: pitch 10–20° so the opening meets the wall, re-center, then close. Agentview overlay of open jaws on the bowl is not enough.
+
+Close / collision (all objects):
+- Never send gripper=0 until the current images show a close would actually grasp. If not, move first.
+- Never send a Cartesian target that would collide; raise or reorient first, then translate.
+
+(no extra accumulated lessons)
+
+
+Work toward the instruction in state.json. Re-check after every motion. Loop until success=true or terminated=true. Do not exit the session while remaining_moves > 0 and terminated is false.
+
 ```
