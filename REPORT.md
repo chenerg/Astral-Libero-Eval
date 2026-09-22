@@ -274,6 +274,7 @@ Prompt 里有一句：画面中心半透明 RGB 三轴是世界 +X/+Y/+Z，不�
 | 028 | Grok nested | goal/0 抽屉 | 双相机轴 | 否 | 25 / 334 | 19.0 min | yaw 90° 空夹 |
 | **029** | Grok nested | goal/7 灶 | **双相机轴** | **是** | **15 / 145** | **8.2 min** | z≈0.963，−yaw 到 −54° |
 | 030 | Grok nested | goal/8 碗 | 双相机轴 | 否 | 24 / 221 | 19.7 min | 唇沿空夹 g=0.14→0.02，give_up |
+| 032 | Astra | goal/8 碗 | 双相机轴 | 额度 | 24 / 239 | 5.2 min | 碗已放到盘上，最后 1 步额度中断 |
 
 Astra 单局墙钟大约 **4–6 min**，token 大约 5–9 万（成功局常见 5.3–8.3 万）。Grok 单局大约 **8–34 min**，多数在 15–25 min。
 
@@ -349,6 +350,81 @@ Astra 026 agentview 全程（20 Hz，约 12 s）：碗放盘成功。
 - 番茄酱瓶颈（该 init）：eef ≈ (−0.11, −0.23, 0.13)，g≈0.42；篮口释放 ≈ (0.02, 0.27, 0.21)
 - 中层抽屉（该 init）：≈ (0.03, −0.13, 1.02)，roll −90°，g≈0.23，再 +y
 - 灶杠杆（该 init）：z≈0.955–0.963，g≈0.31–0.44，**原地负 yaw**，不要抬
+
+### 3.4 Astra 失败：Codex 额度与规划器步数
+
+Astra 的失败不全是夹不住。有两类把已经接近完成的 episode 掐断：**ChatGPT / Codex 额度**，以及 **规划器 `/move` 预算用尽**。下面几局都有 agentview 全程。
+
+**A. Codex 额度用尽（CLI 报 usage limit，进程退出）**
+
+| Run | 任务 | 中断时 | token | 当时场景 |
+|---|---|---|---|---|
+| 007 | spatial/2 桌心碗 | 7 /move，125 物理步 | 1.7 万 | 15° 下降后 −x 退到灶上，闭合 g≈0.69，腕部没有碗。额度在 2 cm 验夹之前到来。 |
+| 032 | goal/8 碗放盘 | 24 /move（预算 25），剩 1 步 | 8.4 万 | 侧壁夹住、运到盘上、张开。画面里碗压在盘上，官方 `check_success()` 仍为 false。额度在最后一次微调前到来。 |
+
+007 结束：爪停在灶上，目标碗在画面右侧未动。
+
+![Astra 007：额度中断，爪在灶上](report_assets/fig_a007_quota.png)
+
+Astra 007 agentview（按 `/move` 边界，约 4 s）：
+
+<video src="report_assets/vid_a007_quota.mp4" controls width="512"></video>
+
+032 结束：碗与盘重叠，爪已张开上收。官方仍未给成功。
+
+![Astra 032：额度中断，碗在盘上但 checker 未过](report_assets/fig_a032_quota.png)
+
+Astra 032 agentview 全程（20 Hz，约 12 s）：
+
+<video src="report_assets/vid_a032_quota.mp4" controls width="512"></video>
+
+**B. 规划器步数用尽（`max_moves` 或剩余步不够再抓一次）**
+
+对照实验默认 25 次 `/move`。Astra 026 用满 25 步仍然成功；017 / 019 同样用满 25 步，失败发生在释放。015 当时预算只有 15 步。
+
+| Run | 任务 | 结束方式 | 还剩 | 当时场景 |
+|---|---|---|---|---|
+| 015 | spatial/0 碗 | give_up | 3 | 全程 jaws-down，两次空抬。15 步预算不够做侧壁再抓。 |
+| 017 | object/7 牛奶 | max_moves | 0 | 第三次闭合 g≈0.67 真夹，运到篮缘。最后一步把 +y 与 `gripper=1` 写在一起，纸盒掉在篮外。 |
+| 018 | 017 的 resume | give_up | 1 | 侧倒纸盒再抓两次空夹，剩 1 步不够「再抓 + 验夹 + 运 + 单独张开」。 |
+| 019 | object/0 字母汤 | max_moves | 0 | 真夹 g≈0.75，张开后罐子视觉上在篮内。官方 checker 仍为 false，没有剩余步数再放一次。 |
+| 025 | goal/7 开灶 | give_up | 1 | 三次空夹，见 §4.4 视频。 |
+
+015 结束：碗仍在桌上，爪已空。
+
+![Astra 015：15 步预算用完前放弃](report_assets/fig_a015_budget.png)
+
+Astra 015 agentview 全程（20 Hz，约 8 s）：
+
+<video src="report_assets/vid_a015_budget.mp4" controls width="512"></video>
+
+017 结束：牛奶纸盒立在篮外地面。
+
+![Astra 017：25 步用尽，牛奶掉在篮旁](report_assets/fig_a017_milk_fail.png)
+
+Astra 017 agentview 全程（20 Hz，约 13 s）：
+
+<video src="report_assets/vid_a017_milk_fail.mp4" controls width="512"></video>
+
+018 是 017 的物理续跑：侧倒后再抓失败。
+
+Astra 018 agentview 全程（20 Hz，约 10 s）：
+
+<video src="report_assets/vid_a018_budget.mp4" controls width="512"></video>
+
+019 结束：字母汤罐在篮内，官方仍为 false。
+
+![Astra 019：25 步用尽，视觉在篮内](report_assets/fig_a019_soup_fail.png)
+
+Astra 019 agentview 全程（20 Hz，约 13 s）：
+
+<video src="report_assets/vid_a019_soup_fail.mp4" controls width="512"></video>
+
+**怎么读这两类失败**
+
+- 额度中断发生在 Codex CLI 进程层，桥和物理还活着。007 停在错误接触上；032 停在「看起来已经放好、checker 未翻转」上。两者都少了最后几次 `/move`。
+- 步数用尽发生在策略层：真夹之后把开爪和横移写在同一步（017），或释放后没有余量应付更严的官方 checker（019）。026 用满 25 步成功，说明 25 步对 goal 碗够用，对「先空夹两次再运牛奶/汤罐」不够。
+- 014（GET `/status` 后退出、0 次 `/move`）是会话早退，不是额度，也没有可看的运动视频。
 
 ---
 
