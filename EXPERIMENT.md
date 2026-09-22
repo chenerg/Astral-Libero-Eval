@@ -93,6 +93,9 @@ Fixes: `HTTPServer` (single thread); gripper `+1` close / `-1` open. Sanity move
 | 30 | goal/8 nested Grok bowl on plate **WORLD_AXES=1** | no | 24 / 221 | two lip pinches; give_up | `runs/attempt_030_grok_libero_goal_t8_i0/` |
 | **31** | goal/7 Astra stove **WORLD_AXES=1** | **yes** | **21 / 192** | empty pinches then open-jaw −yaw descent turns stove | `runs/attempt_031_astra_libero_goal_t7_i0/` |
 | 32 | goal/8 Astra bowl on plate **WORLD_AXES=1** | no | 24 / 239 | grasped and carried; quota abort 1 move left; official success false | `runs/attempt_032_astra_libero_goal_t8_i0/` |
+| **33** | goal/0 nested **grok-4.7** drawer **WORLD_AXES=1** | **yes** | **20 / 188** | roll −90°, handle pinch, pull drawer | `runs/attempt_033_grok_libero_goal_t0_i0/` |
+| **34** | goal/7 nested **grok-4.7** stove **WORLD_AXES=1** | **yes** | **19 / 177** | pinch g≈0.31 then −yaw to ≈−49° | `runs/attempt_034_grok_libero_goal_t7_i0/` |
+| 35 | goal/8 nested **grok-4.7** bowl on plate **WORLD_AXES=1** | no | 25 / 399 | carried onto plate still closed; max_moves before open | `runs/attempt_035_grok_libero_goal_t8_i0/` |
 
 Index: `runs/index.jsonl`. Each run folder has `PROMPT.txt`, `transcript.jsonl`, `result.json`, `frames/` (one pair per planner `/move`), `ctrl/` + `steps.jsonl` (every 20 Hz control step: 7-D action + agentview/wrist), `codex.log`, `NOTES.md` or `AGENT_SUMMARY.md`. Older runs before this change only have `frames/` at `/move` boundaries.
 
