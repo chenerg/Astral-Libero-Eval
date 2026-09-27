@@ -9,7 +9,7 @@ export MUJOCO_GL=egl PYOPENGL_PLATFORM=egl
 export LIBERO_SUITE="${LIBERO_SUITE:-libero_spatial}"
 export LIBERO_TASK_ID="${LIBERO_TASK_ID:-0}"
 export LIBERO_INIT_ID="${LIBERO_INIT_ID:-0}"
-export LIBERO_MAX_MOVES="${LIBERO_MAX_MOVES:-30}"
+export LIBERO_MAX_MOVES="${LIBERO_MAX_MOVES:-50}"
 export LIBERO_MAX_ENV_STEPS="${LIBERO_MAX_ENV_STEPS:-600}"
 # 1/true/on: translucent world XYZ triad at agentview and wrist centers. Default off.
 export LIBERO_WORLD_AXES="${LIBERO_WORLD_AXES:-0}"

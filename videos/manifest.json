@@ -1,0 +1,623 @@
+[
+  {
+    "file": "attempt_003_libero_spatial_t0_i0.mp4",
+    "source": "frames",
+    "frames": 2,
+    "fps": 1.0,
+    "seconds": 2.0,
+    "outcome": "no_result",
+    "bytes": 46688
+  },
+  {
+    "file": "attempt_004_libero_spatial_t0_i0.mp4",
+    "source": "frames",
+    "frames": 28,
+    "fps": 4.0,
+    "seconds": 7.0,
+    "outcome": "give_up",
+    "bytes": 421722
+  },
+  {
+    "file": "attempt_005_libero_spatial_t0_i0.mp4",
+    "source": "frames",
+    "frames": 30,
+    "fps": 4.0,
+    "seconds": 7.5,
+    "outcome": "success",
+    "bytes": 367370
+  },
+  {
+    "file": "attempt_006_libero_spatial_t1_i0.mp4",
+    "source": "frames",
+    "frames": 29,
+    "fps": 4.0,
+    "seconds": 7.25,
+    "outcome": "give_up",
+    "bytes": 480187
+  },
+  {
+    "file": "attempt_007_libero_spatial_t2_i0.mp4",
+    "source": "frames",
+    "frames": 8,
+    "fps": 4.0,
+    "seconds": 2.0,
+    "outcome": "codex_usage_limit",
+    "bytes": 80412
+  },
+  {
+    "file": "attempt_008_grok_libero_spatial_t0_i0.mp4",
+    "source": "frames",
+    "frames": 31,
+    "fps": 4.0,
+    "seconds": 7.75,
+    "outcome": "max_moves",
+    "bytes": 404896
+  },
+  {
+    "file": "attempt_009_grok_libero_spatial_t1_i0.mp4",
+    "source": "frames",
+    "frames": 27,
+    "fps": 4.0,
+    "seconds": 6.75,
+    "outcome": "give_up",
+    "bytes": 372243
+  },
+  {
+    "file": "attempt_010_grok_libero_spatial_t2_i0.mp4",
+    "source": "frames",
+    "frames": 31,
+    "fps": 4.0,
+    "seconds": 7.75,
+    "outcome": "max_moves",
+    "bytes": 248985
+  },
+  {
+    "file": "attempt_011_grok_libero_spatial_t3_i0.mp4",
+    "source": "ctrl",
+    "frames": 210,
+    "fps": 20.0,
+    "seconds": 10.5,
+    "outcome": "no_result",
+    "bytes": 789727
+  },
+  {
+    "file": "attempt_012_grok_libero_object_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 372,
+    "fps": 20.0,
+    "seconds": 18.6,
+    "outcome": "max_moves",
+    "bytes": 1255249
+  },
+  {
+    "file": "attempt_013_grok_libero_object_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 136,
+    "fps": 20.0,
+    "seconds": 6.8,
+    "outcome": "max_moves",
+    "bytes": 513953
+  },
+  {
+    "file": "attempt_014_astra_libero_spatial_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 5,
+    "fps": 2.5,
+    "seconds": 2.0,
+    "outcome": "no_result",
+    "bytes": 61274
+  },
+  {
+    "file": "attempt_015_astra_libero_spatial_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 166,
+    "fps": 20.0,
+    "seconds": 8.3,
+    "outcome": "give_up",
+    "bytes": 672514
+  },
+  {
+    "file": "attempt_016_astra_libero_spatial_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 198,
+    "fps": 20.0,
+    "seconds": 9.9,
+    "outcome": "success",
+    "bytes": 802570
+  },
+  {
+    "file": "attempt_017_astra_libero_object_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 263,
+    "fps": 20.0,
+    "seconds": 13.15,
+    "outcome": "max_moves",
+    "bytes": 946949
+  },
+  {
+    "file": "attempt_018_astra_resume_libero_object_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 197,
+    "fps": 20.0,
+    "seconds": 9.85,
+    "outcome": "give_up",
+    "bytes": 778895
+  },
+  {
+    "file": "attempt_019_astra_libero_object_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 264,
+    "fps": 20.0,
+    "seconds": 13.2,
+    "outcome": "max_moves",
+    "bytes": 956555
+  },
+  {
+    "file": "attempt_020_astra_libero_object_t4_i0.mp4",
+    "source": "ctrl",
+    "frames": 232,
+    "fps": 20.0,
+    "seconds": 11.6,
+    "outcome": "success",
+    "bytes": 885262
+  },
+  {
+    "file": "attempt_021_grok_libero_object_t4_i0.mp4",
+    "source": "ctrl",
+    "frames": 193,
+    "fps": 20.0,
+    "seconds": 9.65,
+    "outcome": "give_up",
+    "bytes": 666086
+  },
+  {
+    "file": "attempt_022_grok_libero_object_t4_i0.mp4",
+    "source": "ctrl",
+    "frames": 175,
+    "fps": 20.0,
+    "seconds": 8.75,
+    "outcome": "give_up",
+    "bytes": 605066
+  },
+  {
+    "file": "attempt_023_grok_libero_object_t4_i0.mp4",
+    "source": "ctrl",
+    "frames": 207,
+    "fps": 20.0,
+    "seconds": 10.35,
+    "outcome": "give_up",
+    "bytes": 814205
+  },
+  {
+    "file": "attempt_024_astra_libero_goal_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 186,
+    "fps": 20.0,
+    "seconds": 9.3,
+    "outcome": "success",
+    "bytes": 621001
+  },
+  {
+    "file": "attempt_025_astra_libero_goal_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 224,
+    "fps": 20.0,
+    "seconds": 11.2,
+    "outcome": "give_up",
+    "bytes": 796193
+  },
+  {
+    "file": "attempt_026_astra_libero_goal_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 246,
+    "fps": 20.0,
+    "seconds": 12.3,
+    "outcome": "success",
+    "bytes": 947702
+  },
+  {
+    "file": "attempt_027_astra_libero_goal_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 200,
+    "fps": 20.0,
+    "seconds": 10.0,
+    "outcome": "success",
+    "bytes": 744530
+  },
+  {
+    "file": "attempt_028_grok_libero_goal_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 334,
+    "fps": 20.0,
+    "seconds": 16.7,
+    "outcome": "max_moves",
+    "bytes": 1315961
+  },
+  {
+    "file": "attempt_029_grok_libero_goal_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 145,
+    "fps": 20.0,
+    "seconds": 7.25,
+    "outcome": "success",
+    "bytes": 556137
+  },
+  {
+    "file": "attempt_030_grok_libero_goal_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 221,
+    "fps": 20.0,
+    "seconds": 11.05,
+    "outcome": "give_up",
+    "bytes": 783902
+  },
+  {
+    "file": "attempt_031_astra_libero_goal_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 192,
+    "fps": 20.0,
+    "seconds": 9.6,
+    "outcome": "success",
+    "bytes": 734344
+  },
+  {
+    "file": "attempt_032_astra_libero_goal_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 239,
+    "fps": 20.0,
+    "seconds": 11.95,
+    "outcome": "codex_usage_limit",
+    "bytes": 1012466
+  },
+  {
+    "file": "attempt_033_grok_libero_goal_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 188,
+    "fps": 20.0,
+    "seconds": 9.4,
+    "outcome": "success",
+    "bytes": 681535
+  },
+  {
+    "file": "attempt_034_grok_libero_goal_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 177,
+    "fps": 20.0,
+    "seconds": 8.85,
+    "outcome": "success",
+    "bytes": 647716
+  },
+  {
+    "file": "attempt_035_grok_libero_goal_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 399,
+    "fps": 20.0,
+    "seconds": 19.95,
+    "outcome": "max_moves",
+    "bytes": 1452644
+  },
+  {
+    "file": "attempt_036_grok_libero_goal_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 371,
+    "fps": 20.0,
+    "seconds": 18.55,
+    "outcome": "max_moves",
+    "bytes": 1097224
+  },
+  {
+    "file": "attempt_037_grok_libero_goal_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 145,
+    "fps": 20.0,
+    "seconds": 7.25,
+    "outcome": "success",
+    "bytes": 515145
+  },
+  {
+    "file": "attempt_038_grok_libero_goal_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 183,
+    "fps": 20.0,
+    "seconds": 9.15,
+    "outcome": "success",
+    "bytes": 724040
+  },
+  {
+    "file": "attempt_039_libero_10_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 312,
+    "fps": 20.0,
+    "seconds": 15.6,
+    "outcome": "max_moves",
+    "bytes": 1128281
+  },
+  {
+    "file": "attempt_040_libero_10_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 372,
+    "fps": 20.0,
+    "seconds": 18.6,
+    "outcome": "give_up",
+    "bytes": 1169351
+  },
+  {
+    "file": "attempt_041_grok_libero_10_t2_i0.mp4",
+    "source": "ctrl",
+    "frames": 422,
+    "fps": 20.0,
+    "seconds": 21.1,
+    "outcome": "max_moves",
+    "bytes": 1336102
+  },
+  {
+    "file": "attempt_042_grok_libero_object_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 345,
+    "fps": 20.0,
+    "seconds": 17.25,
+    "outcome": "max_moves",
+    "bytes": 1201149
+  },
+  {
+    "file": "attempt_043_grok_libero_object_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 457,
+    "fps": 20.0,
+    "seconds": 22.85,
+    "outcome": "max_moves",
+    "bytes": 1436057
+  },
+  {
+    "file": "attempt_044_libero_goal_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 390,
+    "fps": 20.0,
+    "seconds": 19.5,
+    "outcome": "success",
+    "bytes": 1122360
+  },
+  {
+    "file": "attempt_045_libero_goal_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 190,
+    "fps": 20.0,
+    "seconds": 9.5,
+    "outcome": "success",
+    "bytes": 645155
+  },
+  {
+    "file": "attempt_046_libero_goal_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 236,
+    "fps": 20.0,
+    "seconds": 11.8,
+    "outcome": "success",
+    "bytes": 826152
+  },
+  {
+    "file": "attempt_047_libero_goal_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 334,
+    "fps": 20.0,
+    "seconds": 16.7,
+    "outcome": "success",
+    "bytes": 1367406
+  },
+  {
+    "file": "attempt_048_libero_goal_t2_i0.mp4",
+    "source": "ctrl",
+    "frames": 452,
+    "fps": 20.0,
+    "seconds": 22.6,
+    "outcome": "max_moves",
+    "bytes": 1522482
+  },
+  {
+    "file": "attempt_049_libero_goal_t3_i0.mp4",
+    "source": "ctrl",
+    "frames": 397,
+    "fps": 20.0,
+    "seconds": 19.85,
+    "outcome": "give_up",
+    "bytes": 1227513
+  },
+  {
+    "file": "attempt_050_libero_goal_t4_i0.mp4",
+    "source": "ctrl",
+    "frames": 491,
+    "fps": 20.0,
+    "seconds": 24.55,
+    "outcome": "give_up",
+    "bytes": 1863868
+  },
+  {
+    "file": "attempt_051_libero_goal_t5_i0.mp4",
+    "source": "ctrl",
+    "frames": 378,
+    "fps": 20.0,
+    "seconds": 18.9,
+    "outcome": "no_result",
+    "bytes": 935341
+  },
+  {
+    "file": "attempt_052_libero_10_t3_i0.mp4",
+    "source": "ctrl",
+    "frames": 556,
+    "fps": 20.0,
+    "seconds": 27.8,
+    "outcome": "max_moves",
+    "bytes": 1716912
+  },
+  {
+    "file": "attempt_053_libero_10_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 507,
+    "fps": 20.0,
+    "seconds": 25.35,
+    "outcome": "success",
+    "bytes": 1740297
+  },
+  {
+    "file": "attempt_054_libero_10_t2_i0.mp4",
+    "source": "ctrl",
+    "frames": 531,
+    "fps": 20.0,
+    "seconds": 26.55,
+    "outcome": "success",
+    "bytes": 1797270
+  },
+  {
+    "file": "attempt_055_libero_10_t3_i0.mp4",
+    "source": "ctrl",
+    "frames": 600,
+    "fps": 20.0,
+    "seconds": 30.0,
+    "outcome": "max_env_steps",
+    "bytes": 1914341
+  },
+  {
+    "file": "attempt_056_libero_10_t4_i0.mp4",
+    "source": "ctrl",
+    "frames": 499,
+    "fps": 20.0,
+    "seconds": 24.95,
+    "outcome": "give_up",
+    "bytes": 1685959
+  },
+  {
+    "file": "attempt_057_libero_10_t5_i0.mp4",
+    "source": "ctrl",
+    "frames": 588,
+    "fps": 20.0,
+    "seconds": 29.4,
+    "outcome": "max_moves",
+    "bytes": 1380083
+  },
+  {
+    "file": "attempt_058_libero_10_t6_i0.mp4",
+    "source": "ctrl",
+    "frames": 199,
+    "fps": 20.0,
+    "seconds": 9.95,
+    "outcome": "no_result",
+    "bytes": 624916
+  },
+  {
+    "file": "attempt_059_libero_10_t7_i0.mp4",
+    "source": "ctrl",
+    "frames": 512,
+    "fps": 20.0,
+    "seconds": 25.6,
+    "outcome": "success",
+    "bytes": 1663704
+  },
+  {
+    "file": "attempt_060_libero_10_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 505,
+    "fps": 20.0,
+    "seconds": 25.25,
+    "outcome": "success",
+    "bytes": 1468631
+  },
+  {
+    "file": "attempt_061_libero_10_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 466,
+    "fps": 20.0,
+    "seconds": 23.3,
+    "outcome": "success",
+    "bytes": 1368947
+  },
+  {
+    "file": "attempt_062_libero_10_t8_i0.mp4",
+    "source": "ctrl",
+    "frames": 600,
+    "fps": 20.0,
+    "seconds": 30.0,
+    "outcome": "max_env_steps",
+    "bytes": 1853533
+  },
+  {
+    "file": "attempt_063_libero_10_t9_i0.mp4",
+    "source": "ctrl",
+    "frames": 525,
+    "fps": 20.0,
+    "seconds": 26.25,
+    "outcome": "give_up",
+    "bytes": 1421010
+  },
+  {
+    "file": "attempt_064_libero_object_t0_i0.mp4",
+    "source": "ctrl",
+    "frames": 379,
+    "fps": 20.0,
+    "seconds": 18.95,
+    "outcome": "no_result",
+    "bytes": 1256840
+  },
+  {
+    "file": "attempt_065_libero_object_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 5,
+    "fps": 2.5,
+    "seconds": 2.0,
+    "outcome": "no_result",
+    "bytes": 73510
+  },
+  {
+    "file": "attempt_066_libero_object_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 5,
+    "fps": 2.5,
+    "seconds": 2.0,
+    "outcome": "no_result",
+    "bytes": 73504
+  },
+  {
+    "file": "attempt_067_libero_object_t1_i0.mp4",
+    "source": "ctrl",
+    "frames": 467,
+    "fps": 20.0,
+    "seconds": 23.35,
+    "outcome": "give_up",
+    "bytes": 1421218
+  },
+  {
+    "file": "attempt_068_libero_object_t2_i0.mp4",
+    "source": "ctrl",
+    "frames": 306,
+    "fps": 20.0,
+    "seconds": 15.3,
+    "outcome": "success",
+    "bytes": 1076312
+  },
+  {
+    "file": "attempt_069_libero_object_t3_i0.mp4",
+    "source": "ctrl",
+    "frames": 464,
+    "fps": 20.0,
+    "seconds": 23.2,
+    "outcome": "give_up",
+    "bytes": 1605456
+  },
+  {
+    "file": "spatial0_init0_attempt1.mp4",
+    "source": "frames",
+    "frames": 3,
+    "fps": 1.5,
+    "seconds": 2.0,
+    "outcome": "give_up",
+    "bytes": 72451
+  },
+  {
+    "file": "spatial0_init0_attempt2.mp4",
+    "source": "frames",
+    "frames": 25,
+    "fps": 4.0,
+    "seconds": 6.25,
+    "outcome": "give_up",
+    "bytes": 341686
+  }
+]

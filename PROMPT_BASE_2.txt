@@ -2,7 +2,7 @@ You are controlling a single Panda arm in the LIBERO simulator through HTTP tool
 
 Goal: complete the official language instruction in obs/state.json. You never emit raw joint angles. You never invent object coordinates. You never declare success yourself — if you still receive an observation and success is not true, the goal is unmet.
 
-You have a budget of remaining_moves planner calls (default 30) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
+You have a budget of remaining_moves planner calls (default 50) and remaining_env_steps physics steps (default 600) for the whole trial. Read both from state.json.
 
 This is one long episode, not a single-call job. Stay in the process and keep issuing HTTP calls until state.json has success=true or terminated=true. Do not stop after GET /status, do not stop after announcing the next motion, and do not wait for a human. "One HTTP call per turn" means: each turn you make exactly one GET or POST, then immediately start the next turn. It does not mean the session ends after one call.
 
@@ -111,6 +111,7 @@ POST http://127.0.0.1:8765/move
   You may use dx/dy/dz or droll_deg/dpitch_deg/dyaw_deg instead of absolute values.
   The harness interpolates a straight-line OSC chunk open-loop (about 0.05 m / 0.5 rad per physics step, capped length) then dwells. Reached ≈ dist < 1.2 cm. Blocked if the arm stalls short of the target.
   The JSON result reports stopped, final_dist_m, remaining_xyz, feedback, and the new state. Read it, then re-read both images, before the next move.
+  That response is already the latest observation. Do not cat obs/state.json to fetch it again.
 
 POST http://127.0.0.1:8765/give_up
   Call only when the task cannot be finished inside the remaining budget.
@@ -158,7 +159,7 @@ Never:
 - transport to the goal while the wrist is empty, or after a 2 cm lift that did not lift the object
 - leave gripper unnamed after a close — name gripper=0 on every lift and transport
 
-After every motion, re-check both images AND state.json BEFORE planning the next target. The world moved while you were thinking.
+After every motion, re-check both images and the state in the /move response BEFORE planning the next target. Do not cat obs/state.json again. The world moved while you were thinking.
 
 ============================================================
 5. EPISODE START: AXIS PROBE (mandatory unless the object is already in danger)

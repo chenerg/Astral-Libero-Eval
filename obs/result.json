@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:\u7070\u76d6\u68d5\u74f6\u5df2\u7a33\u5b9a\u653e\u5165\u7bee\u5185\u4f46\u5b98\u65b9success\u6301\u7eedfalse\uff0c\u8bf4\u660e\u7269\u4f53\u8bc6\u522b\u6216\u653e\u7f6e\u5224\u5b9a\u4e0d\u7b26\u3002\u4ec5\u52696\u6b21\u89c4\u5212\uff0c\u65e0\u6cd5\u6309\u5b89\u5168\u6b65\u957f\u5b8c\u6210\u53e6\u4e00\u7ea2\u76d6\u68d5\u74f6\u7684\u63a5\u8fd1\u3001\u6293\u53d6\u3001\u9a8c\u8bc1\u3001\u63d0\u8d77\u53ca\u8de8\u684c\u642c\u8fd0\u653e\u7f6e\u3002",
+  "instruction": "pick up the bbq sauce and place it in the basket",
+  "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket",
+  "suite": "libero_object",
+  "task_id": 3,
+  "init_id": 0,
+  "env_steps": 464,
+  "moves": 44,
+  "elapsed_s": 974.62,
+  "final_state": {
+    "eef_x": -0.0349,
+    "eef_y": 0.2626,
+    "eef_z": 0.298,
+    "roll_deg": -0.0,
+    "pitch_deg": -0.1,
+    "yaw_deg": -0.0,
+    "eef_quat": [
+      0.9992,
+      -0.001,
+      -0.0394,
+      -0.0001
+    ],
+    "gripper_open": 0.982,
+    "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.0019, -0.0002, -0.0019]",
+    "env_steps": 464,
+    "moves": 44,
+    "remaining_env_steps": 136,
+    "remaining_moves": 6,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}

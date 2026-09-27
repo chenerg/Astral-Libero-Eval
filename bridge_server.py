@@ -37,7 +37,7 @@ SUITE = os.environ.get("LIBERO_SUITE", "libero_spatial")
 TASK_ID = int(os.environ.get("LIBERO_TASK_ID", "0"))
 INIT_ID = int(os.environ.get("LIBERO_INIT_ID", "0"))
 MAX_ENV_STEPS = int(os.environ.get("LIBERO_MAX_ENV_STEPS", "600"))
-MAX_MOVES = int(os.environ.get("LIBERO_MAX_MOVES", "30"))
+MAX_MOVES = int(os.environ.get("LIBERO_MAX_MOVES", "50"))
 CAMERA_SIZE = int(os.environ.get("LIBERO_CAMERA_SIZE", "256"))
 REPLAY_STEPS = os.environ.get("LIBERO_REPLAY_STEPS", "").strip()
 
