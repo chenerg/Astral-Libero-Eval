@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Nested Grok policy with PROMPT_BASE_3 as the *system* prompt.
+# Nested Grok policy with PROMPT_BASE_3 (or $LIBERO_PROMPT_BASE) as the *system* prompt.
 # Strips Grok's default system prompt, user/project skills, memory, and
 # subagents (same idea as run_episode_clean.sh for Codex).
 set -euo pipefail
@@ -21,7 +21,12 @@ python3 - << 'PY'
 import os
 from pathlib import Path
 root = Path(os.environ["ROOT"])
-text = (root / "PROMPT_BASE_3.txt").read_text()
+base_name = os.environ.get("LIBERO_PROMPT_BASE", "PROMPT_BASE_3.txt").strip() or "PROMPT_BASE_3.txt"
+base_path = root / base_name
+if not base_path.is_file():
+    raise SystemExit(f"prompt file not found: {base_path}")
+text = base_path.read_text()
+print("prompt base", base_path.name)
 flag = os.environ.get("LIBERO_WORLD_AXES", "0").strip().lower()
 if flag in ("1", "true", "on"):
     text = (
