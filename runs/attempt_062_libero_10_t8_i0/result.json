@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "max_env_steps",
+  "instruction": "put both moka pots on the stove",
+  "task_name": "KITCHEN_SCENE8_put_both_moka_pots_on_the_stove",
+  "suite": "libero_10",
+  "task_id": 8,
+  "init_id": 0,
+  "env_steps": 600,
+  "moves": 45,
+  "elapsed_s": 715.73,
+  "final_state": {
+    "eef_x": -0.0713,
+    "eef_y": -0.273,
+    "eef_z": 1.0831,
+    "roll_deg": -0.3,
+    "pitch_deg": 0.1,
+    "yaw_deg": 90.3,
+    "eef_quat": [
+      0.709,
+      -0.7048,
+      -0.0169,
+      0.0184
+    ],
+    "gripper_open": 0.495,
+    "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0024, -0.0009, 0.0026]",
+    "env_steps": 600,
+    "moves": 45,
+    "remaining_env_steps": 0,
+    "remaining_moves": 5,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "instruction": "put the yellow and white mug in the microwave and close it",
+  "task_name": "KITCHEN_SCENE6_put_the_yellow_and_white_mug_in_the_microwave_and_close_it",
+  "suite": "libero_10",
+  "task_id": 9,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0273,
+  "eef_y": 0.1636,
+  "eef_z": 1.0091,
+  "roll_deg": -0.0,
+  "pitch_deg": 1.5,
+  "yaw_deg": 1.2,
+  "eef_quat": [
+    0.9997,
+    -0.0117,
+    -0.0229,
+    0.0009
+  ],
+  "gripper_open": 0.019,
+  "feedback": "ok: reached dist_m=0.010 remaining_xyz=[0.0001, -0.0001, 0.0075]",
+  "env_steps": 525,
+  "moves": 36,
+  "remaining_env_steps": 75,
+  "remaining_moves": 14,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": false
+}
