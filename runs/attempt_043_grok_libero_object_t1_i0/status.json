@@ -1,0 +1,32 @@
+{
+  "instruction": "pick up the cream cheese and place it in the basket",
+  "task_name": "pick_up_the_cream_cheese_and_place_it_in_the_basket",
+  "suite": "libero_object",
+  "task_id": 1,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0856,
+  "eef_y": -0.0799,
+  "eef_z": 0.0447,
+  "roll_deg": -0.4,
+  "pitch_deg": -1.3,
+  "yaw_deg": 0.0,
+  "eef_quat": [
+    0.9995,
+    0.0007,
+    -0.0307,
+    0.0047
+  ],
+  "gripper_open": 0.05,
+  "feedback": "ok: reached dist_m=0.012 remaining_xyz=[-0.0096, 0.0015, -0.0062]",
+  "env_steps": 457,
+  "moves": 30,
+  "remaining_env_steps": 143,
+  "remaining_moves": 0,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": true
+}

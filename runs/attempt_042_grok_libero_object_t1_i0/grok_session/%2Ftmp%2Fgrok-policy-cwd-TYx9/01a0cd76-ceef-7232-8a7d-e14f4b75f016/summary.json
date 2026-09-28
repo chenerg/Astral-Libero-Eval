@@ -1,0 +1,24 @@
+{
+  "info": {
+    "id": "01a0cd76-ceef-7232-8a7d-e14f4b75f016",
+    "cwd": "/tmp/grok-policy-cwd-TYx9"
+  },
+  "agent_id": "ag1.f49d2ccf4d1c4a3a8763c16d55c0340d",
+  "attempt_id": "at1.b8cb2200a97e4019b42c7e3599030b75",
+  "session_summary": "LIBERO episode: status then POST /move",
+  "created_at": "2026-09-23T08:51:50.650866575Z",
+  "updated_at": "2026-09-23T09:23:23.473153047Z",
+  "num_messages": 462,
+  "num_chat_messages": 311,
+  "current_model_id": "grok-4.7",
+  "next_trace_turn": 1,
+  "chat_format_version": 1,
+  "session_kind": "headless",
+  "request_id": "82077b5d-571c-487e-b56b-b9ca8da314be",
+  "grok_home": "/tmp/grok-clean-XHW1",
+  "last_active_at": "2026-09-23T09:23:23.473153047Z",
+  "generated_title": "LIBERO episode: status then POST /move",
+  "agent_name": "grok-build-plan",
+  "sandbox_profile": "off",
+  "reasoning_effort": "high"
+}

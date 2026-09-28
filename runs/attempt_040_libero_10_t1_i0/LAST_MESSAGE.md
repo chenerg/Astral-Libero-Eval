@@ -1,0 +1,1 @@
+Episode ended unsuccessfully: butter placed in basket, but cream cheese grasp failed with insufficient moves remaining. Summary saved to `runs/current/AGENT_SUMMARY.md`.

@@ -1,0 +1,4 @@
+<class 'numpy.lib.npyio.NpzFile'> ['archive/data.pkl', 'archive/version']
+archive/data.pkl <class 'bytes'> None None
+archive/version <class 'bytes'> None None
+torch err <class 'TypeError'> 'weights_only' is an invalid keyword argument for Unpickler()

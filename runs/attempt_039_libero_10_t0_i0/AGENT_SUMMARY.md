@@ -1,0 +1,6 @@
+# Trial summary
+Official result: success=false, terminated=true, reason=max_moves (25 moves, 312 physics steps).
+Attempted both-can basket task. Spent excessive moves locating first can grasp. Initial centered-lid pinch at z≈0.489 closed empty (opening 0.019 after lift). Descents stalled near z≈0.478. Retracted, corrected x +0.035 and pitched 15 degrees. Grasp near x=-0.108,y=0.044,z=0.499 held can with opening≈0.777 and confirmed lift. Transported first can toward basket and released on final move. Second can was not handled; first placement not officially verified.
+
+## Hindsight
++x made stationary objects move down in wrist, -x moved them up; +y moved tool left in agentview. Initial agentview x sign assessment was uncertain; rely on wrist probes. This living-room scene starts at z≈0.701, unlike kitchen scenes. Support appears around z≈0.4 (visual estimate, not measured). Can lid at wrist center is NOT the closing line: real pads are at bottom around image y=200. Lid-centered close was empty. Corrected tilted can grasp had lid/body at bottom between pads and opening≈0.777. Lift to at least z≈0.65 before crossing basket rim: z≈0.595 transport bumped and displaced basket despite reached feedback. Basket coordinates therefore changed. Budget approach and grasp much more efficiently to leave time for both cans.

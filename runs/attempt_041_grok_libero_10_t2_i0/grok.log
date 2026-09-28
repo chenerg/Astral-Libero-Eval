@@ -1,0 +1,5 @@
+I'll start by reading the current observation and robot state so the first move matches the scene.The goal is to turn the stove on and set the moka pot on the burner. I'll probe +x first so the camera axes are confirmed before any grasp.The episode ended without success. The move budget ran out at 40/40 with `success=false`.
+
+The stove knob was never grasped. Every close finished at `gripper_open≈0.05`, so the jaws met on air and the later yaw never turned the hinge. The moka pot was not picked up. The knob sits at the front-right corner of the burner, between the plate and the moka. A high, jaws-down wrist view can center it, but lowering or shifting a few centimeters either passed it or landed on the moka.
+
+Notes are in `runs/current/AGENT_SUMMARY.md`.

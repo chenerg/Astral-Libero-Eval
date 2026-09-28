@@ -1,0 +1,32 @@
+{
+  "instruction": "put the bowl on the stove",
+  "task_name": "put_the_bowl_on_the_stove",
+  "suite": "libero_goal",
+  "task_id": 1,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.2153,
+  "eef_y": 0.1197,
+  "eef_z": 0.9764,
+  "roll_deg": -0.2,
+  "pitch_deg": 0.8,
+  "yaw_deg": -0.6,
+  "eef_quat": [
+    0.9996,
+    0.0002,
+    -0.0278,
+    0.0002
+  ],
+  "gripper_open": 0.11,
+  "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0001, -0.0002, 0.0001]",
+  "env_steps": 334,
+  "moves": 30,
+  "remaining_env_steps": 266,
+  "remaining_moves": 0,
+  "success": true,
+  "terminated": false,
+  "world_axes_overlay": false
+}

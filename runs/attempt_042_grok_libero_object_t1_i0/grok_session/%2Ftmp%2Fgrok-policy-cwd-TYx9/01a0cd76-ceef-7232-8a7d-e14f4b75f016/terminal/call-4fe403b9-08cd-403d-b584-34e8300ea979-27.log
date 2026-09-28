@@ -1,0 +1,28 @@
+agentview (256, 256, 3) uint8
+--- agentview coarse ---
+ggggggg.gggggggg
+.....g..g.......
+gggg.ggg.gggggg.
+ggggg.g.gggggggg
+ggggggggg.gggggg
+gggWggggg.g..ggg
+gggggggggggggggg
+ggggggggggg..ggg
+ggggggg.gggggggg
+gggggggggggggggg
+gggWgggggggggggg
+WggWgggggggggggg
+wrist (256, 256, 3) uint8
+--- wrist coarse ---
+ggggW.R.ggggggWW
+ggggWR..ggggggWW
+ggggWggBggggggWW
+ggggWgggggggggWW
+ggggWgggggggggWW
+ggggggggggggggWg
+ggggggggggggggWg
+gggggggggggWggWg
+gggWWWgggggWggWg
+gg..gWgggggg..gg
+KKKKKKKKKKKKKKKK
+KKKKKKKKKKKKKKKK

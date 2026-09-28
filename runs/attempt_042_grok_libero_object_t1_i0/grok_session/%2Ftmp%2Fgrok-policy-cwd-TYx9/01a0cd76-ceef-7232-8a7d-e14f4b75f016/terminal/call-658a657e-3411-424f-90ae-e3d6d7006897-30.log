@@ -1,0 +1,55 @@
+AGENTVIEW 24x24
+00 ggg.....gWgkg.......gggg
+01 gggggggg.gkg..gggggggggg
+02 kkgkgkgk.kkkggkggggggggg
+03 ggggggggggg.gkgggggggggg
+04 gggggggkWgkggggggggggggg
+05 gggggggkW.gggggggggggggg
+06 gggggggkk..kgggggggggggg
+07 gggggggggggg.ggggggggggg
+08 gggggggg...g.xxggggggggg
+09 .........ggggxx.gggggggg
+10 ....W..g.ggggxg..ggggg.g
+11 ...g..gggggggxx..kB..g..
+12 ...gggg..ggg.....xx.....
+13 ..oooox.......g..gg.....
+14 ..oooox.......Bg.xk.....
+15 ..............gg.xk.....
+16 ..o.o...o.oO.....oo.....
+17 o.ooooooooox..o.........
+18 ooooooooo.o...ooo.......
+19 oooooo.oooo...ooo...oo..
+20 o..ooo.oo.o.ooooo....o..
+21 ...o.Wooooo.ooo.o.......
+22 ...o.Wooooo.ooooo..oo...
+23 ..ooWWooooo.oooooo.oo...
+
+WRIST 24x24
+00 ooo....oRxxooooooooooooo
+01 ooo....oRxOooooooooooooo
+02 oooo...oxxOooooooooooW.o
+03 ooo....oxxOooooooooooW.o
+04 oooo....B.B.oooooooooWWo
+05 oooo....kgkgoooooooooWWo
+06 ooooo...kxk.oooooooooWWo
+07 oooooo.W..oooooooooooWWo
+08 ooooo..W.ooooooooooooWWo
+09 go..oooW.ooooooooooooWoo
+10 go..oooW.ooooooooooooooo
+11 ko..oooW.oooooooooooooo.
+12 ko..oooW.o.ooooooooooooo
+13 kooooooW.o..ooooooooooog
+14 kooooooW.o..ooooooooooox
+15 kooooooW.o..ooooooooooog
+16 .WWW.WWW...ooooooooooWog
+17 .......W...oooooooooooog
+18 o..gkgoW....ooooo.gkgWok
+19 .gkkgKoW.o.oooooo.Kgkkgk
+20 KkkkkKkkkkkkkkkkkkKkkkKK
+21 kkkkkkkkkkkkkkkkkkkkkkkk
+22 kkkkkkkkkkkkkkkkkkkkkkkk
+23 kkkkkkkkkkkkkkkkkkkkkkkk
+
+agentview darkest pixels y>80
+dark y range 1 168 x 22 201 n 728
+lowest dark [(154, 181), (154, 183), (155, 181), (155, 183), (156, 181), (156, 200), (157, 181), (157, 182), (157, 200), (158, 71), (158, 181), (158, 182), (158, 200), (159, 39), (159, 180), (159, 182), (160, 180), (160, 182), (161, 180), (161, 182), (162, 182), (163, 182), (163, 199), (164, 199), (167, 116), (167, 117), (167, 118), (167, 123), (167, 124), (168, 181)]

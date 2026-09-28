@@ -1,0 +1,24 @@
+{
+  "info": {
+    "id": "01a0d140-49c7-7601-8e80-469d3d27af58",
+    "cwd": "/tmp/grok-policy-cwd-uNNh"
+  },
+  "agent_id": "ag1.f82ee8299e13480483dc0e286e751f7f",
+  "attempt_id": "at1.44f117aa6e754fcd8a9f7502fcd61e85",
+  "session_summary": "LIBERO Episode Move Loop Until Success",
+  "created_at": "2026-09-24T02:30:46.484811601Z",
+  "updated_at": "2026-09-24T03:20:20.210428963Z",
+  "num_messages": 524,
+  "num_chat_messages": 333,
+  "current_model_id": "grok-4.7",
+  "next_trace_turn": 1,
+  "chat_format_version": 1,
+  "session_kind": "headless",
+  "request_id": "fa7de39e-fd26-4a8a-9d3c-49dd44a7e979",
+  "grok_home": "/tmp/grok-clean-wqwG",
+  "last_active_at": "2026-09-24T03:20:20.210428963Z",
+  "generated_title": "LIBERO Episode Move Loop Until Success",
+  "agent_name": "grok-build-plan",
+  "sandbox_profile": "off",
+  "reasoning_effort": "high"
+}

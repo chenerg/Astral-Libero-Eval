@@ -1,0 +1,5 @@
+I'll start by reading the scene images and the current simulator state so the first move matches the instruction.The task is to pick up the cream cheese and put it in the basket. Floor scene, gripper at home. I'll probe +x first so the camera mapping is confirmed before any approach.The episode ended on the move limit with the cheese still on the floor. I’ll record what the motions and feedback showed.The episode ended at the move limit with the cream cheese still on the floor. Success was false.
+
+The jaws reached the box and closed three times, including once with about 15° of pitch. Each time `gripper_open` fell from about 0.05 to about 0.02 on a short lift, so the pads were pinching the top face rather than the sides. Driving lower stalled around end-effector z≈0.05 with the fingertips on that top face. The basket, off to image-left, was never reached.
+
+Notes from this run are in `runs/current/AGENT_SUMMARY.md`.

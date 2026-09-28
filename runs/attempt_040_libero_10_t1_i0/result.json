@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:Butter placed in basket, but cream cheese grasp failed and only four planner calls remain, insufficient to regrasp, verify lift, clear obstacles, transport and release.",
+  "instruction": "put both the cream cheese box and the butter in the basket",
+  "task_name": "LIVING_ROOM_SCENE2_put_both_the_cream_cheese_box_and_the_butter_in_the_basket",
+  "suite": "libero_10",
+  "task_id": 1,
+  "init_id": 0,
+  "env_steps": 372,
+  "moves": 36,
+  "elapsed_s": 422.1,
+  "final_state": {
+    "eef_x": 0.1191,
+    "eef_y": -0.1793,
+    "eef_z": 0.4774,
+    "roll_deg": -0.2,
+    "pitch_deg": 0.4,
+    "yaw_deg": -0.6,
+    "eef_quat": [
+      0.9996,
+      0.0005,
+      -0.0283,
+      -0.0002
+    ],
+    "gripper_open": 0.02,
+    "feedback": "ok: reached dist_m=0.010 remaining_xyz=[-0.0001, 0.0006, 0.007]",
+    "env_steps": 372,
+    "moves": 36,
+    "remaining_env_steps": 228,
+    "remaining_moves": 4,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}

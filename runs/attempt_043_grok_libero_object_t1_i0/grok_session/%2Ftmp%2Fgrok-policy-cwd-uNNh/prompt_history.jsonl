@@ -1,0 +1,1 @@
+{"timestamp":"2026-09-24T02:30:46.599431308Z","session_id":"01a0d140-49c7-7601-8e80-469d3d27af58","prompt":"Begin the episode now. Read /home/chener/LIBERO/astra_eval/obs/agentview.png and /home/chener/LIBERO/astra_eval/obs/wrist.png, GET http://127.0.0.1:8765/status, then POST /move until success=true or terminated=true.","is_bash":false}

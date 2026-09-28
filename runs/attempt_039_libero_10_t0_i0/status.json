@@ -1,0 +1,32 @@
+{
+  "instruction": "put both the alphabet soup and the tomato sauce in the basket",
+  "task_name": "LIVING_ROOM_SCENE2_put_both_the_alphabet_soup_and_the_tomato_sauce_in_the_basket",
+  "suite": "libero_10",
+  "task_id": 0,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0513,
+  "eef_y": 0.2831,
+  "eef_z": 0.6609,
+  "roll_deg": -0.3,
+  "pitch_deg": 14.7,
+  "yaw_deg": -0.3,
+  "eef_quat": [
+    0.9934,
+    -0.0009,
+    0.1145,
+    0.0023
+  ],
+  "gripper_open": 0.832,
+  "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.0049, -0.0052, -0.0065]",
+  "env_steps": 312,
+  "moves": 25,
+  "remaining_env_steps": 288,
+  "remaining_moves": 0,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": false
+}

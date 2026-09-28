@@ -1,0 +1,20 @@
+(256, 256, 3) (256, 256, 3)
+
+agent red pixels: 217
+  bbox x=104-144 y=99-179 centroid=(125.4,143.4)
+  y96-128: n=48 x=104-116 cx=110
+  y128-160: n=99 x=122-132 cx=127
+  y160-192: n=70 x=122-144 cx=134
+
+wrist red pixels: 310
+  bbox x=119-224 y=25-200 centroid=(136.6,77.2)
+  y32-64: n=74 x=137-177 cx=154
+  y64-96: n=140 x=119-135 cx=127
+  y96-128: n=76 x=126-128 cx=127
+
+--- triad ---
+agent red axis-ish n=71 centroid=(129.8,156.9) bbox x=123-144 y=131-176
+agent green axis-ish n=145 centroid=(89.4,128.5) bbox x=54-125 y=120-140
+agent blue axis-ish n=254 centroid=(128.6,91.3) bbox x=119-144 y=55-129
+wrist green axis-ish n=225 centroid=(166.8,128.8) bbox x=126-200 y=120-144
+wrist blue axis-ish n=217 centroid=(135.5,115.7) bbox x=117-177 y=47-138
