@@ -1,0 +1,32 @@
+{
+  "instruction": "put the white mug on the plate and put the chocolate pudding to the right of the plate",
+  "task_name": "LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate",
+  "suite": "libero_10",
+  "task_id": 6,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.0013,
+  "eef_y": 0.0908,
+  "eef_z": 0.6069,
+  "roll_deg": -0.4,
+  "pitch_deg": -0.3,
+  "yaw_deg": -0.3,
+  "eef_quat": [
+    0.9997,
+    -0.0018,
+    -0.0243,
+    0.0012
+  ],
+  "gripper_open": 0.984,
+  "feedback": "ok: reached dist_m=0.009 remaining_xyz=[-0.0038, 0.0011, 0.0007]",
+  "env_steps": 199,
+  "moves": 19,
+  "remaining_env_steps": 401,
+  "remaining_moves": 31,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": false
+}

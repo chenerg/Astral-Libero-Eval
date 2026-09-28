@@ -1,0 +1,32 @@
+{
+  "instruction": "put both the alphabet soup and the cream cheese box in the basket",
+  "task_name": "LIVING_ROOM_SCENE1_put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket",
+  "suite": "libero_10",
+  "task_id": 7,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0213,
+  "eef_y": 0.2762,
+  "eef_z": 0.6359,
+  "roll_deg": -0.2,
+  "pitch_deg": 1.1,
+  "yaw_deg": 0.1,
+  "eef_quat": [
+    0.9996,
+    -0.0,
+    -0.0287,
+    0.0005
+  ],
+  "gripper_open": 0.791,
+  "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0001, -0.0006, 0.0001]",
+  "env_steps": 512,
+  "moves": 44,
+  "remaining_env_steps": 88,
+  "remaining_moves": 6,
+  "success": true,
+  "terminated": false,
+  "world_axes_overlay": false
+}

@@ -1,0 +1,32 @@
+{
+  "instruction": "put the white mug on the left plate and put the yellow and white mug on the right plate",
+  "task_name": "LIVING_ROOM_SCENE5_put_the_white_mug_on_the_left_plate_and_put_the_yellow_and_white_mug_on_the_right_plate",
+  "suite": "libero_10",
+  "task_id": 4,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.2604,
+  "eef_y": 0.2899,
+  "eef_z": 0.4749,
+  "roll_deg": 2.8,
+  "pitch_deg": 3.7,
+  "yaw_deg": 2.7,
+  "eef_quat": [
+    0.9993,
+    -0.0261,
+    0.0041,
+    -0.0252
+  ],
+  "gripper_open": 0.998,
+  "feedback": "blocked/contact: target not reached after stall. remaining_xyz_m=[0.0282, 0.0078, 0.0151] remaining_z_cm=1.5. Do not repeat the same z; change height, xy, or pitch.",
+  "env_steps": 499,
+  "moves": 31,
+  "remaining_env_steps": 101,
+  "remaining_moves": 19,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": false
+}

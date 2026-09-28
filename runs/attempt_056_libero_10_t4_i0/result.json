@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:\u5df2\u5c1d\u8bd531\u6b21\u79fb\u52a8\uff1b\u767d\u676f\u591a\u6b21\u676f\u6cbf\u5361\u722a\u3001\u642c\u8fd0\u6ed1\u843d\u548c\u4fa7\u8eba\u540e\u63a5\u89e6\u963b\u6321\uff0c\u5269101\u7269\u7406\u6b65\u4e0d\u8db3\u4ee5\u5b89\u5168\u6062\u590d\u767d\u676f\u5e76\u5b8c\u6210\u5c1a\u672a\u642c\u8fd0\u7684\u9ec4\u767d\u676f\u3002",
+  "instruction": "put the white mug on the left plate and put the yellow and white mug on the right plate",
+  "task_name": "LIVING_ROOM_SCENE5_put_the_white_mug_on_the_left_plate_and_put_the_yellow_and_white_mug_on_the_right_plate",
+  "suite": "libero_10",
+  "task_id": 4,
+  "init_id": 0,
+  "env_steps": 499,
+  "moves": 31,
+  "elapsed_s": 470.24,
+  "final_state": {
+    "eef_x": -0.2604,
+    "eef_y": 0.2899,
+    "eef_z": 0.4749,
+    "roll_deg": 2.8,
+    "pitch_deg": 3.7,
+    "yaw_deg": 2.7,
+    "eef_quat": [
+      0.9993,
+      -0.0261,
+      0.0041,
+      -0.0252
+    ],
+    "gripper_open": 0.998,
+    "feedback": "blocked/contact: target not reached after stall. remaining_xyz_m=[0.0282, 0.0078, 0.0151] remaining_z_cm=1.5. Do not repeat the same z; change height, xy, or pitch.",
+    "env_steps": 499,
+    "moves": 31,
+    "remaining_env_steps": 101,
+    "remaining_moves": 19,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}

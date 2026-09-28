@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "max_moves",
+  "instruction": "pick up the book and place it in the back compartment of the caddy",
+  "task_name": "STUDY_SCENE1_pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy",
+  "suite": "libero_10",
+  "task_id": 5,
+  "init_id": 0,
+  "env_steps": 588,
+  "moves": 50,
+  "elapsed_s": 1080.73,
+  "final_state": {
+    "eef_x": -0.3974,
+    "eef_y": -0.2973,
+    "eef_z": 1.1211,
+    "roll_deg": -1.1,
+    "pitch_deg": 0.4,
+    "yaw_deg": 90.1,
+    "eef_quat": [
+      0.7046,
+      -0.7084,
+      -0.0296,
+      0.029
+    ],
+    "gripper_open": 0.74,
+    "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0004, 0.0002, 0.0008]",
+    "env_steps": 588,
+    "moves": 50,
+    "remaining_env_steps": 12,
+    "remaining_moves": 0,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}
