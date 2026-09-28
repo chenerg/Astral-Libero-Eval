@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:\u5269\u4f598\u6b21\u89c4\u5212\u548c109\u7269\u7406\u6b65\uff0c\u4e0d\u8db3\u4ee5\u5b8c\u6210\u9760\u67dc\u4fa7\u7897\u7684\u5b89\u5168\u91cd\u65b0\u6293\u53d6\u3001\u9a8c\u8bc1\u3001\u8d8a\u67dc\u62ac\u5347\u548c\u653e\u7f6e\uff1b\u6b64\u524d\u8584\u6cbf\u6293\u53d6\u5728\u8f6c\u79fb\u65f6\u6ed1\u8131\u3002",
+  "instruction": "put the bowl on top of the cabinet",
+  "task_name": "put_the_bowl_on_top_of_the_cabinet",
+  "suite": "libero_goal",
+  "task_id": 4,
+  "init_id": 0,
+  "env_steps": 491,
+  "moves": 42,
+  "elapsed_s": 892.83,
+  "final_state": {
+    "eef_x": -0.1149,
+    "eef_y": -0.0661,
+    "eef_z": 1.0079,
+    "roll_deg": 0.1,
+    "pitch_deg": 0.4,
+    "yaw_deg": -0.5,
+    "eef_quat": [
+      0.9996,
+      0.0001,
+      -0.0281,
+      -0.0003
+    ],
+    "gripper_open": 0.999,
+    "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0, 0.0016, -0.0063]",
+    "env_steps": 491,
+    "moves": 42,
+    "remaining_env_steps": 109,
+    "remaining_moves": 8,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}

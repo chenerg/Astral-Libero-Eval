@@ -1,0 +1,1 @@
+Simulator reports success=true: both boxes are in the basket. Summary saved to `runs/current/AGENT_SUMMARY.md`.

@@ -1,0 +1,32 @@
+{
+  "instruction": "put the bowl on top of the cabinet",
+  "task_name": "put_the_bowl_on_top_of_the_cabinet",
+  "suite": "libero_goal",
+  "task_id": 4,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": -0.1149,
+  "eef_y": -0.0661,
+  "eef_z": 1.0079,
+  "roll_deg": 0.1,
+  "pitch_deg": 0.4,
+  "yaw_deg": -0.5,
+  "eef_quat": [
+    0.9996,
+    0.0001,
+    -0.0281,
+    -0.0003
+  ],
+  "gripper_open": 0.999,
+  "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0, 0.0016, -0.0063]",
+  "env_steps": 491,
+  "moves": 42,
+  "remaining_env_steps": 109,
+  "remaining_moves": 8,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": false
+}

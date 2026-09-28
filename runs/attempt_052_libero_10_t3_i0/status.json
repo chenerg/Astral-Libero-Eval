@@ -1,0 +1,32 @@
+{
+  "instruction": "put the black bowl in the bottom drawer of the cabinet and close it",
+  "task_name": "KITCHEN_SCENE4_put_the_black_bowl_in_the_bottom_drawer_of_the_cabinet_and_close_it",
+  "suite": "libero_10",
+  "task_id": 3,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0555,
+  "eef_y": 0.1504,
+  "eef_z": 0.9424,
+  "roll_deg": 40.0,
+  "pitch_deg": 1.8,
+  "yaw_deg": -0.0,
+  "eef_quat": [
+    0.9392,
+    -0.014,
+    -0.0136,
+    -0.3427
+  ],
+  "gripper_open": 0.983,
+  "feedback": "ok: reached dist_m=0.010 remaining_xyz=[-0.0005, 0.0076, -0.0058]",
+  "env_steps": 556,
+  "moves": 50,
+  "remaining_env_steps": 44,
+  "remaining_moves": 0,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": false
+}

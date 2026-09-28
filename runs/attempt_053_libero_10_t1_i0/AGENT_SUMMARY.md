@@ -1,0 +1,7 @@
+# Episode summary
+Official simulator success=true after 44 moves and 507 physics steps. Placed butter first, then cream cheese in basket, releasing each and retracting to allow settling.
+
+Butter body pinch at measured z≈0.447, jaws-down, held opening≈0.487. A short lift confirmed retention. Transported at z≈0.603; basket descent contacted rim at z≈0.580, so released rather than pushing further. Cream cheese approach initially collided with tall neighboring carton. Retracted, moved forward, pitched -20 degrees, and realigned. Pinch at z≈0.459 held opening≈0.531; confirmed with short lift, raised to≈0.629, restored pitch near zero, transported, released at≈0.608. Success registered after settling and moving hand away.
+
+## Hindsight
+World +x moves toward bottom of agentview, +y toward left. Wrist image object motion is opposite intuition: +x shifts stationary objects down, +y shifts them left. This living-room scene has home z≈0.681, not kitchen-table height; support visually around z≈0.4 (estimate). Narrow box body grasps worked around eef z≈0.45. Pad gap is low in wrist image; verify body between pads and use measured opening plus lift. Butter and cheese are narrow enough for transverse jaws-down body pinches. Tall neighboring cartons can block palm well above target; retract and pitch -20 degrees enabled cream-cheese access. Basket release above rim at z≈0.61 followed by retraction worked; deeper descent at z≈0.58 contacted basket. Do not assume immediate success on release: contents needed additional settling steps.

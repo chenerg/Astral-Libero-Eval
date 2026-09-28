@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "reason": "give_up:\u5df2\u752823\u6b21\u89c4\u5212\uff0c\u591a\u6b21\u67dc\u6cbf\u63a5\u89e6\u4e14\u628a\u624b\u5c1a\u672a\u53ef\u9760\u8fdb\u5165\u4e24\u57ab\uff1b\u52697\u6b21\u4e0d\u8db3\u4ee5\u5b8c\u6210\u5f00\u62bd\u5c49\u3001\u6293\u7897\u9a8c\u8bc1\u548c\u642c\u8fd0\u91ca\u653e\u3002",
+  "instruction": "open the top drawer and put the bowl inside",
+  "task_name": "open_the_top_drawer_and_put_the_bowl_inside",
+  "suite": "libero_goal",
+  "task_id": 3,
+  "init_id": 0,
+  "env_steps": 397,
+  "moves": 23,
+  "elapsed_s": 468.91,
+  "final_state": {
+    "eef_x": 0.0546,
+    "eef_y": -0.1099,
+    "eef_z": 1.0884,
+    "roll_deg": 4.2,
+    "pitch_deg": 19.5,
+    "yaw_deg": 90.1,
+    "eef_quat": [
+      0.6967,
+      -0.6975,
+      0.1257,
+      0.1109
+    ],
+    "gripper_open": 1.0,
+    "feedback": "ok: reached dist_m=0.011 remaining_xyz=[-0.0064, -0.0077, -0.0032]",
+    "env_steps": 397,
+    "moves": 23,
+    "remaining_env_steps": 203,
+    "remaining_moves": 7,
+    "success": false,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}

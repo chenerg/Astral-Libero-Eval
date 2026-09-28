@@ -1,0 +1,32 @@
+{
+  "instruction": "push the plate to the front of the stove",
+  "task_name": "push_the_plate_to_the_front_of_the_stove",
+  "suite": "libero_goal",
+  "task_id": 5,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0419,
+  "eef_y": 0.1173,
+  "eef_z": 0.9188,
+  "roll_deg": -0.4,
+  "pitch_deg": -19.1,
+  "yaw_deg": 0.2,
+  "eef_quat": [
+    0.9791,
+    -0.0017,
+    -0.2031,
+    0.0005
+  ],
+  "gripper_open": 1.0,
+  "feedback": "ok: reached dist_m=0.010 remaining_xyz=[0.0036, 0.0067, -0.0014]",
+  "env_steps": 378,
+  "moves": 22,
+  "remaining_env_steps": 222,
+  "remaining_moves": 28,
+  "success": false,
+  "terminated": false,
+  "world_axes_overlay": false
+}

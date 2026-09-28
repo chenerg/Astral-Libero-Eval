@@ -1,0 +1,298 @@
+WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("/tmp/codex-clean-CvXw"))
+Reading additional input from stdin...
+OpenAI Codex v0.155.1
+--------
+workdir: /home/chener/LIBERO/astra_eval
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: medium
+reasoning summaries: detailed
+session id: 01a0ddb4-e252-7210-b722-bcc0764705fa
+--------
+user
+The two attached images are the reset obs/agentview.png and obs/wrist.png. Begin the episode now.
+warning: Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /tmp/codex-clean-CvXw/config.toml.
+exec
+/bin/bash -lc 'curl -s http://127.0.0.1:8765/status' in /home/chener/LIBERO/astra_eval
+ succeeded in 0ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.2019, "eef_y": 0.0187, "eef_z": 1.189, "roll_deg": -0.0, "pitch_deg": -0.0, "yaw_deg": -0.0, "eef_quat": [0.9997, 0.0126, -0.0183, 0.0023], "gripper_open": 0.517, "feedback": "reset: cameras live, jaws at home (pitch=roll=yaw=0)", "env_steps": 5, "moves": 0, "remaining_env_steps": 595, "remaining_moves": 50, "success": false, "terminated": false, "world_axes_overlay": false}
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":0.03,\"note\":\"1.历史和分析:初始观测，先探测轴；2.Agentview:摩卡壶在中央，炉子在左；3.Wrist:壶在上方，爪下方为空；4.后续要操作的物体:摩卡壶在夹爪前方，距离待探测；5.Action:仅x增加3cm；6.预测结果:高处探测不会碰撞\"}'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1128ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1759, "eef_y": 0.0185, "eef_z": 1.1885, "roll_deg": 0.3, "pitch_deg": -1.4, "yaw_deg": 1.3, "eef_quat": [0.9995, 0.0011, -0.0309, 0.0003], "gripper_open": 0.953, "feedback": "ok: reached dist_m=0.010 remaining_xyz=[0.0041, 0.0002, 0.0004]", "env_steps": 13, "moves": 1, "remaining_env_steps": 587, "remaining_moves": 49, "success": false, "terminated": false, "world_axes_overlay": false, "last_move": {"event": "move", "move_id": 1, "named": {"dx": 0.03}, "note": "1.\u5386\u53f2\u548c\u5206\u6790:\u521d\u59cb\u89c2\u6d4b\uff0c\u5148\u63a2\u6d4b\u8f74\uff1b2.Agentview:\u6469\u5361\u58f6\u5728\u4e2d\u592e\uff0c\u7089\u5b50\u5728\u5de6\uff1b3.Wrist:\u58f6\u5728\u4e0a\u65b9\uff0c\u722a\u4e0b\u65b9\u4e3a\u7a7a\uff1b4.\u540e\u7eed\u8981\u64cd\u4f5c\u7684\u7269\u4f53:\u6469\u5361\u58f6\u5728\u5939\u722a\u524d\u65b9\uff0c\u8ddd\u79bb\u5f85\u63a2\u6d4b\uff1b5.Action:\u4ec5x\u589e\u52a03cm\uff1b6.\u9884\u6d4b\u7ed3\u679c:\u9ad8\u5904\u63a2\u6d4b\u4e0d\u4f1a\u78b0\u649e", "target": [-0.1719, 0.0187, 1.189], "target_rpy_deg": [-0.0, -0.0, -0.0], "planned_env_steps": 8, "final_dist_m": 0.0095, "stopped": "reached", "feedback": "ok: reached dist_m=0.010 remaining_xyz=[0.0041, 0.0002, 0.0004]", "state": {"eef_x": -0.1759, "eef_y": 0.0185, "eef_z": 1.1885, "roll_deg": 0.3, "pitch_deg": -1.4, "yaw_deg": 1.3, "eef_quat": [0.9995, 0.0011, -0.0309, 0.0003], "gripper_open": 0.953, "feedback": "ok: reached dist_m=0.010 remaining_xyz=[0.0041, 0.0002, 0.0004]", "env_steps": 13, "moves": 1, "remaining_env_steps": 587, "remaining_moves": 49, "success": false, "terminated": false, "world_axes_overlay": false}}}
+**Estimating pot position**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":0.1,\"dz\":-0.07,\"gripper\":1,\"note\":\"1.历史和分析:probe +x: agentview 朝 BOTTOM 移动；本集把 +x 当作朝下；2.Agentview:壶在爪前方中央；3.Wrist:壶在上方尚未到两爪；4.后续要操作的物体:摩卡壶估计在+x约20cm，下方约20cm；5.Action:前进10cm下降7cm接近；6.预测结果:仍在物体上方，不碰撞\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1578ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.079, "eef_y": 0.0184, "eef_z": 1.1198, "roll_deg": 0.3, "pitch_deg": -1.7, "yaw_deg": 1.4, "eef_quat": [0.9994, 0.0006, -0.0334, -0.0], "gripper_open": 0.98, "feedback": "ok: reached dist_m=0.007 remaining_xyz=[0.0031, 0.0001, -0.0013]", "env_steps": 24, "moves": 2, "remaining_env_steps": 576, "remaining_moves": 48, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":0.1,\"dz\":-0.06,\"note\":\"1.历史和分析:移动到位无接触；2.Agentview:壶在夹爪前下方；3.Wrist:壶身位于画面上半部；4.后续要操作的物体:摩卡壶仍偏+x约10cm，稍偏-y；5.Action:前进10cm下降6cm；6.预测结果:接近壶上方，保留高度\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1484ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0148, "eef_y": 0.0185, "eef_z": 1.0608, "roll_deg": 0.3, "pitch_deg": -1.8, "yaw_deg": 1.4, "eef_quat": [0.9994, 0.0, -0.0337, 0.0], "gripper_open": 0.987, "feedback": "ok: reached dist_m=0.011 remaining_xyz=[0.0061, -0.0001, -0.0011]", "env_steps": 34, "moves": 3, "remaining_env_steps": 566, "remaining_moves": 47, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Centering wrist on pot**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":0.025,\"dy\":-0.018,\"dz\":-0.02,\"note\":\"1.历史和分析:接近无接触，减小步长；2.Agentview:壶盖在两爪前方略右；3.Wrist:壶盖偏左，壶体宽度接近爪开口；4.后续要操作的物体:摩卡壶中心约+x2.5cm、-y1.8cm；5.Action:小幅对齐并下降2cm；6.预测结果:张爪在壶两侧，避免直接压盖\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1547ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.048, "eef_y": 0.0021, "eef_z": 1.0493, "roll_deg": 0.3, "pitch_deg": -2.8, "yaw_deg": 1.4, "eef_quat": [0.9991, 0.0002, -0.0426, 0.0], "gripper_open": 0.992, "feedback": "ok: reached dist_m=0.012 remaining_xyz=[-0.0082, -0.0016, -0.0084]", "env_steps": 45, "moves": 4, "remaining_env_steps": 555, "remaining_moves": 46, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Descending toward pot body**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":-0.012,\"dz\":-0.02,\"note\":\"1.历史和分析:上步x实际多走约8mm，需回调；2.Agentview:爪尖在壶盖两侧；3.Wrist:壶盖靠画面下沿，需向-x回调；4.后续要操作的物体:壶身在爪下约3cm；5.Action:x后退1.2cm并下降2cm；6.预测结果:开爪绕过盖边接近壶腰\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 7738ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0436, "eef_y": 0.001, "eef_z": 1.0414, "roll_deg": 0.1, "pitch_deg": -1.1, "yaw_deg": 1.3, "eef_quat": [0.9996, 0.0011, -0.0279, 0.0013], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.014 remaining_xyz=[-0.0076, 0.0011, -0.0121]", "env_steps": 95, "moves": 5, "remaining_env_steps": 505, "remaining_moves": 45, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Retracting to grab handle**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":0.04,\"note\":\"1.历史和分析:下降残差1.2cm，疑似盖沿挡住爪，不重复；2.Agentview:盖较宽而右侧有细手柄；3.Wrist:盖填满下方，不能确认壶腰入爪；4.后续要操作的物体:改抓摩卡壶右侧黑色手柄；5.Action:抬高4cm避开盖；6.预测结果:向上脱离不会碰撞\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1070ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0435, "eef_y": 0.0011, "eef_z": 1.0761, "roll_deg": 0.3, "pitch_deg": -1.1, "yaw_deg": 1.4, "eef_quat": [0.9996, 0.0003, -0.0282, 0.0003], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.008 remaining_xyz=[0.0002, -0.0001, 0.0052]", "env_steps": 103, "moves": 6, "remaining_env_steps": 497, "remaining_moves": 44, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Shifting grip handle**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dy\":-0.06,\"yaw_deg\":20,\"note\":\"1.历史和分析:已脱离盖沿；2.Agentview:壶柄在壶右约5cm；3.Wrist:黑柄在左侧，对应-y；4.后续要操作的物体:黑色壶柄偏-y6cm；5.Action:横移-y6cm并转yaw20度；6.预测结果:高处横移不碰盖\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1223ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0428, "eef_y": -0.0579, "eef_z": 1.0757, "roll_deg": 0.1, "pitch_deg": -1.1, "yaw_deg": 18.1, "eef_quat": [0.9891, -0.145, -0.0269, 0.0029], "gripper_open": 0.999, "feedback": "ok: reached dist_m=0.002 remaining_xyz=[0.0007, -0.0009, 0.0004]", "env_steps": 112, "moves": 7, "remaining_env_steps": 488, "remaining_moves": 43, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":38,\"note\":\"1.历史和分析:横移到壶柄上方；2.Agentview:夹爪位于壶右；3.Wrist:柄位于两爪前沿，壶身在右；4.后续要操作的物体:壶柄基本在下方；5.Action:yaw转到38度准备跨柄；6.预测结果:高处旋转无碰撞\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1340ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0428, "eef_y": -0.0568, "eef_z": 1.0756, "roll_deg": -0.7, "pitch_deg": -0.8, "yaw_deg": 36.1, "eef_quat": [0.9542, -0.2979, -0.0256, 0.0116], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.0, -0.0011, 0.0001]", "env_steps": 121, "moves": 8, "remaining_env_steps": 479, "remaining_moves": 42, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":56,\"note\":\"1.历史和分析:姿态逐步对齐；2.Agentview:爪位于柄上方；3.Wrist:柄与壶身可区分；4.后续要操作的物体:细柄在爪下；5.Action:yaw56度；6.预测结果:保持高度旋转无碰撞\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1322ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0434, "eef_y": -0.0552, "eef_z": 1.076, "roll_deg": -1.3, "pitch_deg": 0.2, "yaw_deg": 54.2, "eef_quat": [0.8957, -0.4438, -0.0189, 0.0209], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.001 remaining_xyz=[-0.0006, -0.0016, -0.0004]", "env_steps": 130, "moves": 9, "remaining_env_steps": 470, "remaining_moves": 41, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":74,\"dz\":-0.02,\"note\":\"1.历史和分析:旋转无接触；2.Agentview:手柄在爪下稍后；3.Wrist:黑柄位于中间偏左；4.后续要操作的物体:壶柄下方约5cm；5.Action:yaw74度下降2cm；6.预测结果:爪沿柄两侧接近，不碰壶盖\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1345ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0441, "eef_y": -0.0538, "eef_z": 1.0571, "roll_deg": -0.4, "pitch_deg": 1.4, "yaw_deg": 72.2, "eef_quat": [0.8155, -0.5783, -0.0058, 0.0226], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.002 remaining_xyz=[-0.0007, -0.0014, -0.0011]", "env_steps": 139, "moves": 10, "remaining_env_steps": 461, "remaining_moves": 40, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":90,\"dz\":-0.02,\"note\":\"1.历史和分析:爪尖接近手柄；2.Agentview:柄在两指之间下方；3.Wrist:竖向黑柄靠中心稍左；4.后续要操作的物体:壶柄还需下降2cm；5.Action:yaw90度并下降2cm；6.预测结果:跨细柄，不压宽盖\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1346ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0439, "eef_y": -0.0526, "eef_z": 1.0376, "roll_deg": 1.3, "pitch_deg": 0.6, "yaw_deg": 88.5, "eef_quat": [0.725, -0.6887, 0.0003, 0.0098], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.001 remaining_xyz=[0.0001, -0.0011, -0.0005]", "env_steps": 148, "moves": 11, "remaining_env_steps": 452, "remaining_moves": 39, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Positioning wrist at handle**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":0.008,\"dy\":-0.015,\"dz\":-0.015,\"note\":\"1.历史和分析:已转到跨柄姿态且无接触；2.Agentview:指尖在柄附近但偏壶内侧；3.Wrist:黑柄在两爪间偏左前，壶体在下侧；4.后续要操作的物体:柄外缘约-y1.5cm、+x0.8cm；5.Action:小幅对准外柄并下降1.5cm；6.预测结果:避开壶盖，仅接近细柄\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1121ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0473, "eef_y": -0.063, "eef_z": 1.0234, "roll_deg": 1.5, "pitch_deg": 0.4, "yaw_deg": 90.0, "eef_quat": [0.7159, -0.6982, 0.0005, 0.0074], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0046, -0.0047, -0.0008]", "env_steps": 156, "moves": 12, "remaining_env_steps": 444, "remaining_moves": 38, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Adjusting wrist handle shift**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":-0.016,\"dz\":-0.012,\"note\":\"1.历史和分析:小幅+x使柄在腕图更左，修正对齐；2.Agentview:爪在柄前侧；3.Wrist:柄偏左约2cm，未在闭合中心；4.后续要操作的物体:柄需要-x1.6cm修正；5.Action:后退1.6cm下降1.2cm；6.预测结果:保持张开跨柄，避开壶本体\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1127ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0389, "eef_y": -0.0635, "eef_z": 1.017, "roll_deg": 1.3, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7152, -0.6988, -0.0014, 0.0089], "gripper_open": 1.0, "feedback": "ok: reached dist_m=0.011 remaining_xyz=[-0.0076, 0.0006, -0.0056]", "env_steps": 164, "moves": 13, "remaining_env_steps": 436, "remaining_moves": 37, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"gripper\":0,\"note\":\"1.历史和分析:手柄已对准且指尖下降到柄侧；2.Agentview:夹爪包住右侧黑柄；3.Wrist:黑柄在两爪间，宽度小于开口；4.后续要操作的物体:摩卡壶手柄位于闭合区域；5.Action:只闭合夹爪；6.预测结果:两垫夹住细柄而非盖沿\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1810ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0366, "eef_y": -0.0636, "eef_z": 1.0156, "roll_deg": 1.5, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7153, -0.6988, 0.0001, 0.0079], "gripper_open": 0.268, "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0023, 0.0001, 0.0014]", "env_steps": 176, "moves": 14, "remaining_env_steps": 424, "remaining_moves": 36, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":0.02,\"gripper\":0,\"note\":\"1.历史和分析:闭合开度0.268说明有物体，但需验证；2.Agentview:手柄位于指间；3.Wrist:黑柄稳定在两垫中央；4.后续要操作的物体:摩卡壶；5.Action:保持闭合抬高2cm；6.预测结果:若抓牢壶跟随离桌，不碰邻物\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1816ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0364, "eef_y": -0.0637, "eef_z": 1.0277, "roll_deg": 1.4, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7156, -0.6985, -0.0005, 0.0083], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.010 remaining_xyz=[0.0002, 0.0002, 0.0079]", "env_steps": 188, "moves": 15, "remaining_env_steps": 412, "remaining_moves": 35, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":0.08,\"gripper\":0,\"note\":\"1.历史和分析:壶底跟随升高，柄相对腕图稳定；2.Agentview:壶已离桌少许；3.Wrist:黑柄仍在垫间；4.后续要操作的物体:抓牢摩卡壶，炉子在+y侧；5.Action:保持闭合再抬8cm越过炉面；6.预测结果:竖直上升无障碍\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 2765ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0352, "eef_y": -0.0637, "eef_z": 1.1008, "roll_deg": 1.6, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7157, -0.6983, 0.0008, 0.0073], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0012, 0.0, 0.007]", "env_steps": 206, "moves": 16, "remaining_env_steps": 394, "remaining_moves": 34, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Moving stove left**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dy\":0.1,\"gripper\":0,\"note\":\"1.历史和分析:壶明显抬起，抓取有效；2.Agentview:炉盘在左约20cm，壶底高于炉；3.Wrist:柄稳定夹住，路径左侧空；4.后续要操作的物体:把壶搬到+y炉盘；5.Action:保持闭合向+y10cm；6.预测结果:壶底越过炉边，不碰撞\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1793ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0345, "eef_y": 0.0344, "eef_z": 1.1003, "roll_deg": 1.4, "pitch_deg": 0.9, "yaw_deg": 90.4, "eef_quat": [0.7138, -0.7003, 0.0026, 0.0111], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0007, 0.0018, 0.0005]", "env_steps": 218, "moves": 17, "remaining_env_steps": 382, "remaining_moves": 33, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dy\":0.085,\"gripper\":0,\"note\":\"1.历史和分析:横移成功且壶随动；2.Agentview:壶中心在炉心右约3cm图像，相当约8cm；3.Wrist:柄仍稳定；4.后续要操作的物体:炉盘在+y约8.5cm；5.Action:继续+y8.5cm；6.预测结果:保持底部高度越过炉盘\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1730ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0318, "eef_y": 0.1181, "eef_z": 1.0984, "roll_deg": 1.4, "pitch_deg": 0.8, "yaw_deg": 90.3, "eef_quat": [0.7141, -0.6999, 0.0023, 0.0104], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.009 remaining_xyz=[0.0027, 0.0013, 0.0019]", "env_steps": 230, "moves": 18, "remaining_env_steps": 370, "remaining_moves": 32, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Aligning pot with stove**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":-0.025,\"dz\":-0.02,\"gripper\":0,\"note\":\"1.历史和分析:壶已在炉上方，开始小步定位；2.Agentview:壶底略偏炉盘前侧；3.Wrist:炉圈在壶本体侧下方；4.后续要操作的物体:炉心相对壶约-x2.5cm；5.Action:后退2.5cm下降2cm；6.预测结果:仍在炉面上方，不触碰旋钮\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1838ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0098, "eef_y": 0.1187, "eef_z": 1.0806, "roll_deg": 1.8, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7154, -0.6987, 0.002, 0.0056], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.012 remaining_xyz=[-0.003, -0.0006, -0.0022]", "env_steps": 242, "moves": 19, "remaining_env_steps": 358, "remaining_moves": 31, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":-0.02,\"gripper\":0,\"note\":\"1.历史和分析:已对齐炉盘，下降到位；2.Agentview:壶底在炉圈上方；3.Wrist:手柄稳定，炉边无障碍；4.后续要操作的物体:炉面在壶底下数cm；5.Action:保持闭合下降2cm；6.预测结果:缓慢接近支撑面\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1826ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0055, "eef_y": 0.1182, "eef_z": 1.0636, "roll_deg": 1.5, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7156, -0.6985, 0.0005, 0.0075], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.008 remaining_xyz=[0.0043, 0.0005, -0.003]", "env_steps": 254, "moves": 20, "remaining_env_steps": 346, "remaining_moves": 30, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Placing pot on stovetop**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":-0.02,\"gripper\":0,\"note\":\"1.历史和分析:下降正常，壶未倾倒；2.Agentview:壶底靠近炉面；3.Wrist:柄仍夹住，炉圈位于本体下；4.后续要操作的物体:摩卡壶放置炉面；5.Action:再下降2cm；6.预测结果:接近落座高度，不穿过支撑\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1813ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0064, "eef_y": 0.1166, "eef_z": 1.0534, "roll_deg": 1.4, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7155, -0.6986, -0.0, 0.0081], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.010 remaining_xyz=[-0.0009, 0.0016, -0.0098]", "env_steps": 266, "moves": 21, "remaining_env_steps": 334, "remaining_moves": 29, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Positioning pot on stove**
+**Adjusting pot over stove**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":0.035,\"gripper\":0,\"note\":\"1.历史和分析:下降后壶底偏炉前右，先抬起修正，避免拖动；2.Agentview:壶底在炉圈前右；3.Wrist:炉圈中心在壶体左前；4.后续要操作的物体:炉心需要约-x4cm、+y2cm修正；5.Action:先抬3.5cm；6.预测结果:脱离炉边后可安全横移\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1842ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": 0.0054, "eef_y": 0.1167, "eef_z": 1.079, "roll_deg": 1.4, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7153, -0.6987, 0.0, 0.0082], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.012 remaining_xyz=[0.001, -0.0001, 0.0095]", "env_steps": 278, "moves": 22, "remaining_env_steps": 322, "remaining_moves": 28, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":-0.04,\"dy\":0.02,\"gripper\":0,\"note\":\"1.历史和分析:抬升脱离炉面；2.Agentview:壶在炉前右；3.Wrist:炉圈偏左，按已观察映射修正；4.后续要操作的物体:炉心-x4cm、+y2cm；5.Action:保持闭合横移对齐；6.预测结果:小幅悬空移动不碰炉和后方旋钮\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1795ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.0337, "eef_y": 0.1357, "eef_z": 1.0772, "roll_deg": 2.1, "pitch_deg": 0.3, "yaw_deg": 90.1, "eef_quat": [0.7152, -0.6989, 0.0034, 0.0036], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.012 remaining_xyz=[-0.001, 0.001, 0.0018]", "env_steps": 290, "moves": 23, "remaining_env_steps": 310, "remaining_moves": 27, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":-0.02,\"gripper\":0,\"note\":\"1.历史和分析:横向修正后壶底居中；2.Agentview:壶底对准炉圈；3.Wrist:炉圈与壶体轴线更一致；4.后续要操作的物体:炉面下方约3cm；5.Action:下降2cm；6.预测结果:壶底接近炉盘，无侧碰\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1793ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.0378, "eef_y": 0.1346, "eef_z": 1.0604, "roll_deg": 1.5, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7155, -0.6986, 0.0002, 0.0074], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.008 remaining_xyz=[0.0041, 0.001, -0.0032]", "env_steps": 302, "moves": 24, "remaining_env_steps": 298, "remaining_moves": 26, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":-0.015,\"gripper\":0,\"note\":\"1.历史和分析:下降正常；2.Agentview:壶底已接近炉圈；3.Wrist:稳定抓柄，炉面居中；4.后续要操作的物体:摩卡壶落座；5.Action:下降1.5cm；6.预测结果:接近炉面支撑高度，随后放开\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1708ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.0376, "eef_y": 0.1339, "eef_z": 1.0539, "roll_deg": 1.4, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7155, -0.6986, -0.0001, 0.008], "gripper_open": 0.266, "feedback": "ok: reached dist_m=0.010 remaining_xyz=[-0.0002, 0.0007, -0.0085]", "env_steps": 314, "moves": 25, "remaining_env_steps": 286, "remaining_moves": 25, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"gripper\":1,\"note\":\"1.历史和分析:壶底接近炉面，下降残差增大，避免继续压；2.Agentview:壶底在炉圈内；3.Wrist:壶体与炉对齐；4.后续要操作的物体:先释放摩卡壶，再操作后方旋钮；5.Action:张开夹爪；6.预测结果:壶落稳在炉盘\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1413ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.0376, "eef_y": 0.1339, "eef_z": 1.0539, "roll_deg": 1.4, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7154, -0.6986, -0.0001, 0.008], "gripper_open": 0.733, "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.0, 0.0001, -0.0]", "env_steps": 322, "moves": 26, "remaining_env_steps": 278, "remaining_moves": 24, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Locating knob 125**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":0.07,\"note\":\"1.历史和分析:壶已释放并留在炉圈；2.Agentview:壶稳定，旋钮在壶后方；3.Wrist:张爪后柄不再受夹持；4.后续要操作的物体:炉后黑色旋钮；5.Action:抬高7cm脱离手柄；6.预测结果:上升避开壶盖\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1103ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.0388, "eef_y": 0.1337, "eef_z": 1.1178, "roll_deg": 1.5, "pitch_deg": 0.4, "yaw_deg": 90.1, "eef_quat": [0.7153, -0.6987, 0.0004, 0.0073], "gripper_open": 0.973, "feedback": "ok: reached dist_m=0.008 remaining_xyz=[0.0012, 0.0001, 0.0061]", "env_steps": 330, "moves": 27, "remaining_env_steps": 270, "remaining_moves": 23, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dx\":-0.1,\"dy\":0.02,\"yaw_deg\":70,\"note\":\"1.历史和分析:已安全离开壶；2.Agentview:旋钮在壶后方约10cm；3.Wrist:旋钮圆底位于画面左侧，炉盘在下方；4.后续要操作的物体:黑色旋钮在-x约10cm、+y约2cm；5.Action:向后10cm左2cm并yaw70度；6.预测结果:高于壶盖，路径无碰撞\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1664ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1335, "eef_y": 0.1518, "eef_z": 1.1183, "roll_deg": 1.1, "pitch_deg": -1.3, "yaw_deg": 71.0, "eef_quat": [0.821, -0.5706, -0.0171, -0.002], "gripper_open": 0.985, "feedback": "ok: reached dist_m=0.011 remaining_xyz=[-0.0053, 0.0019, -0.0005]", "env_steps": 341, "moves": 28, "remaining_env_steps": 259, "remaining_moves": 22, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Estimating wrist knob alignment**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":51,\"dz\":-0.07,\"note\":\"1.历史和分析:到达旋钮上方；2.Agentview:旋钮在爪下，壶在前方；3.Wrist:圆底旋钮在下左，顶脊可抓；4.后续要操作的物体:旋钮下方约10cm；5.Action:下降7cm并yaw51度逐步对齐脊；6.预测结果:在壶后下降，不碰壶\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1503ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1394, "eef_y": 0.1479, "eef_z": 1.0457, "roll_deg": 0.8, "pitch_deg": -1.5, "yaw_deg": 52.4, "eef_quat": [0.9025, -0.43, -0.0245, -0.0019], "gripper_open": 0.99, "feedback": "ok: reached dist_m=0.008 remaining_xyz=[0.0059, 0.0039, 0.0026]", "env_steps": 351, "moves": 29, "remaining_env_steps": 249, "remaining_moves": 21, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Adjusting the knob**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":32,\"dz\":-0.02,\"note\":\"1.历史和分析:下降到旋钮附近，无接触；2.Agentview:爪在旋钮上方，壶在前侧；3.Wrist:圆旋钮中心在两爪前缘附近；4.后续要操作的物体:旋钮顶脊，需继续下降；5.Action:yaw32度并下降2cm；6.预测结果:不触碰壶体，准备跨脊\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1481ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1369, "eef_y": 0.1468, "eef_z": 1.0275, "roll_deg": -0.2, "pitch_deg": -2.0, "yaw_deg": 33.4, "eef_quat": [0.9608, -0.275, -0.0345, 0.0046], "gripper_open": 0.994, "feedback": "ok: reached dist_m=0.003 remaining_xyz=[-0.0024, 0.0011, -0.0017]", "env_steps": 361, "moves": 30, "remaining_env_steps": 239, "remaining_moves": 20, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":13,\"dz\":-0.02,\"note\":\"1.历史和分析:仍未碰撞，逐步对准旋钮；2.Agentview:爪尖在旋钮两侧上方；3.Wrist:旋钮顶脊位于中间下方；4.后续要操作的物体:旋钮脊下方约2cm；5.Action:yaw13度下降2cm；6.预测结果:张爪绕过脊，避免底座\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1418ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1366, "eef_y": 0.1453, "eef_z": 1.0079, "roll_deg": -0.5, "pitch_deg": -2.0, "yaw_deg": 14.4, "eef_quat": [0.993, -0.1126, -0.0355, 0.0069], "gripper_open": 0.996, "feedback": "ok: reached dist_m=0.001 remaining_xyz=[-0.0003, 0.0015, -0.0004]", "env_steps": 371, "moves": 31, "remaining_env_steps": 229, "remaining_moves": 19, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Moving the knob right**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":0,\"dy\":0.018,\"dx\":-0.008,\"dz\":-0.015,\"note\":\"1.历史和分析:接近旋钮，需横向精调；2.Agentview:旋钮在爪下稍左；3.Wrist:顶脊偏右约2cm，需要+y；4.后续要操作的物体:旋钮脊相对+y1.8cm、-x0.8cm；5.Action:对齐归yaw0并下降1.5cm；6.预测结果:两指落于顶脊两侧，不压底座\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1104ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1436, "eef_y": 0.1619, "eef_z": 0.9939, "roll_deg": -0.5, "pitch_deg": -2.1, "yaw_deg": 1.6, "eef_quat": [0.9993, -0.0015, -0.0364, 0.0067], "gripper_open": 0.997, "feedback": "ok: reached dist_m=0.002 remaining_xyz=[-0.001, 0.0014, -0.0011]", "env_steps": 379, "moves": 32, "remaining_env_steps": 221, "remaining_moves": 18, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Checking camera offset**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dy\":0.017,\"dz\":-0.015,\"note\":\"1.历史和分析:姿态归零，旋钮仍偏右；2.Agentview:爪中心比旋钮略右；3.Wrist:脊中心在画面右下，未正中；4.后续要操作的物体:旋钮需+y1.7cm；5.Action:左移1.7cm下降1.5cm；6.预测结果:接近脊两侧，远离前方壶\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1101ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1442, "eef_y": 0.1722, "eef_z": 0.9835, "roll_deg": -0.6, "pitch_deg": -2.0, "yaw_deg": 0.0, "eef_quat": [0.9993, 0.0125, -0.0356, 0.0073], "gripper_open": 0.998, "feedback": "ok: reached dist_m=0.012 remaining_xyz=[0.0005, 0.0066, -0.0045]", "env_steps": 387, "moves": 33, "remaining_env_steps": 213, "remaining_moves": 17, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Adjusting center offset**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dy\":0.018,\"dx\":-0.007,\"dz\":-0.01,\"note\":\"1.历史和分析:实际横移1cm，仍需精调；2.Agentview:爪在旋钮上方，壶前方保持不动；3.Wrist:脊偏右约1.5cm且靠下；4.后续要操作的物体:旋钮脊+y1.8cm、-x0.7cm；5.Action:小幅移向旋钮并下降1cm；6.预测结果:不触碰圆底，夹持脊的侧面\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1087ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1488, "eef_y": 0.1843, "eef_z": 0.977, "roll_deg": -0.6, "pitch_deg": -2.0, "yaw_deg": -0.0, "eef_quat": [0.9992, 0.0129, -0.0357, 0.0076], "gripper_open": 0.999, "feedback": "ok: reached dist_m=0.011 remaining_xyz=[-0.0024, 0.0059, -0.0035]", "env_steps": 395, "moves": 34, "remaining_env_steps": 205, "remaining_moves": 16, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Positioning knob between claws**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"gripper\":0,\"note\":\"1.历史和分析:完成精调，顶脊落入开口；2.Agentview:夹爪位于炉后旋钮两侧；3.Wrist:黑色窄脊在两指之间，可夹持；4.后续要操作的物体:炉开关旋钮；5.Action:仅闭合抓住顶脊；6.预测结果:夹住脊后可绕z旋转，不移动底座\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1717ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1491, "eef_y": 0.1851, "eef_z": 0.9769, "roll_deg": -0.5, "pitch_deg": -2.0, "yaw_deg": -0.0, "eef_quat": [0.9992, 0.0131, -0.0359, 0.0072], "gripper_open": 0.05, "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0003, -0.0009, 0.0]", "env_steps": 407, "moves": 35, "remaining_env_steps": 193, "remaining_moves": 15, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Lowering gripper toward knob**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":20,\"gripper\":0,\"note\":\"1.历史和分析:闭合开度较小，需观察旋钮是否跟转；2.Agentview:爪位于旋钮顶脊；3.Wrist:脊在闭合垫下方，可能只夹住顶端；4.后续要操作的物体:炉旋钮；5.Action:保持闭合yaw增加20度；6.预测结果:若接触有效旋钮随转，否则重新降低抓取\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1757ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1501, "eef_y": 0.1884, "eef_z": 0.977, "roll_deg": -1.3, "pitch_deg": -1.6, "yaw_deg": 19.5, "eef_quat": [0.987, -0.1564, -0.0334, 0.0146], "gripper_open": 0.019, "feedback": "ok: reached dist_m=0.001 remaining_xyz=[0.0009, -0.0033, -0.0]", "env_steps": 419, "moves": 36, "remaining_env_steps": 181, "remaining_moves": 14, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Lowering the camera**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"gripper\":1,\"yaw_deg\":0,\"note\":\"1.历史和分析:开度近零且脊未随转，抓取偏高失败；2.Agentview:旋钮仍在原位；3.Wrist:旋钮脊相对相机旋转，未被夹住；4.后续要操作的物体:重新抓旋钮更低处；5.Action:张开并yaw归0；6.预测结果:解除空夹，为降低留空间\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1458ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1499, "eef_y": 0.1873, "eef_z": 0.9768, "roll_deg": -1.2, "pitch_deg": -1.6, "yaw_deg": 1.5, "eef_quat": [0.9994, 0.0002, -0.0322, 0.0126], "gripper_open": 0.895, "feedback": "ok: reached dist_m=0.000 remaining_xyz=[-0.0001, 0.0012, 0.0001]", "env_steps": 429, "moves": 37, "remaining_env_steps": 171, "remaining_moves": 13, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":-0.02,\"note\":\"1.历史和分析:已张开重抓，原夹持高度过高；2.Agentview:旋钮下方无邻物；3.Wrist:脊在两爪中央，圆底边缘可见；4.后续要操作的物体:旋钮脊侧面下方2cm；5.Action:下降2cm；6.预测结果:爪进入脊两侧，不穿过底座\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1110ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1489, "eef_y": 0.185, "eef_z": 0.9638, "roll_deg": -1.3, "pitch_deg": -1.6, "yaw_deg": -0.0, "eef_quat": [0.9993, 0.0133, -0.0325, 0.0135], "gripper_open": 0.975, "feedback": "ok: reached dist_m=0.010 remaining_xyz=[-0.001, 0.0023, -0.007]", "env_steps": 437, "moves": 38, "remaining_env_steps": 163, "remaining_moves": 12, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Lowering knob center**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"dz\":-0.015,\"dx\":-0.008,\"note\":\"1.历史和分析:下降实际1.3cm，尚未触底；2.Agentview:爪尖更接近旋钮；3.Wrist:脊略在爪后方，需-x小调；4.后续要操作的物体:旋钮脊-x0.8cm、下1.5cm；5.Action:后退8mm下降1.5cm；6.预测结果:进入顶脊侧面，避免压圆底\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1097ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1532, "eef_y": 0.1852, "eef_z": 0.9544, "roll_deg": -1.3, "pitch_deg": -1.6, "yaw_deg": -0.1, "eef_quat": [0.9993, 0.0135, -0.0321, 0.0137], "gripper_open": 0.982, "feedback": "ok: reached dist_m=0.009 remaining_xyz=[-0.0037, -0.0002, -0.0056]", "env_steps": 445, "moves": 39, "remaining_env_steps": 155, "remaining_moves": 11, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"gripper\":0,\"note\":\"1.历史和分析:比前次抓取降低2.2cm且调整后侧；2.Agentview:指尖位于旋钮顶脊两侧；3.Wrist:脊在两垫间，圆底不在闭合高度；4.后续要操作的物体:炉开关顶脊；5.Action:闭合夹紧；6.预测结果:夹住窄脊，不挤压壶\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1729ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1536, "eef_y": 0.1952, "eef_z": 0.954, "roll_deg": -1.3, "pitch_deg": -1.6, "yaw_deg": -0.0, "eef_quat": [0.9993, 0.0131, -0.032, 0.0134], "gripper_open": 0.307, "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.0004, -0.01, 0.0004]", "env_steps": 457, "moves": 40, "remaining_env_steps": 143, "remaining_moves": 10, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":20,\"gripper\":0,\"note\":\"1.历史和分析:开度0.307明显夹住旋钮；2.Agentview:爪稳定在开关上，壶在炉盘；3.Wrist:脊在两垫间；4.后续要操作的物体:炉旋钮；5.Action:保持闭合yaw正转20度；6.预测结果:旋钮随转开启炉子，底座不移动\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1773ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1515, "eef_y": 0.1914, "eef_z": 0.9553, "roll_deg": -1.5, "pitch_deg": -0.3, "yaw_deg": 18.9, "eef_quat": [0.9881, -0.1513, -0.0221, 0.0174], "gripper_open": 0.105, "feedback": "ok: reached dist_m=0.003 remaining_xyz=[-0.002, 0.0038, -0.0012]", "env_steps": 469, "moves": 41, "remaining_env_steps": 131, "remaining_moves": 9, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":38,\"gripper\":0,\"note\":\"1.历史和分析:旋转到19度，开度仍非零；2.Agentview:壶留在炉上；3.Wrist:顶脊仍在夹爪中，检查继续转动效果；4.后续要操作的物体:炉旋钮；5.Action:yaw转至38度保持夹紧；6.预测结果:继续带动旋钮，避免平移扯动\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1778ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1493, "eef_y": 0.1929, "eef_z": 0.9572, "roll_deg": -1.2, "pitch_deg": 1.0, "yaw_deg": 37.1, "eef_quat": [0.9518, -0.3056, -0.0114, 0.0209], "gripper_open": 0.028, "feedback": "ok: reached dist_m=0.002 remaining_xyz=[-0.0022, -0.0015, -0.0019]", "env_steps": 481, "moves": 42, "remaining_env_steps": 119, "remaining_moves": 8, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Lowering and centering knob**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"gripper\":1,\"yaw_deg\":18,\"note\":\"1.历史和分析:开度降至0.028，旋转滑脱，应更低抓脊；2.Agentview:炉未亮，不能认定开启；3.Wrist:旋钮偏左下，未随腕稳定旋转；4.后续要操作的物体:重新夹旋钮；5.Action:张开yaw退至18度；6.预测结果:释放后重新对准不碰壶\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1438ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1485, "eef_y": 0.1932, "eef_z": 0.9579, "roll_deg": -0.8, "pitch_deg": 1.2, "yaw_deg": 19.8, "eef_quat": [0.9871, -0.1591, -0.0082, 0.0139], "gripper_open": 0.894, "feedback": "ok: reached dist_m=0.002 remaining_xyz=[-0.0008, -0.0003, -0.0008]", "env_steps": 491, "moves": 43, "remaining_env_steps": 109, "remaining_moves": 7, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":0,\"dx\":-0.012,\"dz\":-0.02,\"note\":\"1.历史和分析:重新张开，需降低并向后让旋钮进入垫中；2.Agentview:爪位于旋钮前上方；3.Wrist:脊在下沿偏后，前次仅擦到顶端；4.后续要操作的物体:旋钮顶脊-x1.2cm、下2cm；5.Action:归yaw0，后移并下降；6.预测结果:跨脊接近，避免继续空夹\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1279ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.16, "eef_y": 0.1916, "eef_z": 0.9384, "roll_deg": -0.6, "pitch_deg": 1.3, "yaw_deg": 1.9, "eef_quat": [0.9999, -0.0037, -0.0073, 0.0078], "gripper_open": 0.976, "feedback": "ok: reached dist_m=0.001 remaining_xyz=[-0.0005, 0.0015, -0.0005]", "env_steps": 500, "moves": 44, "remaining_env_steps": 100, "remaining_moves": 6, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"gripper\":0,\"note\":\"1.历史和分析:降低2cm后脊进入垫的高度；2.Agentview:夹爪跨旋钮；3.Wrist:脊在两爪间，宽度可抓；4.后续要操作的物体:炉旋钮；5.Action:闭合夹紧脊；6.预测结果:更深夹持避免转动滑脱\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1936ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.161, "eef_y": 0.2043, "eef_z": 0.9379, "roll_deg": -0.7, "pitch_deg": 1.3, "yaw_deg": -0.2, "eef_quat": [0.9998, 0.0145, -0.007, 0.0085], "gripper_open": 0.393, "feedback": "ok: reached dist_m=0.000 remaining_xyz=[0.001, -0.0127, 0.0005]", "env_steps": 512, "moves": 45, "remaining_env_steps": 88, "remaining_moves": 5, "success": false, "terminated": false, "world_axes_overlay": false}
+
+**Trying the negative turn**
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":-20,\"gripper\":0,\"note\":\"1.历史和分析:开度0.393夹持明显，先前正转未开启；2.Agentview:壶稳定留在炉上；3.Wrist:脊在两垫间；4.后续要操作的物体:炉旋钮；5.Action:保持夹紧向负yaw转20度；6.预测结果:尝试相反方向带动开关，不作平移\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1912ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1596, "eef_y": 0.2091, "eef_z": 0.9377, "roll_deg": -0.8, "pitch_deg": 1.0, "yaw_deg": -19.4, "eef_quat": [0.9835, 0.1806, -0.0086, 0.0045], "gripper_open": 0.331, "feedback": "ok: reached dist_m=0.004 remaining_xyz=[-0.0014, -0.0048, 0.0002]", "env_steps": 524, "moves": 46, "remaining_env_steps": 76, "remaining_moves": 4, "success": false, "terminated": false, "world_axes_overlay": false}
+
+exec
+/bin/bash -lc "curl -s http://127.0.0.1:8765/move -H 'Content-Type: application/json' -d '{\"yaw_deg\":-39,\"gripper\":0,\"note\":\"1.历史和分析:负向转动后开度仍0.331，保持抓持；2.Agentview:旋钮被爪遮挡，壶未移动；3.Wrist:顶脊仍在两垫中；4.后续要操作的物体:炉旋钮；5.Action:继续负yaw至-39度；6.预测结果:带动旋钮达到开炉阈值，不碰邻物\"}' | python -c 'import sys,json; d=json.load(sys.stdin); d.pop(\"last_move\",None); print(json.dumps(d))'" in /home/chener/LIBERO/astra_eval
+ succeeded in 1070ms:
+{"instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "cameras": {"agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png", "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"}, "eef_x": -0.1612, "eef_y": 0.2131, "eef_z": 0.9374, "roll_deg": -1.2, "pitch_deg": 0.8, "yaw_deg": -34.6, "eef_quat": [0.9509, 0.3094, -0.0085, 0.005], "gripper_open": 0.342, "feedback": "ok: reached dist_m=0.004 remaining_xyz=[0.0017, -0.004, 0.0002]", "env_steps": 531, "moves": 47, "remaining_env_steps": 69, "remaining_moves": 3, "success": true, "terminated": false, "world_axes_overlay": false, "result": {"success": true, "reason": "success", "instruction": "turn on the stove and put the moka pot on it", "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it", "suite": "libero_10", "task_id": 2, "init_id": 0, "env_steps": 531, "moves": 47, "elapsed_s": 642.05, "final_state": {"eef_x": -0.1612, "eef_y": 0.2131, "eef_z": 0.9374, "roll_deg": -1.2, "pitch_deg": 0.8, "yaw_deg": -34.6, "eef_quat": [0.9509, 0.3094, -0.0085, 0.005], "gripper_open": 0.342, "feedback": "ok: reached dist_m=0.004 remaining_xyz=[0.0017, -0.004, 0.0002]", "env_steps": 531, "moves": 47, "remaining_env_steps": 69, "remaining_moves": 3, "success": true, "terminated": true, "world_axes_overlay": false}}}
+
+exec
+/bin/bash -lc "mkdir -p runs/current && cat > runs/current/AGENT_SUMMARY.md <<'EOF'
+# 本集记录
+官方目标：turn on the stove and put the moka pot on it。
+第47次移动返回 success=true，result.final_state.terminated=true；使用531物理步。
+
+先探测+x，确认朝agentview BOTTOM。初次试图抓壶本体，宽盖导致下降残差，未盲目闭合。抬起改抓右侧黑柄，yaw约90度，末端约(0.037,-0.064,1.016)闭合后开度0.266，抬升确认壶随动。搬往+y炉盘，修正-x及+y后下降、张开，壶留在炉圈。
+
+旋钮初次夹持高度过高，开度接近零，转动滑脱；逐步降低重抓。最终末端约(-0.161,0.204,0.938)夹住旋钮，开度0.393。保持闭合，yaw负转到约-35度时官方成功。
+
+feedback主要为ok，壶盖接近时存在较大下降残差，应视为潜在接触而换抓法。旋钮抓取需用开度及旋转后图像联合判断，不能把一次闭合当成抓牢。
+
+hindsight：世界+x朝agentview BOTTOM，+y朝LEFT，+z向上。摩卡壶盖宽，右侧手柄适合yaw90度跨抓；搬运每步保持gripper=0。此场景不能默认桌高为0，未直接测得支撑面精确高度；有效壶柄抓取末端z约1.016、炉上释放约1.054，旋钮有效夹持末端z约0.938，这些是末端高度而非支撑面高度。旋钮需要较低夹持顶脊，负yaw方向转动可开启。腕图物体位于下沿不等于已经进入爪垫高度。
+EOF" in /home/chener/LIBERO/astra_eval
+ succeeded in 0ms:
+codex
+
+tokens used
+106,636
+

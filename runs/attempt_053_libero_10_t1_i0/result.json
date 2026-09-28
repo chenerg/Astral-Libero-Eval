@@ -1,0 +1,35 @@
+{
+  "success": true,
+  "reason": "success",
+  "instruction": "put both the cream cheese box and the butter in the basket",
+  "task_name": "LIVING_ROOM_SCENE2_put_both_the_cream_cheese_box_and_the_butter_in_the_basket",
+  "suite": "libero_10",
+  "task_id": 1,
+  "init_id": 0,
+  "env_steps": 507,
+  "moves": 44,
+  "elapsed_s": 460.09,
+  "final_state": {
+    "eef_x": 0.0644,
+    "eef_y": 0.2234,
+    "eef_z": 0.6629,
+    "roll_deg": -0.4,
+    "pitch_deg": -0.3,
+    "yaw_deg": -0.2,
+    "eef_quat": [
+      0.9994,
+      -0.0027,
+      -0.0346,
+      0.001
+    ],
+    "gripper_open": 0.977,
+    "feedback": "ok: reached dist_m=0.065 remaining_xyz=[-0.0012, -0.0651, -0.0016]",
+    "env_steps": 507,
+    "moves": 44,
+    "remaining_env_steps": 93,
+    "remaining_moves": 6,
+    "success": true,
+    "terminated": true,
+    "world_axes_overlay": false
+  }
+}
