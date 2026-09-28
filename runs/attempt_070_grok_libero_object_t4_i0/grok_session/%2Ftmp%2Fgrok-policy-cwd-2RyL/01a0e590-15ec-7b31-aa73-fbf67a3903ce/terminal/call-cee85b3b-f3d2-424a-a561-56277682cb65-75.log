@@ -1,0 +1,43 @@
+move  1 step   13 eef [-0.124, 0.007, 0.262] g=0.953 rpy=[-0.0, -0.4, 0.2]
+move  2 step   23 eef [-0.125, -0.087, 0.262] g=0.980 rpy=[0.2, -0.2, 0.0]
+move  3 step   33 eef [-0.091, -0.183, 0.262] g=0.987 rpy=[0.3, -0.4, 0.0]
+move  4 step   41 eef [-0.088, -0.23, 0.266] g=0.991 rpy=[0.5, -0.8, 0.1]
+move  5 step   50 eef [-0.088, -0.231, 0.191] g=0.994 rpy=[0.1, -0.2, 0.3]
+move  6 step   58 eef [-0.108, -0.231, 0.19] g=0.996 rpy=[-0.2, 0.1, 0.2]
+move  7 step   66 eef [-0.111, -0.23, 0.157] g=0.997 rpy=[-0.1, 0.1, 0.3]
+move  8 step   74 eef [-0.111, -0.23, 0.143] g=0.998 rpy=[0.0, -0.2, 0.3]
+move  9 step   82 eef [-0.111, -0.23, 0.13] g=0.999 rpy=[0.0, -0.2, 0.3]
+move 10 step   90 eef [-0.111, -0.23, 0.13] g=0.430 rpy=[0.0, -0.2, 0.3]
+move 11 step  102 eef [-0.111, -0.23, 0.143] g=0.420 rpy=[-0.0, -0.2, 0.3]
+move 12 step  123 eef [-0.112, -0.23, 0.213] g=0.418 rpy=[-0.1, -0.1, 0.3]
+move 13 step  140 eef [-0.113, -0.23, 0.284] g=0.418 rpy=[-0.1, -0.1, 0.3]
+move 14 step  152 eef [-0.114, -0.114, 0.284] g=0.418 rpy=[-0.3, -0.0, 0.5]
+move 15 step  163 eef [-0.116, -0.001, 0.282] g=0.418 rpy=[-0.3, 0.2, 0.5]
+move 16 step  175 eef [-0.087, 0.114, 0.282] g=0.418 rpy=[-0.3, -0.4, 0.6]
+move 17 step  187 eef [-0.046, 0.229, 0.284] g=0.418 rpy=[-0.5, -0.6, 0.5]
+move 18 step  196 eef [0.015, 0.264, 0.284] g=0.418 rpy=[-0.2, -0.4, 0.3]
+move 19 step  214 eef [0.026, 0.27, 0.25] g=0.418 rpy=[-0.3, -0.7, 0.3]
+move 20 step  222 eef [0.023, 0.269, 0.215] g=0.418 rpy=[0.3, 0.3, 0.3]
+--- transcript notes if any ---
+transcript True
+1 named {'dx': 0.03} eef -0.1245 0.0073 0.2619 g 0.953 fb ok: reached dist_m=0.010 remaining_xyz=[
+2 named {'dy': -0.1} eef -0.1251 -0.0875 0.2619 g 0.98 fb ok: reached dist_m=0.008 remaining_xyz=[
+3 named {'dx': 0.035, 'dy': -0.1} eef -0.0915 -0.183 0.2619 g 0.987 fb ok: reached dist_m=0.009 remaining_xyz=[
+4 named {'dy': -0.05} eef -0.0876 -0.2303 0.2655 g 0.991 fb ok: reached dist_m=0.009 remaining_xyz=[
+5 named {'dz': -0.08} eef -0.0876 -0.2309 0.1908 g 0.994 fb ok: reached dist_m=0.008 remaining_xyz=[
+6 named {'dx': -0.025} eef -0.1081 -0.2308 0.1902 g 0.996 fb ok: reached dist_m=0.009 remaining_xyz=[
+7 named {'dz': -0.04} eef -0.1105 -0.2299 0.1569 g 0.997 fb ok: reached dist_m=0.011 remaining_xyz=[
+8 named {'dz': -0.02} eef -0.1107 -0.2298 0.1434 g 0.998 fb ok: reached dist_m=0.009 remaining_xyz=[
+9 named {'dz': -0.02} eef -0.1106 -0.2297 0.1301 g 0.999 fb ok: reached dist_m=0.009 remaining_xyz=[
+10 named {'gripper': 0.0} eef -0.1108 -0.2302 0.1302 g 0.426 fb ok: reached dist_m=0.000 remaining_xyz=[
+11 named {'dz': 0.02, 'gripper': 0.0} eef -0.1113 -0.2304 0.1426 g 0.419 fb ok: reached dist_m=0.010 remaining_xyz=[
+12 named {'dz': 0.08, 'gripper': 0.0} eef -0.1121 -0.23 0.2131 g 0.418 fb ok: reached dist_m=0.012 remaining_xyz=[
+13 named {'dz': 0.08, 'gripper': 0.0} eef -0.1128 -0.2297 0.2842 g 0.418 fb ok: reached dist_m=0.011 remaining_xyz=[
+14 named {'dy': 0.12, 'gripper': 0.0} eef -0.1137 -0.1141 0.2838 g 0.418 fb ok: reached dist_m=0.008 remaining_xyz=[
+15 named {'dy': 0.12, 'gripper': 0.0} eef -0.1163 0.0006 0.2821 g 0.418 fb ok: reached dist_m=0.010 remaining_xyz=[
+16 named {'dx': 0.03, 'dy': 0.12, 'gripper': 0.0} eef -0.0857 0.1158 0.2833 g 0.418 fb ok: reached dist_m=0.010 remaining_xyz=[
+17 named {'dx': 0.04, 'dy': 0.12, 'gripper': 0.0} eef -0.0441 0.2313 0.2858 g 0.418 fb ok: reached dist_m=0.012 remaining_xyz=[
+18 named {'dx': 0.065, 'dy': 0.035, 'gripper': 0.0} eef 0.024 0.2689 0.2922 g 0.418 fb ok: reached dist_m=0.011 remaining_xyz=[
+19 named {'dz': -0.05, 'gripper': 0.0} eef 0.0262 0.2703 0.2503 g 0.418 fb ok: reached dist_m=0.011 remaining_xyz=[
+20 named {'dz': -0.04, 'gripper': 0.0} eef 0.0218 0.268 0.213 g 0.418 fb ok: reached dist_m=0.008 remaining_xyz=[
+21 named {'gripper': 1.0} eef 0.0211 0.2676 0.2122 g 0.539 fb ok: reached dist_m=0.000 remaining_xyz=[

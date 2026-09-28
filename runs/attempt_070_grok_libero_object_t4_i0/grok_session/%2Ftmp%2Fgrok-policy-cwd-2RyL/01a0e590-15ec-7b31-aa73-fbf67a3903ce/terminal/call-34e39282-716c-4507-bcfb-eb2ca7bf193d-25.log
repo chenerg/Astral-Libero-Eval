@@ -1,0 +1,5 @@
+steps lines 24
+first keys dict_keys(['event', 'env_step', 'move_id', 'interp_i', 'kind', 'action', 'eef', 'rpy_deg', 'gripper_open', 'dist_m', 'success', 'agentview', 'wrist'])
+sample {'event': 'ctrl', 'env_step': 1, 'move_id': 0, 'interp_i': 0, 'kind': 'dummy', 'action': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 'eef': [-0.1486, 0.0093, 0.2641], 'rpy_deg': [0.0, 0.0, 0.0], 'gripper_open': 0.52, 'dist_m': None, 'success': False, 'agentview': 'ctrl/0001_agentview.png'}
+--- last ---
+{'event': 'ctrl', 'env_step': 24, 'move_id': 2, 'interp_i': 7, 'kind': 'dwell', 'action': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0], 'eef': [0.0023, -0.1243, 0.2161], 'rpy_deg': [0.5, -1.6, 0.1], 'gripper_open': 0.982, 'dist_m': 0.0087, 'success': False, 'agentview': 'ctrl/0024_agentview.png', 'wrist': 'ctrl/0024_wrist.png'}

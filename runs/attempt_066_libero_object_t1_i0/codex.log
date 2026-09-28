@@ -1,0 +1,18 @@
+WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("/tmp/codex-clean-44jl"))
+Reading additional input from stdin...
+OpenAI Codex v0.155.1
+--------
+workdir: /home/chener/LIBERO/astra_eval
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: medium
+reasoning summaries: detailed
+session id: 01a0e26a-b02b-7540-bd16-4c0e9bb6ccb1
+--------
+user
+The two attached images are the reset obs/agentview.png and obs/wrist.png. Begin the episode now.
+warning: Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /tmp/codex-clean-44jl/config.toml.
+ERROR: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 8:38 PM.
+ERROR: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 8:38 PM.

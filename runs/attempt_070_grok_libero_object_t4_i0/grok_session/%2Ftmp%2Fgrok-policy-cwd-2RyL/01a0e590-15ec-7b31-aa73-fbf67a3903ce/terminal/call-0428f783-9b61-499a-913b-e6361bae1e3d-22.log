@@ -1,0 +1,8 @@
+agent red 49 centroid (149.4, 94.6)
+  y88: n=19 xmean=147 143-155
+  y96: n=28 xmean=148 143-155
+wrist red 242 centroid (145.4, 125.2)
+ bbox 136 116 157 136
+  y112: n=144 xmean=146 136-157
+  y128: n=98 xmean=145 136-157
+wrist warm 58

@@ -1,0 +1,9 @@
+['0005_agentview.png', '0005_wrist.png', '0016_agentview.png', '0016_wrist.png', '0024_agentview.png', '0024_wrist.png', '0032_agentview.png', '0032_wrist.png', '0040_agentview.png', '0040_wrist.png', '0048_agentview.png', '0048_wrist.png', '0056_agentview.png', '0056_wrist.png', '0068_agentview.png', '0068_wrist.png', '0076_agentview.png', '0076_wrist.png']
+48 agentview none
+48 wrist n=777 cent=(129.2,154.1) bbox x113-145 y138-170
+56 agentview none
+56 wrist n=1001 cent=(129.2,158.9) bbox x111-148 y141-177
+68 agentview none
+68 wrist n=1000 cent=(129.2,159.0) bbox x111-148 y141-177
+76 agentview none
+76 wrist n=996 cent=(129.2,158.9) bbox x111-148 y141-177

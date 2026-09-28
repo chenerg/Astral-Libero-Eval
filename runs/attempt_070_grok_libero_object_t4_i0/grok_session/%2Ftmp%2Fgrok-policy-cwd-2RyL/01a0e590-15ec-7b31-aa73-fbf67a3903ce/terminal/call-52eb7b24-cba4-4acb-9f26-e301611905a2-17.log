@@ -1,0 +1,8 @@
+red count 69 org 35 grn 0
+red n 69 centroid 149.5 96.0 bbox 143 93 192 110
+org n 35 centroid 149.9 96.3 bbox 144 93 155 99
+grn none
+red rows:
+  y 88-96: n=  33 xmean= 148.8 xmin=143 xmax=155
+  y 96-104: n=  35 xmean= 148.9 xmin=143 xmax=155
+grn rows:

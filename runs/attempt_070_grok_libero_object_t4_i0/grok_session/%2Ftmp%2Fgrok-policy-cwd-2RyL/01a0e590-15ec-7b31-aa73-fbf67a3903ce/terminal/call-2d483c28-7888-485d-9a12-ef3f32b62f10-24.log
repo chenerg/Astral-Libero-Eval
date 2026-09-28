@@ -1,0 +1,13 @@
+PROMPT.txt
+ctrl
+frames
+status.json
+steps.jsonl
+transcript.jsonl
+---frames---
+0005_agentview.png
+0005_wrist.png
+0016_agentview.png
+0016_wrist.png
+0024_agentview.png
+0024_wrist.png

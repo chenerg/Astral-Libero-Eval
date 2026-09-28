@@ -1,0 +1,32 @@
+{
+  "instruction": "pick up the ketchup and place it in the basket",
+  "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket",
+  "suite": "libero_object",
+  "task_id": 4,
+  "init_id": 0,
+  "cameras": {
+    "agentview": "/home/chener/LIBERO/astra_eval/obs/agentview.png",
+    "wrist": "/home/chener/LIBERO/astra_eval/obs/wrist.png"
+  },
+  "eef_x": 0.0175,
+  "eef_y": 0.2745,
+  "eef_z": 0.2322,
+  "roll_deg": 0.0,
+  "pitch_deg": 0.2,
+  "yaw_deg": 0.3,
+  "eef_quat": [
+    0.9997,
+    -0.0001,
+    -0.0252,
+    -0.0004
+  ],
+  "gripper_open": 0.933,
+  "feedback": "ok: reached dist_m=0.048 remaining_xyz=[0.0012, -0.0001, 0.0478]",
+  "env_steps": 323,
+  "moves": 30,
+  "remaining_env_steps": 277,
+  "remaining_moves": 20,
+  "success": true,
+  "terminated": false,
+  "world_axes_overlay": false
+}

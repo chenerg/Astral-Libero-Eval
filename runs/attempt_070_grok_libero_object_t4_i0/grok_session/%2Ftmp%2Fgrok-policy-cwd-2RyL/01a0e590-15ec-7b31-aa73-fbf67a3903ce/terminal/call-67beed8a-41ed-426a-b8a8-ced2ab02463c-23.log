@@ -1,0 +1,38 @@
+attempt_060_libero_10_t8_i0
+attempt_061_libero_10_t8_i0
+attempt_062_libero_10_t8_i0
+attempt_063_libero_10_t9_i0
+attempt_064_libero_object_t0_i0
+attempt_065_libero_object_t1_i0
+attempt_066_libero_object_t1_i0
+attempt_067_libero_object_t1_i0
+attempt_068_libero_object_t2_i0
+attempt_069_libero_object_t3_i0
+attempt_070_grok_libero_object_t4_i0
+current
+index.jsonl
+spatial0_init0_attempt1
+spatial0_init0_attempt2
+/home/chener/LIBERO/astra_eval/runs/attempt_052_libero_10_t3_i0
+
+
+total 312
+drwxr-xr-x 4 chener chener  4096 Sep 28 09:10 attempt_070_grok_libero_object_t4_i0
+lrwxrwxrwx 1 chener chener    36 Sep 28 09:10 current -> attempt_070_grok_libero_object_t4_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 19:42 attempt_069_libero_object_t3_i0
+-rw-r--r-- 1 chener chener 32239 Sep 27 19:41 index.jsonl
+drwxr-xr-x 4 chener chener  4096 Sep 27 19:22 attempt_068_libero_object_t2_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 19:03 attempt_067_libero_object_t1_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 18:32 attempt_066_libero_object_t1_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 18:27 attempt_065_libero_object_t1_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 17:48 attempt_064_libero_object_t0_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 17:26 attempt_063_libero_10_t9_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 17:12 attempt_062_libero_10_t8_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 16:47 attempt_061_libero_10_t8_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 10:40 attempt_060_libero_10_t8_i0
+drwxr-xr-x 4 chener chener  4096 Sep 27 05:24 attempt_059_libero_10_t7_i0
+drwxr-xr-x 4 chener chener  4096 Sep 26 23:56 attempt_058_libero_10_t6_i0
+drwxr-xr-x 4 chener chener  4096 Sep 26 23:48 attempt_057_libero_10_t5_i0
+drwxr-xr-x 4 chener chener  4096 Sep 26 23:16 attempt_056_libero_10_t4_i0
+drwxr-xr-x 4 chener chener  4096 Sep 26 22:42 attempt_055_libero_10_t3_i0
+drwxr-xr-x 4 chener chener  4096 Sep 26 20:45 attempt_054_libero_10_t2_i0
