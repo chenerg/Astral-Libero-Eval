@@ -16,7 +16,10 @@ FRAMES_OUT = OUT / "frames"
 CTRL_OUT = OUT / "ctrl"
 DATA_JS = OUT / "data.js"
 WIN_SYNC = Path("/mnt/c/Users/c00670587/Documents/LIBERO-astra-viz")
-STALE_SOURCES = ("transcript.jsonl", "steps.jsonl", "result.json", "NOTES.md", "AGENT_SUMMARY.md")
+STALE_SOURCES = (
+    "transcript.jsonl", "steps.jsonl", "result.json", "NOTES.md",
+    "AGENT_SUMMARY.md", "runner.json", "codex.log", "pi.log", "grok.log",
+)
 
 CATALOG = [
     {
@@ -233,6 +236,37 @@ def run_number(name: str):
     return None
 
 
+def detect_harness(run_dir: Path, runner: dict, planner: str) -> str:
+    """Identify the policy runner independently from the model it called."""
+    explicit = str(runner.get("runner") or "").strip().lower()
+    labels = {
+        "codex": "Codex",
+        "codex cli": "Codex",
+        "pi": "Pi agent",
+        "pi-agent": "Pi agent",
+        "pi agent": "Pi agent",
+        "grok": "Grok CLI",
+        "grok cli": "Grok CLI",
+    }
+    if explicit:
+        return labels.get(explicit, runner["runner"])
+
+    if (run_dir / "pi.log").exists() or (run_dir / "pi_session").is_dir():
+        return "Pi agent"
+    if (run_dir / "codex.log").exists():
+        return "Codex"
+    if (run_dir / "grok.log").exists():
+        return "Grok CLI"
+
+    name = run_dir.name.lower()
+    if "_pi_" in name:
+        return "Pi agent"
+    if "_grok_" in name or planner.lower() == "grok":
+        return "Grok CLI"
+    # Historical Astra runs predate runner.json but were launched by Codex.
+    return "Codex"
+
+
 def latest_run_mtime() -> float:
     newest = 0.0
     if not RUNS.exists():
@@ -275,8 +309,17 @@ def discover_catalog() -> list[dict]:
         cat["dir"] = d.name
         cat["n"] = n
         cat["id"] = ov.get("id") or f"a{n}"
-        if not cat.get("planner"):
-            cat["planner"] = "grok" if "_grok_" in d.name else "gpt-6-astra"
+        runner_path = d / "runner.json"
+        try:
+            runner = json.loads(runner_path.read_text()) if runner_path.exists() else {}
+        except (OSError, ValueError):
+            runner = {}
+        if runner.get("model"):
+            cat["planner"] = runner["model"]
+        elif not cat.get("planner"):
+            cat["planner"] = ("gpt-6.1-sol" if "_sol_" in d.name else
+                              "grok" if "_grok_" in d.name else "gpt-6-astra")
+        cat["harness"] = ov.get("harness") or detect_harness(d, runner, cat["planner"])
         m = SUITE_RE.search(d.name)
         if m:
             cat.setdefault("suite", "libero_" + m.group(1))
@@ -609,6 +652,7 @@ def pack_episode(cat: dict) -> dict:
         "dir": cat["dir"],
         "title": cat["title"],
         "kind": cat["kind"],
+        "harness": cat.get("harness") or "Unknown",
         "planner": cat.get("planner") or "gpt-6-astra",
         "suite": cat.get("suite") or result.get("suite") or "libero_spatial",
         "task_id": cat.get("task_id", result.get("task_id")),
@@ -697,17 +741,17 @@ def main(argv: list[str] | None = None) -> None:
     episodes = [pack_episode(c) for c in discover_catalog()]
     payload = {
         "meta": {
-            "title": "LIBERO × Codex CLI · GPT-6 Astra",
+            "title": "LIBERO · 多模型策略回放",
             "built_at": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S %Z"),
             "n_episodes": len(episodes),
             "suite": "libero_spatial",
             "task_id": 0,
             "init_id": 0,
-            "model": "gpt-6-astra",
+            "model": "mixed",
             "effort": "medium",
             "task": "pick up the black bowl between the plate and the ramekin and place it on the plate",
             "architecture": [
-                {"id": "planner", "title": "Codex CLI", "sub": "gpt-6-astra · medium"},
+                {"id": "planner", "title": "Planner harness", "sub": "model"},
                 {"id": "http", "title": "HTTP 桥", "sub": "POST /move  :8765"},
                 {"id": "osc", "title": "OSC 插值", "sub": "xyz + 可选姿态"},
                 {"id": "env", "title": "LIBERO", "sub": "Panda · EGL"},

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LIBERO × Astra · 全部测评回放</title>
+  <title>LIBERO · 全部测评回放</title>
   <style>
     :root {
       --bg: #0b0f14;
@@ -41,7 +41,7 @@
     }
     .picker label { color: var(--muted); font-size: 12px; letter-spacing: .4px; text-transform: uppercase; font-weight: 650; }
     .picker select {
-      flex: 1; min-width: 280px; max-width: 720px;
+      flex: 1; min-width: 280px;
       background: #1c2733; border: 1px solid #4c5d73;
       border-radius: 10px; padding: 10px 12px; font-size: 15px;
     }
@@ -56,12 +56,14 @@
       padding: 12px 14px;
       cursor: pointer;
       text-align: left;
+      white-space: normal;
+      min-width: 0;
     }
     .ep:hover { border-color: #4c5d73; }
     .ep.on { border-color: var(--approach); box-shadow: 0 0 0 1px color-mix(in srgb, var(--approach) 45%, transparent); }
-    .ep .n { color: var(--muted); font-size: 11px; letter-spacing: .4px; text-transform: uppercase; }
-    .ep h3 { margin: 2px 0 6px; font-size: 15px; }
-    .ep .hd { color: #c9d6e5; min-height: 44px; }
+    .ep .n { color: var(--muted); font-size: 11px; letter-spacing: .4px; text-transform: uppercase; overflow-wrap: anywhere; }
+    .ep h3 { margin: 2px 0 6px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .ep .hd { color: #c9d6e5; min-height: 44px; overflow-wrap: anywhere; }
     .st { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
     .st.fail, .st.harness { background: #3a1820; color: #ff8b97; }
     .st.aborted { background: #3a3218; color: #e6c35c; }
@@ -73,7 +75,7 @@
     table.cmp th { color: var(--muted); font-size: 11px; letter-spacing: .4px; text-transform: uppercase; font-weight: 650; }
     table.cmp tr.on td { background: #182833; }
     .anal { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-bottom: 12px; }
-    .anal h2 { margin: 0 0 8px; font-size: 14px; }
+    .anal h2 { margin: 0 0 8px; font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
     .anal ul { margin: 0; padding-left: 18px; color: #d5deea; }
     .anal li { margin: 4px 0; }
     .pipe { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 0 0 14px; }
@@ -157,9 +159,8 @@
   <div class="wrap">
     <header>
       <div>
-        <h1>LIBERO × Codex CLI · 全部测评回放</h1>
+        <h1>LIBERO · 全部测评回放</h1>
         <div class="sub">
-          同一任务：<b id="task"></b><br />
           下拉框回看任意一集。有 <code>ctrl/</code> 细帧的会按 20 Hz 控制步播放。<br />
           <code>http://localhost:8788</code> 刷新时若 runs 更新会先重打包再加载。<br />
           <span id="builtAt"></span>
@@ -357,15 +358,36 @@
       loadUrl(url).then(draw);
     }
 
-    document.getElementById("task").textContent = meta.task;
-
     const stLabel = { fail: "策略失败", harness: "harness 失败", aborted: "中途退出", running: "进行中", success: "成功" };
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[ch]));
+    }
+    function taskName(e) {
+      return (e.task || "").trim();
+    }
+    function titleLine(e) {
+      const name = taskName(e);
+      if (!name || (e.title || "").includes(name)) return e.title || "";
+      return `${e.title} · ${name}`;
+    }
+    function cardHeadline(e) {
+      const h = (e.headline || "").trim();
+      const name = taskName(e);
+      if (!h) return "";
+      const norm = h.replace(/^instruction:\s*/i, "").trim();
+      if (name && (norm === name || h === name)) return "";
+      return h;
+    }
+    function harnessShort(e) {
+      if (e.harness === "Pi agent") return "Pi";
+      if (e.harness === "Grok CLI") return "Grok";
+      return e.harness || "Unknown";
+    }
     function optionLabel(e) {
       const st = stLabel[e.status] || e.status;
-      const suite = (e.suite || "libero_spatial").replace("libero_", "");
-      const task = e.task_id == null ? suite : `${suite}/${e.task_id}`;
-      const who = e.planner ? ` · ${e.planner}` : "";
-      return `第 ${e.n} 集 · ${task}${who} · ${e.title.replace(/^第 \d+ 集 · /, "")} · ${e.moves ?? "—"} moves · ${st}`;
+      return `[${harnessShort(e)} · ${e.planner || "unknown model"}] ${titleLine(e)} · ${e.moves ?? "—"} moves · ${st}`;
     }
     const sel = document.getElementById("epSelect");
     episodes.forEach((e, i) => {
@@ -383,10 +405,11 @@
       const b = document.createElement("button");
       b.className = "ep";
       b.dataset.id = e.id;
-      b.innerHTML = `<div class="n">Attempt ${e.n} · ${e.kind}${e.planner ? " · "+e.planner : ""} · ${(e.suite||"libero_spatial").replace("libero_","")}/${e.task_id ?? "—"}</div>
-        <h3>${e.title}</h3>
+      const hd = cardHeadline(e);
+      b.innerHTML = `<div class="n">Attempt ${e.n} · ${esc(e.harness || "Unknown")} · ${esc(e.planner || "unknown model")} · ${(e.suite||"libero_spatial").replace("libero_","")}/${e.task_id ?? "—"}</div>
+        <h3>${esc(titleLine(e))}</h3>
         <span class="st ${e.status}">${stLabel[e.status] || e.status}</span>
-        <div class="hd">${e.headline}</div>
+        ${hd ? `<div class="hd">${esc(hd)}</div>` : ""}
         <div class="metrics"><span>${e.moves ?? "—"} moves</span><span>${e.env_steps ?? "—"} steps</span><span>${e.elapsed_s ? Math.round(e.elapsed_s)+" s" : ""}</span></div>`;
       b.onclick = () => selectEp(i, true);
       epsEl.appendChild(b);
@@ -394,11 +417,12 @@
 
     const cmp = document.getElementById("cmp");
     cmp.innerHTML = `<thead><tr>
-      <th></th><th>任务</th><th>Planner</th><th>结果</th><th>Moves</th><th>Env steps</th><th>细帧</th><th>合爪</th><th>空抓抬升</th><th>卡住</th><th>最低 z</th>
+      <th></th><th>任务</th><th>Harness</th><th>Model</th><th>结果</th><th>Moves</th><th>Env steps</th><th>细帧</th><th>合爪</th><th>空抓抬升</th><th>卡住</th><th>最低 z</th>
     </tr></thead><tbody>` + episodes.map(e => `<tr data-id="${e.id}">
       <td>第 ${e.n} 集</td>
       <td>${(e.suite||"libero_spatial").replace("libero_","")}/${e.task_id ?? "—"}</td>
-      <td>${e.planner || "—"}</td>
+      <td>${esc(e.harness || "Unknown")}</td>
+      <td>${esc(e.planner || "—")}</td>
       <td>${stLabel[e.status] || e.status}</td>
       <td>${e.moves ?? "—"}</td>
       <td>${e.env_steps ?? "—"}</td>
@@ -510,9 +534,13 @@
       if (location.hash !== "#" + ep.id) history.replaceState(null, "", "#" + ep.id);
       document.querySelectorAll(".ep").forEach(el => el.classList.toggle("on", el.dataset.id === ep.id));
       document.querySelectorAll("#cmp tbody tr").forEach(el => el.classList.toggle("on", el.dataset.id === ep.id));
-      document.getElementById("task").textContent = ep.task || meta.task;
+      const plannerHop = pipeEl.querySelector('[data-id="planner"]');
+      if (plannerHop) {
+        plannerHop.querySelector(".t").textContent = ep.harness || "Unknown harness";
+        plannerHop.querySelector(".s").textContent = ep.planner || "unknown model";
+      }
       document.getElementById("anal").innerHTML =
-        `<h2>${ep.title}</h2><div class="sub" style="margin-bottom:8px">${ep.reason || ""}</div><ul>` +
+        `<h2>${esc(titleLine(ep))}</h2><div class="sub" style="margin-bottom:8px">Harness: ${esc(ep.harness || "Unknown")} · Model: ${esc(ep.planner || "unknown")} ${ep.reason ? "· "+esc(ep.reason) : ""}</div><ul>` +
         (ep.analysis || []).map(x => `<li>${x}</li>`).join("") + `</ul>`;
       setMode(ep.hasCtrl ? "ctrl" : "move", false);
     }

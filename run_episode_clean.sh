@@ -115,19 +115,29 @@ else:
 print("wrote", root / "PROMPT.txt", "bytes", len(text))
 PY
 
-n=0
-for d in "$ROOT"/runs/attempt_*; do
-  [[ -d "$d" ]] && n=$((n + 1))
-done
-for d in "$ROOT"/runs/spatial0_init0_attempt1 "$ROOT"/runs/spatial0_init0_attempt2; do
-  [[ -d "$d" ]] && n=$((n + 1))
-done
-n=$((n + 1))
-NAME=$(printf "attempt_%03d_%s_t%s_i%s" "$n" "$LIBERO_SUITE" "$LIBERO_TASK_ID" "$LIBERO_INIT_ID")
-export LIBERO_RUN_DIR="$ROOT/runs/$NAME"
-rm -rf "$ROOT/obs" "$ROOT/runs/current"
-mkdir -p "$LIBERO_RUN_DIR/frames" "$ROOT/obs" "$ROOT/logs"
-ln -sfn "$NAME" "$ROOT/runs/current"
+export LIBERO_PLANNER="${LIBERO_PLANNER:-astra}"
+bash "$ROOT/start_bridge.sh"
+export LIBERO_RUN_DIR="$(readlink -f "$ROOT/runs/current")"
+NAME="$(basename "$LIBERO_RUN_DIR")"
+BRIDGE_PID="$(cat "$LIBERO_RUN_DIR/bridge.pid")"
+CLEAN_HOME=""
+cleanup() {
+  cp -f "$ROOT/logs/codex.log" "$LIBERO_RUN_DIR/codex.log" 2>/dev/null || true
+  cp -f "$ROOT/logs/bridge.log" "$LIBERO_RUN_DIR/bridge.log" 2>/dev/null || true
+  kill "$BRIDGE_PID" 2>/dev/null || true
+  [[ -z "$CLEAN_HOME" ]] || rm -rf "$CLEAN_HOME"
+}
+trap cleanup EXIT
+python3 - <<'PY'
+import json, os
+from pathlib import Path
+root = Path(os.environ["ROOT"])
+state = json.loads((root / "obs/state.json").read_text())
+assert state["remaining_moves"] == int(os.environ["LIBERO_MAX_MOVES"]), state
+assert state["world_axes_overlay"] == (os.environ["LIBERO_WORLD_AXES"].lower() in ("1", "true", "on")), state
+(Path(os.environ["LIBERO_RUN_DIR"]) / "reset_state.json").write_text(json.dumps(state, indent=2) + "\n")
+print("reset verified:", state["instruction"], "remaining_moves=", state["remaining_moves"], "world_axes_overlay=", state["world_axes_overlay"])
+PY
 
 # Auth and the model cache stay shared. skills/ and plugins/ are not linked, so
 # this process does not load the Codex skill catalog from CODEX_HOME.
@@ -137,24 +147,6 @@ ln -s /home/chener/.codex/models_cache.json "$CLEAN_HOME/models_cache.json"
 ln -s /home/chener/.codex/config.toml "$CLEAN_HOME/config.toml"
 ln -s /home/chener/.codex/sessions "$CLEAN_HOME/sessions"
 export CODEX_HOME="$CLEAN_HOME"
-trap 'rm -rf "$CLEAN_HOME"' EXIT
-
-if [[ -f "$ROOT/logs/bridge.pid" ]]; then
-  kill "$(cat "$ROOT/logs/bridge.pid")" 2>/dev/null || true
-fi
-fuser -k 8765/tcp 2>/dev/null || true
-sleep 1
-
-python "$ROOT/bridge_server.py" >"$ROOT/logs/bridge.log" 2>&1 &
-echo $! >"$ROOT/logs/bridge.pid"
-for i in $(seq 1 45); do
-  if curl -sf http://127.0.0.1:8765/status >/dev/null; then
-    echo "bridge ready ($i) run=$NAME"
-    break
-  fi
-  sleep 1
-done
-curl -sf http://127.0.0.1:8765/status >/dev/null
 
 MODEL="${CODEX_MODEL:-gpt-6-astra}"
 EFFORT="${CODEX_EFFORT:-medium}"
@@ -166,6 +158,7 @@ if [[ -n "$HIST_PATH" ]]; then
 fi
 echo "Codex clean $MODEL $EFFORT summary=$SUMMARY  run=$LIBERO_RUN_DIR world_axes=$LIBERO_WORLD_AXES history=${HIST_PATH:-none}"
 : > "$ROOT/logs/codex.log"
+set +e
 codex exec \
   -m "$MODEL" \
   -c "model_reasoning_effort=\"${EFFORT}\"" \
@@ -191,7 +184,11 @@ codex exec \
   -o "$LIBERO_RUN_DIR/LAST_MESSAGE.md" \
   "$KICKOFF" \
   > "$ROOT/logs/codex.log" 2>&1
-echo "codex_exit:$?"
+CODEX_EXIT=$?
+set -e
+export CODEX_EXIT MODEL EFFORT SUMMARY
+echo "$CODEX_EXIT" > "$LIBERO_RUN_DIR/codex_exit_code"
+echo "codex_exit:$CODEX_EXIT"
 cp -f "$ROOT/logs/codex.log" "$LIBERO_RUN_DIR/codex.log" || true
 python3 - << PY
 import json, os, time
@@ -215,6 +212,11 @@ rec = {
     "elapsed_s": result.get("elapsed_s"),
     "prompt": str(run / "PROMPT.txt"),
     "launcher": "run_episode_clean.sh",
+    "runner": "codex",
+    "model": os.environ["MODEL"],
+    "thinking": os.environ["EFFORT"],
+    "reasoning_summary": os.environ["SUMMARY"],
+    "exit_code": int(os.environ["CODEX_EXIT"]),
     "history_run": os.environ.get("HIST_PATH") or None,
 }
 with open(root / "runs" / "index.jsonl", "a") as f:
@@ -222,3 +224,4 @@ with open(root / "runs" / "index.jsonl", "a") as f:
 print(json.dumps(rec, indent=2))
 PY
 python3 "$ROOT/viz/build.py" --no-win >>"$ROOT/logs/viz_build.log" 2>&1 || true
+exit "$CODEX_EXIT"
