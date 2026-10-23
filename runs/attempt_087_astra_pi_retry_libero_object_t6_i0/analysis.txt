@@ -1,0 +1,56 @@
+RUN attempt_087_astra_pi_retry_libero_object_t6_i0
+success=True reason=success moves=29 steps=327 s=1531.12
+instruction: pick up the butter and place it in the basket
+ctrl log: 327 steps.jsonl rows, 654 pngs under ctrl/
+--- moves ---
+m01 z=0.2547 pitch=0.4 g=0.953 stop=reached named={'dx': 0.03} | ok: reached dist_m=0.011 remaining_xyz=[0.0061, -0.0001, 0.0019]
+m02 z=0.2546 pitch=0.5 g=0.98 stop=reached named={'dy': -0.1, 'gripper': 1.0} | ok: reached dist_m=0.008 remaining_xyz=[0.0008, -0.0052, 0.0001]
+m03 z=0.2531 pitch=0.7 g=0.988 stop=reached named={'dy': -0.12} | ok: reached dist_m=0.012 remaining_xyz=[0.0027, -0.0073, 0.0015]
+m04 z=0.1604 pitch=0.4 g=0.992 stop=reached named={'dy': -0.04, 'dz': -0.1} | ok: reached dist_m=0.010 remaining_xyz=[-0.0003, 0.0021, -0.0073]
+m05 z=0.0868 pitch=0.8 g=0.994 stop=reached named={'dz': -0.08} | ok: reached dist_m=0.010 remaining_xyz=[0.0019, -0.0004, -0.0064]
+m06 z=0.0715 pitch=0.7 g=0.996 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.008 remaining_xyz=[0.0027, 0.001, -0.0047]
+m07 z=0.0581 pitch=0.5 g=0.997 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.009 remaining_xyz=[-0.0001, -0.0001, -0.0067]
+m08 z=0.0448 pitch=0.5 g=0.998 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.009 remaining_xyz=[-0.0002, -0.0, -0.0067]
+m09 z=0.0316 pitch=0.5 g=0.999 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.009 remaining_xyz=[-0.0003, -0.0001, -0.0067]
+m10 z=0.0286 pitch=0.5 g=0.999 stop=reached named={'dy': 0.006, 'dz': -0.012} | ok: reached dist_m=0.012 remaining_xyz=[0.0, 0.0051, -0.009]
+m11 z=0.0286 pitch=0.5 g=0.05 stop=reached named={'gripper': 0.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0003, 0.0005, 0.0]
+m12 z=0.0286 pitch=0.5 g=0.728 stop=reached named={'gripper': 1.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0001, 0.0002, -0.0]
+m13 z=0.0277 pitch=0.4 g=0.973 stop=reached named={'dx': 0.02, 'gripper': 1.0} | ok: reached dist_m=0.012 remaining_xyz=[0.0082, -0.0003, 0.0009]
+m14 z=0.0273 pitch=0.4 g=0.981 stop=reached named={'dx': 0.02} | ok: reached dist_m=0.011 remaining_xyz=[0.0073, 0.0, 0.0004]
+m15 z=0.0279 pitch=0.4 g=0.05 stop=reached named={'gripper': 0.0} | ok: reached dist_m=0.000 remaining_xyz=[-0.0009, 0.0004, -0.0006]
+m16 z=0.028 pitch=0.5 g=0.728 stop=reached named={'gripper': 1.0} | ok: reached dist_m=0.000 remaining_xyz=[-0.0, 0.0, -0.0]
+m17 z=0.0147 pitch=0.5 g=0.973 stop=reached named={'dz': -0.02, 'gripper': 1.0} | ok: reached dist_m=0.009 remaining_xyz=[-0.0003, -0.0003, -0.0067]
+m18 z=0.0148 pitch=0.5 g=0.485 stop=reached named={'gripper': 0.0} | ok: reached dist_m=0.000 remaining_xyz=[-0.0, 0.0001, -0.0001]
+m19 z=0.0273 pitch=0.5 g=0.485 stop=reached named={'dz': 0.02, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0005, 0.0003, 0.0075]
+m20 z=0.1396 pitch=0.5 g=0.487 stop=reached named={'dz': 0.12, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0004, -0.0001, 0.0077]
+m21 z=0.2328 pitch=0.5 g=0.487 stop=reached named={'dz': 0.1, 'gripper': 0.0} | ok: reached dist_m=0.009 remaining_xyz=[0.0006, -0.0003, 0.0068]
+m22 z=0.2325 pitch=0.7 g=0.487 stop=reached named={'dy': 0.12, 'gripper': 0.0} | ok: reached dist_m=0.008 remaining_xyz=[0.001, 0.0044, 0.0003]
+m23 z=0.2311 pitch=0.8 g=0.487 stop=reached named={'dy': 0.12, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0025, 0.0051, 0.0014]
+m24 z=0.2302 pitch=0.6 g=0.487 stop=reached named={'dy': 0.12, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0019, 0.0058, 0.0009]
+m25 z=0.2348 pitch=-0.8 g=0.487 stop=reached named={'dx': 0.07, 'dy': 0.09, 'gripper': 0.0} | ok: reached dist_m=0.008 remaining_xyz=[-0.0033, -0.0016, -0.0047]
+m26 z=0.2413 pitch=-1.1 g=0.487 stop=reached named={'dx': 0.07, 'dy': 0.075, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[-0.0033, -0.0026, -0.0064]
+m27 z=0.166 pitch=1.0 g=0.487 stop=reached named={'dz': -0.08, 'gripper': 0.0} | ok: reached dist_m=0.008 remaining_xyz=[0.0031, 0.0016, -0.0047]
+m28 z=0.1504 pitch=0.6 g=0.487 stop=reached named={'dz': -0.02, 'gripper': 0.0} | ok: reached dist_m=0.008 remaining_xyz=[0.0028, 0.0015, -0.0045]
+m29 z=0.1503 pitch=0.5 g=0.568 stop=reached named={'gripper': 1.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0002, 0.0001, 0.0002]
+--- agent summary ---
+# Episode summary
+
+- 官方指令：pick up the butter and place it in the basket。
+- 场景：libero_object，task_id=6，init_id=0。
+- 官方最终 POST /move 返回 success=true；result.final_state.terminated=true。共29次移动、327物理步，剩余21次规划与273物理步。
+
+## 执行过程与反馈
+1. GET状态并读取双相机，执行+x 3cm轴探测。
+2. 从腕图文字辨认右后侧小包装为 CREAM BUTTER，分段-y移到其上方，逐步下降。
+3. 前两次闭合开口仅0.05，图像显示未夹住，未空夹搬运。重新张开，+x累计约2.4cm修正前后位置，再下降约1.3cm修正抓取高度。
+4. 在测得末端约(-0.109,-0.250,0.0148)闭合后开口0.485。小幅抬升时黄油跟随，腕图相对位置稳定，确认实际夹持。
+5. 抬到z约0.233，分段+y搬运越过瓶罐，随后+x、+y对齐篮口。下降到末端约(0.0248,0.2611,0.1504)后张开。
+6. 官方立即返回success=true；最终图像黄油在篮内。全程feedback为ok/reached，没有blocked/contact；ok本身不代表夹取成功。
+
+## Hindsight
+世界+x朝agentview BOTTOM，+y朝LEFT，+z向上。腕图中固定物体随+x运动向下、随-y运动向右。近距离腕图的夹持区域在图像下方，不是光学中心；只看物体横向居中会漏掉前后偏差。
+
+黄油可用复位朝下姿态夹短边，实际夹持开口约0.485，空夹约0.05。测得z约0.028仍偏高，z约0.015时夹住；此为本场景抓取末端高度，并非测得桌面高度。支撑面精确z未测量，不能当成0。黄油短边可容纳于全张开夹爪，近似4cm量级。小步移动常因约1.2cm到位阈值只执行一部分，必须比较实测状态，不能累计命令当实测位移。
+
+在z约0.23搬运足以越过本场景瓶罐与篮缘；篮口视觉对齐后在末端约(0.025,0.261,0.150)释放得到官方成功。所有搬运动作均显式保持gripper=0，释放才改为1。
+

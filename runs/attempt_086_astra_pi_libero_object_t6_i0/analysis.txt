@@ -1,0 +1,5 @@
+RUN attempt_086_astra_pi_libero_object_t6_i0
+success=None reason=None moves=None steps=None s=None
+instruction: None
+ctrl log: 5 steps.jsonl rows, 10 pngs under ctrl/
+--- moves ---

@@ -1,0 +1,78 @@
+RUN attempt_084_sol_libero_object_t0_i0
+success=True reason=success moves=50 steps=587 s=1969.28
+instruction: pick up the alphabet soup and place it in the basket
+ctrl log: 587 steps.jsonl rows, 1174 pngs under ctrl/
+--- moves ---
+m01 z=0.2465 pitch=0.7 g=0.953 stop=reached named={'dx': 0.03} | ok: reached dist_m=0.011 remaining_xyz=[0.0067, -0.0004, 0.0022]
+m02 z=0.247 pitch=0.2 g=0.98 stop=reached named={'dx': 0.1, 'dy': 0.025, 'gripper': 1.0} | ok: reached dist_m=0.008 remaining_xyz=[0.0035, -0.0004, -0.0005]
+m03 z=0.2473 pitch=0.1 g=0.987 stop=reached named={'dx': 0.1} | ok: reached dist_m=0.010 remaining_xyz=[0.0055, -0.0001, -0.0003]
+m04 z=0.2499 pitch=-0.4 g=0.991 stop=reached named={'dx': 0.06} | ok: reached dist_m=0.009 remaining_xyz=[0.0026, -0.0002, -0.0027]
+m05 z=0.157 pitch=-0.8 g=0.995 stop=reached named={'dz': -0.1} | ok: reached dist_m=0.012 remaining_xyz=[-0.008, -0.0005, -0.0071]
+m06 z=0.1205 pitch=1.5 g=0.997 stop=reached named={'dz': -0.04} | ok: reached dist_m=0.011 remaining_xyz=[0.0071, 0.0, -0.0035]
+m07 z=0.0991 pitch=1.3 g=0.998 stop=reached named={'dx': 0.015, 'dy': 0.008, 'dz': -0.02} | ok: reached dist_m=0.012 remaining_xyz=[0.0106, 0.0022, 0.0014]
+m08 z=0.0873 pitch=0.6 g=0.998 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.010 remaining_xyz=[-0.0024, -0.0002, -0.0082]
+m09 z=0.0744 pitch=0.7 g=0.999 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.009 remaining_xyz=[-0.0007, -0.0001, -0.0071]
+m10 z=0.0606 pitch=0.8 g=0.999 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.009 remaining_xyz=[0.0006, 0.0, -0.0062]
+m11 z=0.061 pitch=0.8 g=0.669 stop=reached named={'gripper': 0.0} | ok: reached dist_m=0.000 remaining_xyz=[-0.0001, -0.0004, -0.0003]
+m12 z=0.074 pitch=0.8 g=0.664 stop=reached named={'dz': 0.02, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[-0.0005, 0.0, 0.0069]
+m13 z=0.1649 pitch=1.0 g=0.657 stop=reached named={'dz': 0.1, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0009, -0.0001, 0.0091]
+m14 z=0.2557 pitch=1.0 g=0.65 stop=reached named={'dz': 0.1, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0012, -0.0001, 0.0092]
+m15 z=0.255 pitch=1.4 g=0.646 stop=reached named={'dx': -0.05, 'dy': 0.1, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0013, 0.0024, 0.0007]
+m16 z=0.2471 pitch=2.0 g=0.643 stop=reached named={'dx': -0.06, 'dy': 0.09, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0089, 0.006, 0.0079]
+m17 z=0.2455 pitch=1.0 g=0.642 stop=reached named={'dx': -0.025, 'dy': 0.03, 'gripper': 0.0} | ok: reached dist_m=0.009 remaining_xyz=[-0.0012, 0.0037, 0.0017]
+m18 z=0.2016 pitch=0.8 g=0.64 stop=reached named={'dz': -0.05, 'gripper': 0.0} | ok: reached dist_m=0.009 remaining_xyz=[-0.0002, -0.0, -0.0062]
+m19 z=0.1788 pitch=0.8 g=0.639 stop=reached named={'dz': -0.03, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0004, 0.0002, -0.0071]
+m20 z=0.1787 pitch=0.8 g=0.781 stop=reached named={'gripper': 1.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0001, -0.0001, 0.0001]
+m21 z=0.2324 pitch=0.8 g=0.973 stop=reached named={'dz': 0.06, 'gripper': 1.0} | ok: reached dist_m=0.009 remaining_xyz=[0.001, 0.0004, 0.0063]
+m22 z=0.2302 pitch=1.5 g=0.984 stop=reached named={'dx': -0.045, 'dy': -0.105, 'gripper': 1.0} | ok: reached dist_m=0.008 remaining_xyz=[0.0031, -0.004, 0.0022]
+m23 z=0.2253 pitch=2.1 g=0.99 stop=reached named={'dx': -0.04, 'dy': -0.11} | ok: reached dist_m=0.010 remaining_xyz=[0.0067, -0.0037, 0.0049]
+m24 z=0.2245 pitch=1.0 g=0.994 stop=reached named={'dy': -0.11} | ok: reached dist_m=0.007 remaining_xyz=[0.0016, -0.004, 0.0008]
+m25 z=0.2235 pitch=1.0 g=0.996 stop=reached named={'dy': -0.12} | ok: reached dist_m=0.011 remaining_xyz=[0.0021, -0.0071, 0.001]
+m26 z=0.1594 pitch=0.6 g=0.997 stop=reached named={'dy': -0.045, 'dz': -0.07} | ok: reached dist_m=0.008 remaining_xyz=[-0.0002, 0.0001, -0.006]
+m27 z=0.1157 pitch=0.9 g=0.998 stop=reached named={'dz': -0.05} | ok: reached dist_m=0.010 remaining_xyz=[0.0005, 0.0015, -0.0062]
+m28 z=0.1018 pitch=0.9 g=0.999 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.009 remaining_xyz=[0.0007, -0.0001, -0.0062]
+m29 z=0.0885 pitch=0.8 g=0.999 stop=reached named={'dz': -0.02} | ok: reached dist_m=0.009 remaining_xyz=[-0.0, -0.0001, -0.0066]
+m30 z=0.0883 pitch=0.8 g=0.05 stop=reached named={'gripper': 0.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0004, 0.0007, 0.0001]
+m31 z=0.0883 pitch=0.8 g=0.728 stop=reached named={'gripper': 1.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0001, 0.0003, 0.0]
+m32 z=0.0696 pitch=0.5 g=0.97 stop=reached named={'dx': -0.02, 'dz': -0.025} | ok: reached dist_m=0.011 remaining_xyz=[-0.0067, 0.0012, -0.0063]
+m33 z=0.0607 pitch=1.0 g=0.981 stop=reached named={'dx': -0.015, 'dy': 0.005, 'dz': -0.012} | ok: reached dist_m=0.010 remaining_xyz=[-0.0034, 0.0015, -0.003]
+m34 z=0.0612 pitch=0.8 g=0.643 stop=reached named={'gripper': 0.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0015, 0.0021, -0.0005]
+m35 z=0.0734 pitch=0.8 g=0.641 stop=reached named={'dz': 0.02, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0008, -0.0001, 0.0078]
+m36 z=0.1752 pitch=0.9 g=0.64 stop=reached named={'dz': 0.11, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0007, -0.0004, 0.0082]
+m37 z=0.2682 pitch=0.9 g=0.639 stop=reached named={'dz': 0.1, 'gripper': 0.0} | ok: reached dist_m=0.009 remaining_xyz=[0.0006, -0.0003, 0.007]
+m38 z=0.2695 pitch=0.7 g=0.638 stop=reached named={'dx': 0.03, 'dy': 0.115, 'gripper': 0.0} | ok: reached dist_m=0.010 remaining_xyz=[-0.001, 0.0047, -0.0012]
+m39 z=0.2699 pitch=0.7 g=0.027 stop=reached named={'dx': 0.03, 'dy': 0.115, 'gripper': 0.0} | ok: reached dist_m=0.008 remaining_xyz=[0.0001, 0.0037, -0.0004]
+m40 z=0.1577 pitch=1.1 g=0.93 stop=reached named={'dy': -0.035, 'dz': -0.12, 'gripper': 1.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0018, 0.0004, -0.0078]
+m41 z=0.0824 pitch=1.1 g=0.976 stop=reached named={'dx': 0.04, 'dy': -0.015, 'dz': -0.08, 'gripper': 1.0} | ok: reached dist_m=0.010 remaining_xyz=[0.0054, -0.0006, -0.0046]
+m42 z=0.0605 pitch=0.4 g=0.983 stop=reached named={'dx': 0.008, 'dy': -0.01, 'dz': -0.03, 'gripper': 1.0} | ok: reached dist_m=0.010 remaining_xyz=[-0.0024, -0.0009, -0.0082]
+m43 z=0.0612 pitch=0.7 g=0.787 stop=reached named={'gripper': 0.0} | ok: reached dist_m=0.000 remaining_xyz=[-0.0011, 0.0011, -0.0007]
+m44 z=0.1638 pitch=0.9 g=0.787 stop=reached named={'dz': 0.11, 'gripper': 0.0} | ok: reached dist_m=0.009 remaining_xyz=[0.0008, 0.0, 0.0074]
+m45 z=0.2347 pitch=0.9 g=0.788 stop=reached named={'dz': 0.08, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0008, -0.0, 0.009]
+m46 z=0.2346 pitch=0.8 g=0.788 stop=reached named={'dy': 0.105, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0007, 0.0044, 0.0002]
+m47 z=0.2335 pitch=0.8 g=0.788 stop=reached named={'dy': 0.105, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0021, 0.0043, 0.0011]
+m48 z=0.2354 pitch=0.2 g=0.788 stop=reached named={'dx': 0.035, 'dy': 0.11, 'gripper': 0.0} | ok: reached dist_m=0.009 remaining_xyz=[-0.001, 0.002, -0.0019]
+m49 z=0.1782 pitch=0.9 g=0.788 stop=reached named={'dz': -0.065, 'gripper': 0.0} | ok: reached dist_m=0.011 remaining_xyz=[0.0008, 0.0004, -0.0078]
+m50 z=0.1749 pitch=1.0 g=0.837 stop=reached named={'gripper': 1.0} | ok: reached dist_m=0.000 remaining_xyz=[0.0034, 0.001, 0.0033]
+--- agent summary ---
+# Episode summary
+
+- Official instruction: pick up the alphabet soup and place it in the basket.
+- Suite libero_object, task 0, init 0.
+- Final official HTTP result: **success=true**, result final_state terminated=true. Used 50 moves and 587 environment steps; 13 physical steps remained.
+
+## Attempts and outcome
+
+1. Probed +x by 3 cm and confirmed movement toward agentview BOTTOM.
+2. Initially misidentified the front red/green can as alphabet soup. Grasped it around measured eef z=0.061, verified that it followed the gripper, and placed it in the basket. Official success remained false. Re-examining the scene identified the blue rear-right can as the actual target.
+3. Approached the blue can. Closing at z=0.088 produced gripper_open=0.05: an empty/shallow grasp. Reopened, adjusted -x, and descended to approximately z=0.061. Closing then stopped around gripper_open=0.643 and lifting confirmed pickup.
+4. The first blue-can transport slipped: gripper_open fell to 0.027 and both images showed the can beside the dressing bottle. Stopped transport immediately and regrasped the observed new position.
+5. Regrasp near measured eef (-0.044,-0.076,0.061) produced gripper_open about 0.787. The can followed vertical lifts and remained stable during mostly pure +y transport. Moved over the basket, descended to eef z=0.178, and opened. Move 50 returned official success=true.
+
+## Feedback
+
+Moves generally returned ok/reached with residuals up to about 1.2 cm. No blocked/contact recovery was needed. Reached feedback alone did not establish a grasp: images and the measured jaw opening revealed the empty close and the later slip.
+
+## Hindsight
+
+世界 +x 朝 agentview 的 BOTTOM，+y 朝 LEFT，+z 向上。真正的 alphabet soup 是初始场景右后方的蓝色圆罐，前面的红绿罐不是目标。腕图与 agentview 横向相反；目标在腕图左侧时通常需要-y靠近。不同深度物体的像素中心不可直接当作相同平面位置：下降时罐盖投影会改变。支撑面的绝对z未直接测得，不能宣称z=0；本集罐侧壁有效抓取的末端高度约0.06，搬运末端高度0.235至0.268，篮上释放高度约0.175至0.178。篮附近成功末端xy约(-0.012,0.232)，这些是实际执行位置而非物体真值。闭合后每次抬升搬运均持续gripper=0；开口约0.64可表示夹住但仍可能滑落，约0.03表示已空。重抓后的约0.788开口更稳定，纯横向搬运比同时多轴快速改变更可靠。罐直径视觉约5至6厘米，开爪可跨两侧。先确认物体身份可节省大量预算。
+
